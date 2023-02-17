@@ -7,6 +7,7 @@ use App\Http\Controllers\EmployeController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CostController;
+use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Auth\LogoutController;
 /*
 |--------------------------------------------------------------------------
@@ -50,15 +51,35 @@ Route::group(['prefix' => 'customer','middleware'    => 'auth'],function(){
     Route::get('/modal',[CustomerController::class, 'modal']);
     Route::post('/',[CustomerController::class, 'store']);
 });
+Route::group(['prefix' => 'material','middleware'    => 'auth'],function(){
+    Route::get('/',[MaterialController::class, 'index']);
+    Route::get('/view',[MaterialController::class, 'view_data']);
+    Route::get('/getdata',[MaterialController::class, 'get_data']);
+    Route::get('/create',[MaterialController::class, 'create']);
+    Route::get('/delete',[MaterialController::class, 'delete']);
+    Route::get('/modal',[MaterialController::class, 'modal']);
+    Route::post('/',[MaterialController::class, 'store']);
+});
 Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::get('/',[ProjectController::class, 'index']);
     Route::get('/view',[ProjectController::class, 'view_data']);
+    Route::get('/form_send',[ProjectController::class, 'form_send']);
+    Route::get('/timeline',[ProjectController::class, 'timeline']);
     Route::get('/getdata',[ProjectController::class, 'get_data']);
     Route::get('/get_status_data',[ProjectController::class, 'get_status_data']);
+    Route::get('/getdatamaterial',[ProjectController::class, 'getdatamaterial']);
     Route::get('/create',[ProjectController::class, 'create']);
+    Route::get('/total_item',[ProjectController::class, 'total_item']);
+    Route::get('/tampil_material',[ProjectController::class, 'tampil_material']);
+    Route::get('/total_qty',[ProjectController::class, 'total_qty']);
     Route::get('/delete',[ProjectController::class, 'delete']);
+    Route::get('/delete_material',[ProjectController::class, 'delete_material']);
     Route::get('/modal',[ProjectController::class, 'modal']);
     Route::post('/',[ProjectController::class, 'store']);
+    Route::post('/kirim_komersil',[ProjectController::class, 'kirim_komersil']);
+    Route::post('/kembali_komersil',[ProjectController::class, 'kembali_komersil']);
+    Route::get('/kirim_procurement',[ProjectController::class, 'kirim_procurement']);
+    Route::post('/store_material',[ProjectController::class, 'store_material']);
 });
 
 Route::group(['middleware' => 'auth'], function() {

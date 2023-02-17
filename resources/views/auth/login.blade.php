@@ -32,7 +32,7 @@
 <body class="hold-transition login-page" style="background:url({{url_plug()}}/img/bgbg.jpg?v={{date('Ymdhis')}})">
 <div class="login-box">
   <div class="login-logo">
-    <img src="{{url_plug()}}/img/logo.png" width="100%">
+    <img src="{{url_plug()}}/img/logo.png?v={[date('ymdhis')}}" width="100%">
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body" style="background: #121111ad;">

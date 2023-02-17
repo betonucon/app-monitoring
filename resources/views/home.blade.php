@@ -90,7 +90,7 @@
             <!-- small box -->
             <div class="small-box bg-aqua">
                 <div class="inner">
-                    <h3>150</h3>
+                    <h3>{{count_project(1)}}</h3>
 
                     <p>Total Project</p>
                 </div>
@@ -105,9 +105,9 @@
             <!-- small box -->
             <div class="small-box bg-green">
                 <div class="inner">
-                    <h3>53<sup style="font-size: 20px">%</sup></h3>
+                    <h3>{{count_project(2)}}</h3>
 
-                    <p>Progres</p>
+                    <p>Progres Approval</p>
                 </div>
                 <div class="icon">
                     <i class="ion ion-pie-graph"></i>
@@ -120,9 +120,9 @@
             <!-- small box -->
             <div class="small-box bg-yellow">
                 <div class="inner">
-                    <h3>44</h3>
+                    <h3>{{count_project(3)}}</h3>
 
-                    <p>Selesai</p>
+                    <p>Pengerjaan</p>
                 </div>
                 <div class="icon">
                     <i class="ion ion-pie-graph"></i>
@@ -135,9 +135,9 @@
             <!-- small box -->
             <div class="small-box bg-red">
                 <div class="inner">
-                    <h3>65</h3>
+                    <h3>{{count_project(4)}}</h3>
 
-                    <p>Outstanding</p>
+                    <p>Selesai</p>
                 </div>
                 <div class="icon">
                     <i class="ion ion-pie-graph"></i>
@@ -147,23 +147,78 @@
             </div>
         </div>
         <div class="row">
-            <section class="col-lg-7 connectedSortable ui-sortable">
-                <div class="nav-tabs-custom" style="cursor: move;">
-            <!-- Tabs within a box -->
-                    <ul class="nav nav-tabs pull-right ui-sortable-handle">
-                    <li class="active"><a href="#revenue-chart" data-toggle="tab">Area</a></li>
-                    <li><a href="#sales-chart" data-toggle="tab">Donut</a></li>
-                    <li class="pull-left header"><i class="fa fa-inbox"></i> Sales</li>
-                    </ul>
-                    <div class="tab-content no-padding">
-              <!-- Morris chart - Sales -->
-                        <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 300px; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-                        </div>
-                        <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
-                        </div>
-                     </div>
+            <div class="col-md-8">
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                    <h3 class="box-title">Progres Project</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                    </div>
+                    </div>
+                    <div class="box-body">
+                    <div class="chart">
+                        <canvas id="barChart" style="height:430px"></canvas>
+                    </div>
+                    </div>
+                    <!-- /.box-body -->
                 </div>
-            </section>
+
+                <div class="box">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">List Project</h3>
+                  </div>
+                  <!-- /.box-header -->
+                  <div class="box-body">
+                    <table class="table table-bordered">
+                      <tbody>
+                        <tr>
+                          <th style="width: 5%">#</th>
+                          <th style="width: 18%">Cost Center</th>
+                          <th>Project</th>
+                          <th style="width: 20%">Status</th>
+                        </tr>
+                        @foreach(get_all_project() as $no=>$dr)
+                        <tr>
+                          <td>{{$no+1}}</td>
+                          <td>{{$dr->cost_center}}</td>
+                          <td><b>{{$dr->customer}}</b> <br>{{$dr->area}}</td>
+                          <td style="background:{{$dr->color}}">{{$dr->singkatan}}</td>
+                        </tr>
+                        @endforeach
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                </div>
+            </div>
+            <div class="col-md-4">
+              <div class="box box-success">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Progres Project</h3>
+
+                  <div class="box-tools pull-right">
+                      <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                      </button>
+                      <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                  </div>
+                </div>
+                <div class="box-body">
+                  @foreach(get_status() as $o)
+                    <div class="progress-group">
+                      <span class="progress-text">{{$o->status}}</span>
+                      <span class="progress-number"><b>{{count_status_project($o->id)}}</b>/{{count_all_project()}}</span>
+
+                      <div class="progress sm">
+                        <div class="progress-bar progress-bar-{{$o->color}}" style="width: {{round((100/count_all_project())*count_status_project($o->id))}}%"></div>
+                      </div>
+                    </div>
+                  @endforeach
+                </div>
+              </div>
+            </div>
         </div>
      
     </section>
@@ -171,10 +226,110 @@
 @endsection
 
 @push('ajax')
-<script src="{{url_plug()}}/bower_components/chart.js/Chart.js"></script>
+
 <!-- FastClick -->
 <!-- page script -->
 <script>
- 
+ $(function () {
+    /* ChartJS
+     * -------
+     * Here we will create a few charts using ChartJS
+     */
+
+    //--------------
+    //- AREA CHART -
+    //--------------
+
+    
+    var areaChartData = {
+      labels  : [
+            @foreach(get_status() as $o)
+
+                '{{$o->singkatan}}',
+            @endforeach
+        ],
+      datasets: [
+        {
+          label               : 'Progres Project',
+          fillColor           : 'rgba(210, 214, 222, 1)',
+          strokeColor         : 'rgba(210, 214, 222, 1)',
+          pointColor          : 'rgba(210, 214, 222, 1)',
+          pointStrokeColor    : '#c1c7d1',
+          pointHighlightFill  : '#fff',
+          options: {
+                animations: {
+                tension: {
+                    duration: 1000,
+                    easing: 'linear',
+                    from: 1,
+                    to: 0,
+                    loop: true
+                }
+                },
+                scales: {
+                y: { // defining min and max so hiding the dataset does not change scale range
+                    min: 0,
+                    max: 100
+                }
+                }
+            },
+          pointHighlightStroke: 'rgba(220,220,220,1)',
+          fillColor: [
+            @foreach(get_status() as $o)
+                '{{$o->color}}',
+            @endforeach
+          ],
+          strokeColor: [
+            @foreach(get_status() as $o)
+                '{{$o->color}}',
+            @endforeach
+          ],
+          data                : [
+            @foreach(get_status() as $o)
+                {{$o->total}},
+            @endforeach
+          ]
+        }
+      ]
+    }
+
+
+    
+    var barChartCanvas                   = $('#barChart').get(0).getContext('2d')
+    var barChart                         = new Chart(barChartCanvas)
+    var barChartData                     = areaChartData
+    var barChartOptions                  = {
+      //Boolean - Whether the scale should start at zero, or an order of magnitude down from the lowest value
+      scaleBeginAtZero        : true,
+      
+      
+      //Boolean - Whether grid lines are shown across the chart
+      scaleShowGridLines      : true,
+      //String - Colour of the grid lines
+      scaleGridLineColor      : 'rgba(0,0,0,.05)',
+      //Number - Width of the grid lines
+      scaleGridLineWidth      : 1,
+      //Boolean - Whether to show horizontal lines (except X axis)
+      scaleShowHorizontalLines: true,
+      //Boolean - Whether to show vertical lines (except Y axis)
+      scaleShowVerticalLines  : true,
+      //Boolean - If there is a stroke on each bar
+      barShowStroke           : true,
+      //Number - Pixel width of the bar stroke
+      barStrokeWidth          : 2,
+      //Number - Spacing between each of the X value sets
+      barValueSpacing         : 5,
+      //Number - Spacing between data sets within X values
+      barDatasetSpacing       : 1,
+      //String - A legend template
+      legendTemplate          : '<ul class="<%=name.toLowerCase()%>-legend"><% for (var i=0; i<datasets.length; i++){%><li><span style="background-color:<%=datasets[i].fillColor%>"></span><%if(datasets[i].label){%><%=datasets[i].label%><%}%></li><%}%></ul>',
+      //Boolean - whether to make the chart responsive
+      responsive              : true,
+      maintainAspectRatio     : true
+    }
+
+    barChartOptions.datasetFill = true
+    barChart.Bar(barChartData, barChartOptions)
+  })
 </script>      
 @endpush

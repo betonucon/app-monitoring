@@ -98,7 +98,7 @@
         <div class="box-body">
             <form class="form-horizontal" id="mydata" method="post" action="{{ url('project') }}" enctype="multipart/form-data" >
               @csrf
-              <input type="submit">
+              <!-- <input type="submit"> -->
               <input type="hidden" name="id" value="{{$id}}">
               <div class="row">
               
@@ -115,7 +115,7 @@
                         <div class="col-sm-2">
                           <div class="input-group">
                             <span class="input-group-addon" onclick="show_draft()"><i class="fa fa-search"></i></span>
-                            <input type="text" id="cost" name="cost" readonly class="form-control  input-sm" placeholder="0000">
+                            <input type="text" id="cost" name="cost" value="{{$data->cost}}" readonly class="form-control  input-sm" placeholder="0000">
                           </div>
                         </div>
                         <div class="col-sm-7">
@@ -174,10 +174,10 @@
                         <label for="inputEmail3" class="col-sm-2 control-label">Nilai Kontrak (Rp)</label>
 
                         <div class="col-sm-2">
-                          <input type="text"  id="nilai" name="nilai" value="" class="form-control  input-sm" placeholder="yyyy-mm-dd">
+                          <input type="text"  id="nilai" name="nilai"  class="form-control  input-sm" value="{{$data->nilai}}" placeholder="">
                         </div>
                         <div class="col-sm-7">
-                          <input type="text"  id="out" readonly name="terbilang" value="" class="form-control  input-sm" placeholder="yyyy-mm-dd">
+                          <input type="text"  id="out" readonly name="terbilang" value="{{$data->terbilang}}" class="form-control  input-sm" placeholder="">
                         </div>
                         
                         
@@ -366,5 +366,6 @@
                     }
                 });
         };
+        
     </script> 
 @endpush

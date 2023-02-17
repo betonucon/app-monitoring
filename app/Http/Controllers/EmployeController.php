@@ -171,6 +171,15 @@ class EmployeController extends Controller
                     'role_id'=>$request->role_id,
                     'active'=>1,
                 ]);
+                $data=User::UpdateOrcreate([
+                    'username'=>$request->nik,
+                ],[
+                    'name'=>$request->nama,
+                    'email'=>$request->nik.'@gmail.com',
+                    'password'=>Hash::make($request->nik),
+                    'role_id'=>$request->role_id,
+                    'active'=>1,
+                ]);
                 echo'@ok';
             }else{
                 $data=Employe::UpdateOrcreate([

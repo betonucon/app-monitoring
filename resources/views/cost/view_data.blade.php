@@ -94,7 +94,7 @@
         </div>
         
         <div class="box-body">
-            <form class="form-horizontal" id="mydata" method="post" action="{{ url('barang/upload') }}" enctype="multipart/form-data" >
+          <form class="form-horizontal" id="mydata" method="post" action="{{ url('barang/upload') }}" enctype="multipart/form-data" >
               @csrf
               <input type="hidden" name="id" value="{{$id}}">
               <div class="row">

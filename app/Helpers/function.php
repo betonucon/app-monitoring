@@ -4,7 +4,7 @@ function name(){
    return "PT.UCON BETON";
 }
 function alamat(){
-   return "Link Jombang Kali, Kel Masigit Kec Jombang";
+   return "Jl. Raya anyer kav A-0/1 kawasan industri Krakatau Warnasari, Kec. Citangkil, Kota Cilegon Banten 42443";
 }
 function email(){
    return "uconbeton@gmail.com";

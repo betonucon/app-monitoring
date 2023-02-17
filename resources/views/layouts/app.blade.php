@@ -113,6 +113,16 @@
           margin: 20px 0px 20px 40px;
           border-bottom: solid 2px #dadadf;
       }
+      #header-label-modal{
+          text-align: left;
+          font-family: inherit;
+          font-weight: 700;
+          padding: 0px 0px;
+          color: #77779b;
+          font-size: 16px;
+          margin: 20px 0px 20px 0px;
+          border-bottom: solid 2px #dadadf;
+      }
       .loadnya {
         height: 100%;
         width: 0;
@@ -134,6 +144,26 @@
         color:#fff;
         font-size:20px;
       }
+      .li-dashboard {
+          position: relative;
+          display: block;
+          padding: 3px 15px !important;
+      }
+      .table-responsive {
+          background: #f5f5ff;
+          min-height: 300px !important;
+          overflow-x: auto;
+      }
+      @media only screen and (min-width: 600px) {
+
+      }
+      @media only screen and (max-width: 590px) {
+        .table-responsive-mobile {
+          min-height: 300px !important;
+          overflow-x: auto;
+        }
+      }
+      
       .info-box-iconic {
         border-top-left-radius: 2px;
         border-top-right-radius: 0;
@@ -152,7 +182,7 @@
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<body class="hold-transition sidebar-mini skin-purple">
+<body class="hold-transition fixed sidebar-mini skin-purple">
 <div id="loadnya" class="loadnya">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
       <div class="loadnya-content">
@@ -166,7 +196,7 @@
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
       <div class="loadpage-content">
         
-            <img src="{{url_plug()}}/img/logo.png" width="10%"><br>
+            <img src="{{url_plug()}}/img/logo.png?v={[date('ymdhis')}}" width="20%"><br>
             <img src="{{url_plug()}}/img/loading.gif" width="10%">
         
       </div>
@@ -176,9 +206,7 @@
   <header class="main-header">
     <!-- Logo -->
     <a href="{{url_plug()}}/index2.html" class="logo">
-      <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>A</b>LT</span>
-      <!-- logo for regular state and mobile devices -->
       <span class="logo-lg"><b>E-PROM</b></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
@@ -196,13 +224,13 @@
           
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="{{url_plug()}}/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
+              <img src="{{url_plug()}}/img/akun.png" class="user-image" alt="User Image">
               <span class="hidden-xs">@ {{Auth::user()->name}}</span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="{{url_plug()}}/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+                <img src="{{url_plug()}}/dist/img/akun.png" class="img-circle" alt="User Image">
 
                 <p>
                   @ {{Auth::user()->name}} - Web Developer
@@ -250,7 +278,7 @@
       <!-- Sidebar user panel -->
       <div class="user-panel">
         <div class="pull-left image">
-          <img src="{{url_plug()}}/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
+          <img src="{{url_plug()}}/img/akun.png" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
           <p>@ {{Auth::user()->name}}</p>
@@ -498,6 +526,7 @@
 <script src="{{url_plug()}}/plugins/iCheck/icheck.min.js"></script>
 <!-- FastClick -->
 <script src="{{url_plug()}}/bower_components/fastclick/lib/fastclick.js"></script>
+
 <!-- AdminLTE App -->
 <script src="{{url_plug()}}/dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
