@@ -9,7 +9,7 @@
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
             </a>
-            <ul class="treeview-menu" style="display:@if((Request::is('employe')==1 || Request::is('employe/*')==1)|| (Request::is('customer')==1 || Request::is('customer/*')==1) || (Request::is('cost/*')==1 || Request::is('cost')==1) || (Request::is('material/*')==1 || Request::is('material')==1)) block @endif">
+            <ul class="treeview-menu" style="display:@if((Request::is('employe')==1 || Request::is('employe/*')==1)|| (Request::is('customer')==1 || Request::is('customer/*')==1) || (Request::is('cost/*')==1 || Request::is('cost')==1) ) block @endif">
               <li @if(Request::is('employe')==1 || Request::is('employe/*')==1) class="active" @endif ><a href="{{url('employe')}}">&nbsp;<i class="fa  fa-sort-down"></i> Employe</a></li>
               <li @if(Request::is('customer')==1 || Request::is('customer/*')==1) class="active" @endif><a href="{{url('customer')}}">&nbsp;<i class="fa  fa-sort-down"></i> Customer</a></li>
               <li @if(Request::is('cost')==1 || Request::is('cost/*')==1) class="active" @endif><a href="{{url('cost')}}">&nbsp;<i class="fa  fa-sort-down"></i> Cost</a></li>
