@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use App\Models\ViewEmploye;
 use App\Models\ViewProjectMaterial;
+use App\Models\ViewMaterial;
 use App\Models\Viewrole;
 use App\Models\Role;
 use App\Models\Customer;
@@ -69,7 +70,7 @@ class MaterialController extends Controller
     public function get_data(request $request)
     {
         error_reporting(0);
-        $query = Material::query();
+        $query = ViewMaterial::query();
         if($request->hide==1){
             $data = $query->where('active',0);
         }else{
@@ -81,6 +82,13 @@ class MaterialController extends Controller
             ->addColumn('seleksi', function ($row) {
                 $btn='<span class="btn btn-success btn-xs" onclick="pilih_material(`'.$row->kode_material.'`,`'.$row->nama_material.'`,`'.$row->harga.'`)">Pilih</span>';
                 return $btn;
+            })
+            ->addColumn('stok', function ($row) {
+                if($row->stok_keluar>$row->stok_masuk){
+                    return '<font color="red">'.($row->stok_masuk-$row->stok_keluar).'</font>';
+                }else{
+                    return '<font color="#000">'.($row->stok_masuk-$row->stok_keluar).'</font>';
+                }
             })
             ->addColumn('action', function ($row) {
                 if($row->active==1){
@@ -110,7 +118,7 @@ class MaterialController extends Controller
                 return $btn;
             })
             
-            ->rawColumns(['action','seleksi'])
+            ->rawColumns(['action','seleksi','stok'])
             ->make(true);
     }
 

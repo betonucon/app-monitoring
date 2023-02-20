@@ -46,6 +46,9 @@
                         { data: 'nama_material' },
                         { data: 'harga' },
                         { data: 'satuan' },
+                        { data: 'stok' },
+                        { data: 'stok_masuk' },
+                        { data: 'stok_keluar' },
                         
                       ],
                       
@@ -161,7 +164,10 @@
                             <th width="10%">Kode</th>
                             <th>Nama material</th>
                             <th width="15%">Harga</th>
-                            <th width="10%">Satuan</th>
+                            <th width="8%">Satuan</th>
+                            <th width="8%">Stok</th>
+                            <th width="8%">In</th>
+                            <th width="8%">Out</th>
                         </tr>
                     </thead>
                     
