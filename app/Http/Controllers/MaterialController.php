@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use App\Models\ViewEmploye;
+use App\Models\ViewProjectMaterial;
 use App\Models\Viewrole;
 use App\Models\Role;
 use App\Models\Customer;
@@ -24,6 +25,20 @@ class MaterialController extends Controller
         $template='top';
         
         return view('material.index',compact('template'));
+    }
+    public function index_masuk(request $request)
+    {
+        error_reporting(0);
+        $template='top';
+        
+        return view('material.index_masuk',compact('template'));
+    }
+    public function index_keluar(request $request)
+    {
+        error_reporting(0);
+        $template='top';
+        
+        return view('material.index_keluar',compact('template'));
     }
 
     public function view_data(request $request)
@@ -67,6 +82,45 @@ class MaterialController extends Controller
                 $btn='<span class="btn btn-success btn-xs" onclick="pilih_material(`'.$row->kode_material.'`,`'.$row->nama_material.'`,`'.$row->harga.'`)">Pilih</span>';
                 return $btn;
             })
+            ->addColumn('action', function ($row) {
+                if($row->active==1){
+                    $btn='
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Act <i class="fa fa-sort-desc"></i> 
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" onclick="location.assign(`'.url('material/view').'?id='.encoder($row->id).'`)">View</a></li>
+                                <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,`0`)">Hidden</a></li>
+                            </ul>
+                        </div>
+                    ';
+                }else{
+                    $btn='
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Act <i class="fa fa-sort-desc"></i> 
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,1)">Un Hidden</a></li>
+                            </ul>
+                        </div>
+                    ';
+                }
+                return $btn;
+            })
+            
+            ->rawColumns(['action','seleksi'])
+            ->make(true);
+    }
+
+    public function get_data_event(request $request)
+    {
+        error_reporting(0);
+        $query = ViewProjectMaterial::query();
+        $data = $query->where('status_material',$request->status)->orderBy('created_at','Asc')->get();
+
+        return Datatables::of($data)
             ->addColumn('action', function ($row) {
                 if($row->active==1){
                     $btn='

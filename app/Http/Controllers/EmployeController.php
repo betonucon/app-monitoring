@@ -91,7 +91,9 @@ class EmployeController extends Controller
     {
         $id=decoder($request->id);
         
+        $mst=Employe::where('id',$id)->first();
         $data=Employe::where('id',$id)->update(['active'=>$request->act]);
+        $user=User::where('username',$mst->nik)->update(['active'=>$request->act]);
     }
 
     public function get_role(request $request)
@@ -171,7 +173,7 @@ class EmployeController extends Controller
                     'role_id'=>$request->role_id,
                     'active'=>1,
                 ]);
-                $data=User::UpdateOrcreate([
+                $user=User::UpdateOrcreate([
                     'username'=>$request->nik,
                 ],[
                     'name'=>$request->nama,
@@ -188,6 +190,15 @@ class EmployeController extends Controller
                     'nama'=>$request->nama,
                     'jabatan_id'=>$request->jabatan_id,
                     'role_id'=>$request->role_id,
+                ]);
+
+                $user=User::UpdateOrcreate([
+                    'username'=>$request->nik,
+                ],[
+                    'name'=>$request->nama,
+                    'email'=>$request->nik.'@gmail.com',
+                    'role_id'=>$request->role_id,
+                    'active'=>1,
                 ]);
                 echo'@ok';
             }

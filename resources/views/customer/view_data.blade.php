@@ -66,6 +66,13 @@
                         </div>
                       </div>
                       <div class="form-group">
+                        <label for="inputEmail3" class="col-sm-3 control-label">Singkatan</label>
+
+                        <div class="col-sm-3">
+                          <input type="text" name="singkatan" class="form-control input-sm"  value="{{$data->singkatan}}" placeholder="Ketik...">
+                        </div>
+                      </div>
+                      <div class="form-group">
                         <label for="inputEmail3" class="col-sm-3 control-label">Alamat</label>
 
                         <div class="col-sm-9">

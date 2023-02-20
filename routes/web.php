@@ -53,8 +53,11 @@ Route::group(['prefix' => 'customer','middleware'    => 'auth'],function(){
 });
 Route::group(['prefix' => 'material','middleware'    => 'auth'],function(){
     Route::get('/',[MaterialController::class, 'index']);
+    Route::get('/masuk',[MaterialController::class, 'index_masuk']);
+    Route::get('/keluar',[MaterialController::class, 'index_keluar']);
     Route::get('/view',[MaterialController::class, 'view_data']);
     Route::get('/getdata',[MaterialController::class, 'get_data']);
+    Route::get('/getdataevent',[MaterialController::class, 'get_data_event']);
     Route::get('/create',[MaterialController::class, 'create']);
     Route::get('/delete',[MaterialController::class, 'delete']);
     Route::get('/modal',[MaterialController::class, 'modal']);

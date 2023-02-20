@@ -176,15 +176,17 @@
                       <tbody>
                         <tr>
                           <th style="width: 5%">#</th>
-                          <th style="width: 18%">Cost Center</th>
+                          <th style="width: 12%">Cost</th>
+                          <th style="width: 12%">Customer</th>
                           <th>Project</th>
                           <th style="width: 20%">Status</th>
                         </tr>
                         @foreach(get_all_project() as $no=>$dr)
-                        <tr>
+                        <tr @if($dr->outstanding>0) style="background:#ef9898" @endif>
                           <td>{{$no+1}}</td>
                           <td>{{$dr->cost_center}}</td>
-                          <td><b>{{$dr->customer}}</b> <br>{{$dr->area}}</td>
+                          <td><b>{{$dr->singkatan_customer}}</b></td>
+                          <td>{{$dr->area}}</td>
                           <td style="background:{{$dr->color}}">{{$dr->singkatan}}</td>
                         </tr>
                         @endforeach

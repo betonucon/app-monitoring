@@ -686,6 +686,8 @@ class ProjectController extends Controller
                 ],[
                     'qty'=>$request->qty,
                     'nama_material'=>$mst->nama_material,
+                    'status_material'=>2,
+                    'created_at'=>date('Y-m-d H:i:s'),
                 ]);
 
                 echo'@ok';

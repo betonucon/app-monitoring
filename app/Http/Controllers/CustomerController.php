@@ -160,6 +160,7 @@ class CustomerController extends Controller
                 
                     $data=Customer::create([
                         'customer_code'=>penomoran_customer(),
+                        'singkatan'=>$request->singkatan,
                         'alamat'=>$request->alamat,
                         'active'=>1,
                         'customer'=>$request->customer,
@@ -172,6 +173,7 @@ class CustomerController extends Controller
                 ],[
                     'alamat'=>$request->alamat,
                     'customer'=>$request->customer,
+                    'singkatan'=>$request->singkatan,
                 ]);
                 echo'@ok';
             }
