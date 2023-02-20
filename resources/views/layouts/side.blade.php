@@ -51,4 +51,7 @@
         @if(Auth::user()->role_id==5)
           <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Project Control</span></a></li>
         @endif
+        @if(Auth::user()->role_id==6)
+          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Project Control</span></a></li>
+        @endif
       </ul>
