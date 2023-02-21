@@ -17,7 +17,6 @@ use App\Models\HeaderProject;
 use App\Models\ViewHeaderProject;
 use App\Models\ProjectMaterial;
 use App\Models\ViewProjectMaterial;
-use App\Models\ProjectRisiko;
 use App\Models\Material;
 use App\Models\LogPengajuan;
 use App\Models\ViewCost;
@@ -35,14 +34,12 @@ class ProjectController extends Controller
         }
         elseif(Auth::user()->role_id==4){
             return view('project.index_komersil',compact('template'));
-        }elseif(Auth::user()->role_id==7){
-            return view('project.index_operasional',compact('template'));
         }elseif(Auth::user()->role_id==5){
             return view('project.index_procurement',compact('template'));
         }elseif(Auth::user()->role_id==2){
-            return view('project.index_direktur_operasional',compact('template'));
+            return view('project.index_komersil',compact('template'));
         }elseif(Auth::user()->role_id==3){
-            return view('project.index_mgr_operasional',compact('template'));
+            return view('project.index_komersil',compact('template'));
         }else{
             return view('error');
         }
@@ -59,18 +56,15 @@ class ProjectController extends Controller
         
         if($id==0){
             $disabled='';
-            $nom=1;
         }else{
             $disabled='readonly';
-            $connomor=ProjectRisiko::where('project_header_id',$id)->count();
-            $nom=($connomor+1);
         }
         if(Auth::user()->role_id==6){
             if($data->status_id==1){
-                return view('project.view_data',compact('template','data','disabled','id','nom'));
+                
             }else{
                 if($id==0){
-                    return view('project.view_data',compact('template','data','disabled','id','nom'));
+                    return view('project.view_data',compact('template','data','disabled','id'));
                 }else{
                     return view('project.view',compact('template','data','disabled','id'));
                 }
@@ -79,31 +73,7 @@ class ProjectController extends Controller
         }
         if(Auth::user()->role_id==4){
             if($data->status_id==2){
-                return view('project.view_approve_komersil',compact('template','data','disabled','id'));
-            }else{
-                return view('project.view',compact('template','data','disabled','id'));
-                
-            }
-        }
-        if(Auth::user()->role_id==7){
-            if($data->status_id==3){
-                return view('project.view_approve_operasional',compact('template','data','disabled','id'));
-            }else{
-                return view('project.view',compact('template','data','disabled','id'));
-                
-            }
-        }
-        if(Auth::user()->role_id==3){
-            if($data->status_id==4){
-                return view('project.view_approve_mgr_operasional',compact('template','data','disabled','id'));
-            }else{
-                return view('project.view',compact('template','data','disabled','id'));
-                
-            }
-        }
-        if(Auth::user()->role_id==2){
-            if($data->status_id==5){
-                return view('project.view_approve_direktur_operasional',compact('template','data','disabled','id'));
+                return view('project.view_proses',compact('template','data','disabled','id'));
             }else{
                 return view('project.view',compact('template','data','disabled','id'));
                 
@@ -209,7 +179,7 @@ class ProjectController extends Controller
             if($request->status_id!=""){
                 $data = $query->where('status_id',$request->status_id);
             }else{
-                $data = $query->where('status_id','>',4);
+                $data = $query->where('status_id','>',1);
             }
         }
         if(Auth::user()->role_id==3){
@@ -223,7 +193,7 @@ class ProjectController extends Controller
             if($request->status_id!=""){
                 $data = $query->where('status_id',$request->status_id);
             }else{
-                $data = $query->where('status_id','>',2);
+                $data = $query->where('status_id','>',1);
             }
         }
         if(Auth::user()->role_id==8){
@@ -248,7 +218,7 @@ class ProjectController extends Controller
                                     if($row->status_id==1){
                                         $btn.='
                                         <li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($row->id).'`)">View</a></li>
-                                        <li><a href="javascript:;"  onclick="send_data_to(`'.encoder($row->id).'`,`0`)">Send Komersil</a></li>
+                                        <li><a href="javascript:;"  onclick="send_data(`'.encoder($row->id).'`,`0`)">Send Komersil</a></li>
                                         <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,`0`)">Hidden</a></li>
                                         ';
                                     }else{
@@ -340,33 +310,6 @@ class ProjectController extends Controller
         }
         return response()->json($success, 200);
     }
-
-    public function tampil_risiko(request $request)
-    {
-        $act='';
-        foreach(get_risiko($request->id) as $no=>$o){
-            $act.='
-            <tr style="background:#fff">
-                <td>'.($no+1).'</td>
-                <td>'.$o->risiko.'</td>
-                <td><span class="btn btn-danger btn-xs" onclick="delete_risiko('.$o->id.')"><i class="fa fa-close"></i></span></td>
-            </tr>';
-        }
-        return $act;
-    }
-
-    public function tampil_risiko_view(request $request)
-    {
-        $act='';
-        foreach(get_risiko($request->id) as $no=>$o){
-            $act.='
-            <tr style="background:#fff">
-                <td>'.($no+1).'</td>
-                <td>'.$o->risiko.'</td>
-            </tr>';
-        }
-        return $act;
-    }
     public function total_item(request $request)
     {
         $id=decoder($request->id);
@@ -413,13 +356,6 @@ class ProjectController extends Controller
         $data=HeaderProject::where('id',$id)->update(['active'=>$request->act]);
     }
 
-    public function delete_risiko(request $request)
-    {
-        $id=$request->id;
-        
-        $data=ProjectRisiko::where('id',$id)->delete();
-    }
-
     public function delete_material(request $request)
     {
         $id=decoder($request->id);
@@ -432,35 +368,40 @@ class ProjectController extends Controller
         $rules = [];
         $messages = [];
         
-        
-        $rules['customer_code']= 'required';
-        $messages['customer_code.required']= 'Pilih  customer ';
-       
-        $rules['deskripsi_project']= 'required';
-        $messages['deskripsi_project.required']= 'Masukan Ruang Lingkup Project';
-        
-        $rules['start_date']= 'required';
-        $messages['start_date.required']= 'Masukan start date ';
-
-        $rules['end_date']= 'required';
-        $messages['end_date.required']= 'Masukan end date ';
-        if($request->id==0){
-            $countrisiko=count($request->risiko);
-            $totcr=0;
-            for($x=0;$x<$countrisiko;$x++){
-                if($request->risiko[$x]==""){
-                    $totcr+=0;
-                }else{
-                    $totcr+=1;
-                }
-            }
-            if($totcr<1){
-                $rules['msg']= 'required';
-                $messages['msg.required']= 'Masukan risiko pekerjaan ';
-            }else{
-                
+        if($request->id=='0'){
+            $rules['cost']= 'required';
+            $messages['cost.required']= 'Pilih header cost ';
+            
+            $rules['customer_code']= 'required';
+            $messages['customer_code.required']= 'Pilih header customer ';
+            
+            $rules['file']= 'required|mimes:pdf';
+            $messages['file.required']= 'Upload file kontrak';
+        }else{
+            if($request->file!=""){
+                $rules['file']= 'required|mimes:pdf';
+                $messages['file.required']= 'Upload file kontrak';
             }
         }
+        
+        $rules['deskripsi_project']= 'required';
+        $messages['deskripsi_project.required']= 'Masukan deskripsi kontrak';
+        
+        $rules['start_date']= 'required';
+        $messages['start_date.required']= 'Masukan start date kontrak';
+
+        $rules['end_date']= 'required';
+        $messages['end_date.required']= 'Masukan end date kontrak';
+        
+        
+        
+        $rules['nilai']= 'required|min:0|not_in:0';
+        $messages['nilai.required']= 'Masukan nilai kontrak';
+        $messages['nilai.not_in']= 'Masukan nilai kontrak';
+        
+        $rules['terbilang']= 'required';
+        $messages['terbilang.required']= 'Masukan terbilang';
+
        
         $validator = Validator::make($request->all(), $rules, $messages);
         $val=$validator->Errors();
@@ -477,99 +418,110 @@ class ProjectController extends Controller
             echo'</div></div>';
         }else{
             if($request->id=='0'){
-                
-                
-                $data=HeaderProject::create([
-                    'customer_code'=>$request->customer_code,
-                    'deskripsi_project'=>$request->deskripsi_project,
-                    'start_date'=>$request->start_date,
-                    'end_date'=>$request->end_date,
-                    'username'=>Auth::user()->username,
-                    'active'=>1,
-                    'status_id'=>1,
-                    'create'=>date('Y-m-d H:i:s'),
-                ]);
-
-                for($x=0;$x<$countrisiko;$x++){
-                    if($request->risiko[$x]!=""){
-                        $ris=ProjectRisiko::create([
-                            'risiko'=>$request->risiko[$x],
-                            'project_header_id'=>$data->id,
-                            'urut'=>($x+1),
-                        ]);
-                    }
+                $penomoran=penomoran_cost_center($request->cost);
+                $cek=HeaderProject::where('cost_center',$penomoran)->count();
+                if($cek>0){
+                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Cost Center '.test_penomoran_cost_center($request->cost).' sudah terdaftar</div>';
+                }else{
                     
+                    $thumbnail = $request->file;
+                    $thumbnailFileName =$penomoran.'-'.date('ymdhis').'.'.$thumbnail->getClientOriginalExtension();
+                    $thumbnailPath =$thumbnailFileName;
+
+                    $file =\Storage::disk('public_uploads');
+                    if($file->put($thumbnailPath, file_get_contents($thumbnail))){
+                        $data=HeaderProject::create([
+                            'cost'=>$request->cost,
+                            'cost_center'=>$penomoran,
+                            'customer_code'=>$request->cost,
+                            'deskripsi_project'=>$request->deskripsi_project,
+                            'start_date'=>$request->start_date,
+                            'end_date'=>$request->end_date,
+                            'username'=>Auth::user()->username,
+                            'terbilang'=>$request->terbilang,
+                            'nilai'=>ubah_uang($request->nilai),
+                            'file_kontrak'=>$thumbnailPath,
+                            'active'=>1,
+                            'status_id'=>1,
+                            'create'=>date('Y-m-d H:i:s'),
+                        ]);
+
+                        $log=LogPengajuan::create([
+                            'cost_center'=>$penomoran,
+                            'project_header_id'=>$data->id,
+                            'deskripsi'=>'Pengajuan baru dengan cost center '.$penomoran,
+                            'status_id'=>1,
+                            'nik'=>Auth::user()->username,
+                            'role_id'=>Auth::user()->role_id,
+                            'revisi'=>1,
+                            'created_at'=>date('Y-m-d H:i:s'),
+                        ]);
+                        echo'@ok';
+                    }
                 }
-                $log=LogPengajuan::create([
-                    'cost_center'=>null,
-                    'project_header_id'=>$data->id,
-                    'deskripsi'=>'Rencana Pekerjaan baru',
-                    'status_id'=>1,
-                    'nik'=>Auth::user()->username,
-                    'role_id'=>Auth::user()->role_id,
-                    'revisi'=>1,
-                    'created_at'=>date('Y-m-d H:i:s'),
-                ]);
-                echo'@ok';
-                   
-                
             }else{
-                $con=ProjectRisiko::where('project_header_id',$request->id)->count();
                 $mst=HeaderProject::where('id',$request->id)->first();
                 $data=HeaderProject::UpdateOrcreate([
                     'id'=>$request->id,
                 ],[
-                    'customer_code'=>$request->customer_code,
                     'deskripsi_project'=>$request->deskripsi_project,
                     'start_date'=>$request->start_date,
                     'end_date'=>$request->end_date,
                     'username'=>Auth::user()->username,
+                    'terbilang'=>$request->terbilang,
+                    'nilai'=>ubah_uang($request->nilai),
                     'update'=>date('Y-m-d H:i:s'),
                 ]);
 
-                $countrisiko=count($request->risiko);
-                for($x=0;$x<$countrisiko;$x++){
-                    if($request->risiko[$x]!=""){
-                        $ris=ProjectRisiko::create([
-                            'risiko'=>$request->risiko[$x],
-                            'project_header_id'=>$request->id,
-                            'urut'=>($con+($x+1)),
-                        ]);
-                    }
-                    
-                }
                 $log=LogPengajuan::create([
+                    'cost_center'=>$mst['cost_center'],
                     'project_header_id'=>$request->id,
-                    'deskripsi'=>'Perubahan Rencana pekerjaan',
+                    'deskripsi'=>'Perubahan cost center '.$mst['cost_center'],
                     'status_id'=>1,
                     'nik'=>Auth::user()->username,
                     'role_id'=>Auth::user()->role_id,
                     'revisi'=>1,
                     'created_at'=>date('Y-m-d H:i:s'),
                 ]);
-                echo'@ok';
+                if($request->file!=""){
+                    $thumbnail = $request->file;
+                    $thumbnailFileName =$mst['cost_center'].'.'.$thumbnail->getClientOriginalExtension();
+                    $thumbnailPath =$thumbnailFileName;
+
+                    $file =\Storage::disk('public_uploads');
+                    if($file->put($thumbnailPath, file_get_contents($thumbnail))){
+                        $data=HeaderProject::UpdateOrcreate([
+                            'id'=>$request->id,
+                        ],[
+                            'file_kontrak'=>$thumbnailPath,
+                            'username'=>Auth::user()->username,
+                        ]);
+                        echo'@ok';
+                    }
+                }else{
+                    
+                    echo'@ok';
+                }
                 
             }
            
         }
     }
 
-    public function approve_kadis_komersil(request $request){
+    public function kirim_komersil(request $request){
         error_reporting(0);
         $rules = [];
         $messages = [];
         
         
-        $rules['status_id']= 'required';
-        $messages['status_id.required']= 'Pilih  status approve ';
+        $rules['nik']= 'required';
+        $messages['nik.required']= 'Pilih petugas dari div komersil';
+        
+        $rules['catatan']= 'required';
+        $messages['catatan.required']= 'Masukan catatan';
+
+
        
-        if($request->status_id==1){
-            $rules['catatan']= 'required';
-            $messages['catatan.required']= 'Masukan alasan pengembalian';
-        }else{
-
-        }
-
         $validator = Validator::make($request->all(), $rules, $messages);
         $val=$validator->Errors();
 
@@ -584,217 +536,31 @@ class ProjectController extends Controller
                 }
             echo'</div></div>';
         }else{
+            
+                $mst=HeaderProject::where('id',$request->id)->first();
                 $data=HeaderProject::UpdateOrcreate([
                     'id'=>$request->id,
                 ],[
-                    'status_id'=>$request->status_id,
-                    'approve_kadis_komersil'=>date('Y-m-d H:i:s'),
+                    'status_id'=>(((int)$mst->status_id)+1),
+                    'nik_komersil'=>$request->nik,
+                    'tgl_send_komersil'=>date('Y-m-d H:i:s'),
                     'update'=>date('Y-m-d H:i:s'),
                 ]);
 
-                if($request->status_id==1){
-                    $catatan=$request->catatan;
-                    $revisi=2;
-                }else{
-                    $catatan='Pengajuan telah disetujui ke kadis komersil';
-                    $revisi=1;
-                }
                 $log=LogPengajuan::create([
+                    'cost_center'=>$mst['cost_center'],
                     'project_header_id'=>$request->id,
-                    'deskripsi'=>$catatan,
-                    'status_id'=>$request->status_id,
+                    'deskripsi'=>$request->catatan,
+                    'status_id'=>(((int)$mst->status_id)+1),
                     'nik'=>Auth::user()->username,
                     'role_id'=>Auth::user()->role_id,
-                    'revisi'=>$revisi,
+                    'revisi'=>1,
                     'created_at'=>date('Y-m-d H:i:s'),
                 ]);
                 echo'@ok';
-        }
                
-        
-        
-    }
-
-    public function approve_kadis_operasional(request $request){
-        error_reporting(0);
-        $rules = [];
-        $messages = [];
-        
-        
-        $rules['status_id']= 'required';
-        $messages['status_id.required']= 'Pilih  status approve ';
-       
-        if($request->status_id==1){
-            $rules['catatan']= 'required';
-            $messages['catatan.required']= 'Masukan alasan pengembalian';
-        }else{
-
+           
         }
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-        $val=$validator->Errors();
-
-
-        if ($validator->fails()) {
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-                foreach(parsing_validator($val) as $value){
-                    
-                    foreach($value as $isi){
-                        echo'-&nbsp;'.$isi.'<br>';
-                    }
-                }
-            echo'</div></div>';
-        }else{
-                $data=HeaderProject::UpdateOrcreate([
-                    'id'=>$request->id,
-                ],[
-                    'status_id'=>$request->status_id,
-                    'approve_kadis_operasional'=>date('Y-m-d H:i:s'),
-                    'update'=>date('Y-m-d H:i:s'),
-                ]);
-
-                if($request->status_id==1){
-                    $catatan=$request->catatan;
-                    $revisi=2;
-                }else{
-                    $catatan='Pengajuan telah disetujui ke kadis operasional';
-                    $revisi=1;
-                }
-                $log=LogPengajuan::create([
-                    'project_header_id'=>$request->id,
-                    'deskripsi'=>$catatan,
-                    'status_id'=>$request->status_id,
-                    'nik'=>Auth::user()->username,
-                    'role_id'=>Auth::user()->role_id,
-                    'revisi'=>$revisi,
-                    'created_at'=>date('Y-m-d H:i:s'),
-                ]);
-                echo'@ok';
-        }
-               
-        
-        
-    }
-
-    public function approve_mgr_operasional(request $request){
-        error_reporting(0);
-        $rules = [];
-        $messages = [];
-        
-        
-        $rules['status_id']= 'required';
-        $messages['status_id.required']= 'Pilih  status approve ';
-       
-        if($request->status_id==1){
-            $rules['catatan']= 'required';
-            $messages['catatan.required']= 'Masukan alasan pengembalian';
-        }else{
-
-        }
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-        $val=$validator->Errors();
-
-
-        if ($validator->fails()) {
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-                foreach(parsing_validator($val) as $value){
-                    
-                    foreach($value as $isi){
-                        echo'-&nbsp;'.$isi.'<br>';
-                    }
-                }
-            echo'</div></div>';
-        }else{
-                $data=HeaderProject::UpdateOrcreate([
-                    'id'=>$request->id,
-                ],[
-                    'status_id'=>$request->status_id,
-                    'approve_mgr_operasional'=>date('Y-m-d H:i:s'),
-                    'update'=>date('Y-m-d H:i:s'),
-                ]);
-
-                if($request->status_id==1){
-                    $catatan=$request->catatan;
-                    $revisi=2;
-                }else{
-                    $catatan='Pengajuan telah disetujui ke manager operasional';
-                    $revisi=1;
-                }
-                $log=LogPengajuan::create([
-                    'project_header_id'=>$request->id,
-                    'deskripsi'=>$catatan,
-                    'status_id'=>$request->status_id,
-                    'nik'=>Auth::user()->username,
-                    'role_id'=>Auth::user()->role_id,
-                    'revisi'=>$revisi,
-                    'created_at'=>date('Y-m-d H:i:s'),
-                ]);
-                echo'@ok';
-        }
-               
-        
-        
-    }
-
-    public function approve_direktur_operasional(request $request){
-        error_reporting(0);
-        $rules = [];
-        $messages = [];
-        
-        
-        $rules['status_id']= 'required';
-        $messages['status_id.required']= 'Pilih  status approve ';
-       
-        if($request->status_id==1){
-            $rules['catatan']= 'required';
-            $messages['catatan.required']= 'Masukan alasan pengembalian';
-        }else{
-
-        }
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-        $val=$validator->Errors();
-
-
-        if ($validator->fails()) {
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-                foreach(parsing_validator($val) as $value){
-                    
-                    foreach($value as $isi){
-                        echo'-&nbsp;'.$isi.'<br>';
-                    }
-                }
-            echo'</div></div>';
-        }else{
-                $data=HeaderProject::UpdateOrcreate([
-                    'id'=>$request->id,
-                ],[
-                    'status_id'=>$request->status_id,
-                    'approve_direktur_operasional'=>date('Y-m-d H:i:s'),
-                    'update'=>date('Y-m-d H:i:s'),
-                ]);
-
-                if($request->status_id==1){
-                    $catatan=$request->catatan;
-                    $revisi=2;
-                }else{
-                    $catatan='Pengajuan telah disetujui ke direktur operasional';
-                    $revisi=1;
-                }
-                $log=LogPengajuan::create([
-                    'project_header_id'=>$request->id,
-                    'deskripsi'=>$catatan,
-                    'status_id'=>$request->status_id,
-                    'nik'=>Auth::user()->username,
-                    'role_id'=>Auth::user()->role_id,
-                    'revisi'=>$revisi,
-                    'created_at'=>date('Y-m-d H:i:s'),
-                ]);
-                echo'@ok';
-        }
-               
-        
         
     }
 

@@ -43,14 +43,11 @@
                         },
                         
                         { data: 'action' },
-                        { data: 'file' },
                         { data: 'timeline' },
-                        { data: 'cost_center' },
                         { data: 'customer' },
+                        { data: 'deskripsi_project' },
                         { data: 'start_date' },
                         { data: 'end_date' },
-                        { data: 'selisih' },
-                        { data: 'area' },
                         { data: 'status_now' },
                         
                       ],
@@ -192,20 +189,17 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="122%" class="cell-border display">
+                <table id="data-table-fixed-header" width="100%" class="cell-border display">
                     <thead>
                         <tr>
                             <th width="5%">No</th>
                             
-                            <th width="4%"></th>
-                            <th width="4%">File</th>
-                            <th width="4%">Log</th>
-                            <th width="10%">Cost Center</th>
+                            <th width="5%"></th>
+                            <th width="5%"></th>
                             <th width="18%">Customer</th>
+                            <th >Ruang Lingkup</th>
                             <th width="10%">Start</th>
                             <th width="10%">End</th>
-                            <th width="7%">T.Hari</th>
-                            <th >Area</th>
                             <th width="10%">Status</th>
                         </tr>
                     </thead>
@@ -352,6 +346,41 @@
                         });
                       }
                       $("#tampil-dashboard-role").load(); 
+                } else {
+                    
+                }
+            });
+            
+        } 
+      function send_data_to(id){
+            
+            swal({
+                title: "Yakin akan mengirim data keporses berikutnya ?",
+                text: "",
+                type: "warning",
+                icon: "info",
+                showCancelButton: true,
+                align:"center",
+                confirmButtonClass: "btn-info",
+                confirmButtonText: "Yes, cancel it!",
+                closeOnConfirm: false
+            }).then((willDelete) => {
+                if (willDelete) {
+                      
+                        $.ajax({
+                            type: 'GET',
+                            url: "{{url('project/kirim_kadis_komersil')}}",
+                            data: "id="+id,
+                            success: function(msg){
+                                swal("Success! berhasil terkirim!", {
+                                    icon: "success",
+                                });
+                                var tables=$('#data-table-fixed-header').DataTable();
+                                    tables.ajax.url("{{ url('project/getdata')}}").load();
+                            }
+                        });
+                    
+                      
                 } else {
                     
                 }

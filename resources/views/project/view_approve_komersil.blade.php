@@ -101,12 +101,6 @@
                             
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">CreateBy</label>
-                              <div class="col-sm-5">
-                              <input  class="form-control input-sm" disabled  value="{{$data->createby}}" placeholder="Ketik..." >
-                            </div>
-                          </div>
-                          <div class="form-group">
                             <label for="inputEmail3" class="col-sm-2 control-label">Progress</label>
 
                             <div class="col-sm-5">
@@ -156,7 +150,8 @@
         <div class="box-footer">
         
             <div class="btn-group">
-              <button type="button" class="btn btn-danger btn-sm" onclick="location.assign(`{{url('project')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="location.assign(`{{url('project')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
+              <button type="button" class="btn btn-sm btn-primary" onclick="approve_data()"><i class="fa  fa-check-square"></i> Approve</button>
             </div>
                  
         </div>
@@ -165,21 +160,68 @@
      
 
     </section>
-      <div class="modal fade" id="modal-draf" style="display: none;">
-        <div class="modal-dialog">
+    
+    <div class="modal file" id="modal-approve" style="display: none;">
+        <div class="modal-dialog" style="max-width:70%">
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">×</span></button>
-              <h4 class="modal-title">Header Cost</h4>
+              <h4 class="modal-title">Konfirmasi / Approve</h4>
             </div>
-            <div class="modal-body">
-              
-                
-              
+            <div class="modal-body" style="padding: 0px 25px">
+              <form class="form-horizontal" id="mydataapprove" method="post" action="{{ url('project/approve_kadis_komersil') }}" enctype="multipart/form-data" >
+                  @csrf
+                  <input type="hidden" name="id" value="{{$id}}">
+                  <div class="row">
+                  
+                    <div class="col-md-12">
+                      
+                        <div class="box-body">
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label-modal"><i class="fa fa-bars"></i> Approval</label>
+
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Status Approve</label>
+
+                            <div class="col-sm-8">
+                              <div class="input-group">
+                                <span class="input-group-addon" ><i class="fa  fa-chevron-down"></i></span>
+                                <select name="status_id" onchange="pilih_status(this.value)" class="form-control  input-sm" placeholder="0000">
+                                  <option value="">Pilih------</option>
+                                  <option value="3">Setujui</option>
+                                  <option value="1">Kembalikan</option>
+                                  
+                                </select>
+                              </div>
+                            </div>
+                            
+                          </div>
+                          
+                          <div class="form-group" id="tampil-catatan" style="margin-top:1%">
+                            <label for="inputEmail3" class="col-sm-3 control-label">Alasan Kembalian</label>
+                            <div class="col-sm-8">
+                              <textarea  class="form-control input-sm" name="catatan" placeholder="ketik disini....."  rows="5"></textarea>
+                            </div>
+                          </div>
+                          
+                          
+                        </div>
+                        <!-- /.box-body -->
+                        
+                        <!-- /.box-footer -->
+                      
+                    </div>
+                    
+                    
+                  </div>
+              </form>
+               
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Tutup</button>
+              <button type="button" class="btn btn-primary pull-right" onclick="approve_proses()" >Approve</button>
             </div>
           </div>
           <!-- /.modal-content -->
@@ -192,6 +234,72 @@
 @push('ajax')
     <script> 
        
-       $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}");
+        $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}");
+        $('#tampil-catatan').hide()
+
+        function approve_data(){
+          $('#modal-approve').modal('show')
+        }
+
+        function pilih_status(id){
+          if(id==1){
+            $('#tampil-catatan').show()
+          }else{
+            $('#tampil-catatan').hide()
+          }
+          
+        }
+
+        
+        function approve_proses(){
+            
+            var form=document.getElementById('mydataapprove');
+            
+                
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ url('project/approve_kadis_komersil') }}",
+                    data: new FormData(form),
+                    contentType: false,
+                    cache: false,
+                    processData:false,
+                    beforeSend: function() {
+                        document.getElementById("loadnya").style.width = "100%";
+                    },
+                    success: function(msg){
+                        var bat=msg.split('@');
+                        if(bat[1]=='ok'){
+                            document.getElementById("loadnya").style.width = "0px";
+                            swal({
+                              title: "Success! berhasil diproses!",
+                              icon: "success",
+                            });
+                            location.assign("{{url('project')}}");
+                        }else{
+                            document.getElementById("loadnya").style.width = "0px";
+                            swal({
+                                title: 'Notifikasi',
+                               
+                                html:true,
+                                text:'ss',
+                                icon: 'error',
+                                buttons: {
+                                    cancel: {
+                                        text: 'Tutup',
+                                        value: null,
+                                        visible: true,
+                                        className: 'btn btn-dangers',
+                                        closeModal: true,
+                                    },
+                                    
+                                }
+                            });
+                            $('.swal-text').html('<div style="width:100%;background:#f2f2f5;padding:1%;text-align:left;font-size:13px">'+msg+'</div>')
+                        }
+                        
+                        
+                    }
+                });
+        }
     </script> 
 @endpush

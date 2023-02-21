@@ -86,64 +86,92 @@
     <section class="content">
       
         <div class="row">
-            <div class="col-lg-3 col-xs-6">
+            <div class="col-lg-2 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-aqua">
-                <div class="inner">
-                    <h3>{{count_project(1)}}</h3>
+              <div class="small-box bg-aqua">
+                  <div class="inner">
+                      <h3>{{count_project(1)}}</h3>
 
-                    <p>Total Project</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-pie-graph"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
+                      <p>Total Project</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
             </div>
             <!-- ./col -->
-            <div class="col-lg-3 col-xs-6">
+            <div class="col-lg-2 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-green">
-                <div class="inner">
-                    <h3>{{count_project(2)}}</h3>
+              <div class="small-box bg-green">
+                  <div class="inner">
+                      <h3>{{count_project(2)}}</h3>
 
-                    <p>Progres Approval</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-pie-graph"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
+                      <p>Rencana Project</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
             </div>
             <!-- ./col -->
-            <div class="col-lg-3 col-xs-6">
+            <div class="col-lg-2 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-yellow">
-                <div class="inner">
-                    <h3>{{count_project(3)}}</h3>
+              <div class="small-box bg-yellow">
+                  <div class="inner">
+                      <h3>{{count_project(3)}}</h3>
 
-                    <p>Pengerjaan</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-pie-graph"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-            </div>
+                      <p>Kontrak</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
             </div>
             <!-- ./col -->
-            <div class="col-lg-3 col-xs-6">
+            <div class="col-lg-2 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-red">
-                <div class="inner">
-                    <h3>{{count_project(4)}}</h3>
+              <div class="small-box bg-red">
+                  <div class="inner">
+                      <h3>{{count_project(4)}}</h3>
 
-                    <p>Selesai</p>
-                </div>
-                <div class="icon">
-                    <i class="ion ion-pie-graph"></i>
-                </div>
-                <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+                      <p>Pengerjaan</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
             </div>
+            <div class="col-lg-2 col-xs-6">
+            <!-- small box -->
+              <div class="small-box bg-blue">
+                  <div class="inner">
+                      <h3>{{count_project(5)}}</h3>
+
+                      <p>Selesai</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <div class="col-lg-2 col-xs-6">
+            <!-- small box -->
+              <div class="small-box bg-aqua">
+                  <div class="inner">
+                      <h3>{{count_project(6)}}</h3>
+
+                      <p>Tagihan</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
             </div>
         </div>
         <div class="row">
@@ -168,26 +196,51 @@
 
                 <div class="box">
                   <div class="box-header with-border">
-                    <h3 class="box-title">List Project</h3>
+                    <h3 class="box-title">Rencana Project</h3>
                   </div>
                   <!-- /.box-header -->
-                  <div class="box-body">
+                  <div class="box-body responsive-bawah">
                     <table class="table table-bordered">
                       <tbody>
-                        <tr>
+                        <tr style="background:blue;color:#fff">
                           <th style="width: 5%">#</th>
-                          <th style="width: 12%">Cost</th>
-                          <th style="width: 12%">Customer</th>
+                          <th style="width: 15%">Customer</th>
                           <th>Project</th>
                           <th style="width: 20%">Status</th>
                         </tr>
                         @foreach(get_all_project() as $no=>$dr)
                         <tr @if($dr->outstanding>0) style="background:#ef9898" @endif>
                           <td>{{$no+1}}</td>
-                          <td>{{$dr->cost_center}}</td>
                           <td><b>{{$dr->singkatan_customer}}</b></td>
-                          <td>{{$dr->area}}</td>
+                          <td>{{$dr->deskripsi_project}}</td>
                           <td style="background:{{$dr->color}}">{{$dr->singkatan}}</td>
+                        </tr>
+                        @endforeach
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                </div>
+                <div class="box">
+                  <div class="box-header with-border">
+                    <h3 class="box-title">Rencana Project Cancel</h3>
+                  </div>
+                  <!-- /.box-header -->
+                  <div class="box-body responsive-bawah">
+                    <table class="table table-bordered">
+                      <tbody>
+                        <tr style="background:red;color:#fff">
+                          <th style="width: 5%">#</th>
+                          <th style="width: 15%">Customer</th>
+                          <th>Project</th>
+                          <th style="width: 20%">Status</th>
+                        </tr>
+                        @foreach(get_all_project_cancel() as $no=>$dr)
+                        <tr @if($dr->outstanding>0) style="background:#ef9898" @endif>
+                          <td>{{$no+1}}</td>
+                          <td><b>{{$dr->singkatan_customer}}</b></td>
+                          <td>{{$dr->deskripsi_project}}</td>
+                          <td style="background:{{$dr->color}}">Cancel</td>
                         </tr>
                         @endforeach
                       </tbody>

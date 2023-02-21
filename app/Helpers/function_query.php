@@ -8,6 +8,10 @@ function get_role(){
     $data=App\Models\Role::where('id','!=',1)->orderBy('id','Asc')->get();
     return $data;
 }
+function get_risiko($id){
+    $data=App\Models\ProjectRisiko::where('project_header_id',$id)->orderBy('urut','Asc')->get();
+    return $data;
+}
 function get_satuan(){
     $data=App\Models\Satuan::orderBy('satuan','Asc')->get();
     return $data;
@@ -42,7 +46,11 @@ function count_all_project(){
     return $data;
 }
 function get_all_project(){
-    $data=App\Models\ViewHeaderProject::where('active',1)->orderBy('id','Asc')->get();
+    $data=App\Models\ViewHeaderProject::where('active',1)->where('status_id','<',9)->orderBy('id','Asc')->get();
+    return $data;
+}
+function get_all_project_cancel(){
+    $data=App\Models\ViewHeaderProject::where('active',1)->where('status_id',50)->orderBy('id','Asc')->get();
     return $data;
 }
 function notifikasi_side(){
@@ -57,7 +65,7 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==2){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array())->count();
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(5))->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -67,7 +75,7 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==3){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array())->count();
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(4))->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -107,7 +115,7 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==7){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array())->count();
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(3))->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -133,40 +141,49 @@ function count_project($id){
         $data=App\Models\HeaderProject::count();
     }
     if($id==2){
-        $data=App\Models\HeaderProject::whereBetween('status_id',[1,9])->count();
+        $data=App\Models\HeaderProject::whereBetween('status_id',[1,8])->count();
     }
     if($id==3){
-        $data=App\Models\HeaderProject::where('status_id',10)->count();
+        $data=App\Models\HeaderProject::whereBetween('status_id',[9,11])->count();
     }
     if($id==4){
-        $data=App\Models\HeaderProject::where('status_id',11)->count();
+        $data=App\Models\HeaderProject::whereBetween('status_id',[12,13])->count();
+    }
+    if($id==5){
+        $data=App\Models\HeaderProject::where('status_id',13)->count();
+    }
+    if($id==6){
+        $data=App\Models\HeaderProject::whereBetween('status_id',[14,15])->count();
+    }
+    if($id==7){
+        $data=App\Models\HeaderProject::where('status_id',50)->count();
     }
     
     return $data;
 }
 function get_status_event(){
     if(Auth::user()->role_id==1){
-        $data=App\Models\Viewstatus::whereBetween('id',[1,4])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[1,18])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==2){
-        $data=App\Models\HeaderProject::whereBetween('status_id',[1,9])->count();
+        $data=App\Models\HeaderProject::whereBetween('status_id',[5,18])->count();
     }
     if(Auth::user()->role_id==3){
         $data=App\Models\Viewstatus::whereBetween('id',[1,4])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==4){
-        $data=App\Models\Viewstatus::whereBetween('id',[2,11])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[2,18])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==5){
-        $data=App\Models\Viewstatus::whereBetween('id',[3,11])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[3,18])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==6){
-        $data=App\Models\Viewstatus::whereBetween('id',[1,11])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[1,18])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==7){
-        $data=App\Models\Viewstatus::whereBetween('id',[1,4])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[3,18])->orderBy('id','Asc')->get();
     }
-    if(Auth::user()->role_id==7){
+    if(Auth::user()->role_id==8){
         $data=App\Models\Viewstatus::whereBetween('id',[1,4])->orderBy('id','Asc')->get();
     }
     
@@ -178,24 +195,21 @@ function tombol_act($id,$status_id){
     if(Auth::user()->role_id==1){
         if($status_id==1){
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
-        }
-        if($status_id==2){
+        }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
         }
     }
     if(Auth::user()->role_id==2){
-        if($status_id==1){
-            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
-        }
-        if($status_id==2){
+        if($status_id==5){
+            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">Approve & Konfirmasi</a></li>';
+        }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
         }
     }
     if(Auth::user()->role_id==3){
-        if($status_id==1){
-            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
-        }
-        if($status_id==2){
+        if($status_id==4){
+            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">Approve & Konfirmasi</a></li>';
+        }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
         }
     }
@@ -209,32 +223,28 @@ function tombol_act($id,$status_id){
     if(Auth::user()->role_id==5){
         if($status_id==3){
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">Approve & Konfirmasi</a></li>';
-        }
-        if($status_id==2){
+        }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
         }
     }
     if(Auth::user()->role_id==6){
         if($status_id==1){
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
-        }
-        if($status_id==2){
+        }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
         }
     }
     if(Auth::user()->role_id==7){
-        if($status_id==1){
-            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
-        }
-        if($status_id==2){
+        if($status_id==3){
+            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">Approve & Konfirmasi</a></li>';
+        }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
         }
     }
     if(Auth::user()->role_id==8){
         if($status_id==1){
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
-        }
-        if($status_id==2){
+        }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($id).'`)">View</a></li>';
         }
     }

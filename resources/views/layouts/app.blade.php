@@ -163,7 +163,10 @@
           overflow-x: auto;
         }
       }
-      
+      .responsive-bawah{
+        max-height:400px;
+        overflow-y:scroll;
+      }
       .info-box-iconic {
         border-top-left-radius: 2px;
         border-top-right-radius: 0;
@@ -177,6 +180,10 @@
         font-size: 20px;
         line-height: 50px;
         background: rgba(0,0,0,0.2);
+    }
+    .nav-tabs-custom>.nav-tabs>li.active>a, .nav-tabs-custom>.nav-tabs>li.active:hover>a {
+        background-color: #fff3f3;
+        color: #444;
     }
   </style>
   <link rel="stylesheet"

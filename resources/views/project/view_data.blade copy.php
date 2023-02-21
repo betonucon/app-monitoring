@@ -31,11 +31,13 @@
                         headerOffset: $('#header').height()
                     },
                     responsive: true,
-                    ajax:"{{ url('customer/getdata')}}",
+                    ajax:"{{ url('cost/getdata')}}",
                       columns: [
                         { data: 'seleksi' },
+                        { data: 'no_cost' },
                         { data: 'customer_code' },
                         { data: 'customer' },
+                        { data: 'area' },
                         
                       ],
                       
@@ -103,41 +105,66 @@
                 <div class="col-md-12">
                   <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
-                      <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
-                      <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
-                      <!-- <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false">Tab 3</a></li> -->
-                      
+                      <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Tab 1</a></li>
+                      <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false">Tab 2</a></li>
+                      <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false">Tab 3</a></li>
+                      <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                          Dropdown <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Action</a></li>
+                          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Another action</a></li>
+                          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Something else here</a></li>
+                          <li role="presentation" class="divider"></li>
+                          <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Separated link</a></li>
+                        </ul>
+                      </li>
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
                     </ul>
                     <div class="tab-content" style="background: #fff3f3;">
                       <div class="tab-pane active" id="tab_1">
                         <div class="box-body">
-                          
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Rencana Pekerjaan</label>
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Cost Code</label>
 
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Header Cost</label>
+
+                            <div class="col-sm-2">
+                              <div class="input-group">
+                                <span class="input-group-addon" onclick="show_draft()"><i class="fa fa-search"></i></span>
+                                <input type="text" id="cost" name="cost" value="{{$data->cost}}" readonly class="form-control  input-sm" placeholder="0000">
+                              </div>
+                            </div>
+                            <div class="col-sm-7">
+                              <input type="text" id="area" readonly class="form-control input-sm"  value="{{$data->area}}" placeholder="Ketik...">
+                            </div>
                           </div>
                           <div class="form-group">
                             <label for="inputEmail3" class="col-sm-2 control-label">Customer</label>
 
                             <div class="col-sm-2">
-                              <div class="input-group">
-                                <span class="input-group-addon" onclick="show_draft()"><i class="fa fa-search"></i></span>
-                                <input type="text" id="customer_code" name="customer_code" readonly value="{{$data->customer_code}}" class="form-control  input-sm" placeholder="0000">
-                              </div>
+                              <input type="text" id="customer_code" name="customer_code" readonly class="form-control input-sm"  value="{{$data->customer_code}}" placeholder="Ketik...">
                             </div>
-                            <div class="col-sm-4">
+                            <div class="col-sm-5">
                               <input type="text" id="customer" readonly class="form-control input-sm"  value="{{$data->customer}}" placeholder="Ketik...">
                             </div>
                           </div>
+
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Ruang Lingkup Project</label>
-                              <div class="col-sm-10">
-                              <input  class="form-control input-sm" name="deskripsi_project" value="{{$data->deskripsi_project}}" placeholder="Ketik..." >
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Deskripsi Project</label>
+
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Deskripsi</label>
+                              <div class="col-sm-7">
+                              <textarea  class="form-control input-sm" name="deskripsi_project"  placeholder="Ketik..." rows="4">{!! $data->deskripsi_project !!}</textarea>
                             </div>
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Durasi (Start / End)</label>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Start date / End date</label>
 
                             <div class="col-sm-2">
                               <div class="input-group">
@@ -153,33 +180,32 @@
                             </div>
                             
                           </div>
-                          
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">File Kontrak</label>
+
+                            <div class="col-sm-4">
+                              <input type="file" id="file" name="file" readonly value="{{$data->file}}" class="form-control  input-sm" placeholder="yyyy-mm-dd">
+                              <span class="help-block">Format file harus "pdf"</span>
+                            </div>
+                            
+                            
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Kontrak (Rp)</label>
+
+                            <div class="col-sm-2">
+                              <input type="text"  id="nilai" name="nilai"  class="form-control  input-sm" value="{{$data->nilai}}" placeholder="">
+                            </div>
+                            <div class="col-sm-7">
+                              <input type="text"  id="out" readonly name="terbilang" value="{{$data->terbilang}}" class="form-control  input-sm" placeholder="">
+                            </div>
+                            
+                            
+                          </div>
                           
                         </div>
                       </div>
                       <div class="tab-pane" id="tab_2">
-                        <div class="form-group">
-                          <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Risiko Pekerjaan</label>
-
-                        </div>
-                        <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-1 control-label"></label>
-                            
-                            <div class="col-sm-10">
-                              <span class="btn btn-info btn-sm" id="add"><i class="fa fa-clone"></i> Tambah Risiko</span>
-                              <table class="table table-bordered" id="">
-                                <thead>
-                                  <tr style="background:#bcbcc7">
-                                    <th style="width: 10px">No</th>
-                                    <th>Risiko Yang Terjadi</th>
-                                    <th style="width:5%"></th>
-                                  </tr>
-                                </thead>
-                                <tbody id="tampil-risiko-save"></tbody>
-                                <tbody id="tampil_risiko"></tbody>
-                              </table>
-                            </div>
-                        </div>
                       </div>
                     </div>
                     <!-- /.box-body -->
@@ -195,8 +221,8 @@
         <div class="box-footer">
         
             <div class="btn-group">
-              <button type="button" class="btn btn-sm btn-info" onclick="simpan_data()"><i class="fa fa-save"></i> Simpan</button>
-              <button type="button" class="btn btn-sm btn-danger" onclick="location.assign(`{{url('cost')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
+              <button type="button" class="btn btn-info" onclick="simpan_data()">Simpan</button>
+              <button type="button" class="btn btn-danger" onclick="location.assign(`{{url('cost')}}`)">Kembali</button>
             </div>
                  
         </div>
@@ -206,7 +232,7 @@
 
     </section>
       <div class="modal fade" id="modal-draf" style="display: none;">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -218,9 +244,11 @@
                 <table id="data-table-fixed-header" width="100%" class="cell-border display">
                     <thead>
                         <tr>
-                            <th width="10%"></th>
+                            <th width="5%"></th>
+                            <th width="15%">Cost</th>
                             <th width="20%">Cust Code</th>
-                            <th >Nama Customer</th>
+                            <th width="30%" >Nama Customer</th>
+                            <th >Area</th>
                         </tr>
                     </thead>
                     
@@ -251,41 +279,18 @@
           format:'yyyy-mm-dd'
         });
 
-        $('#tampil-risiko-save').load("{{url('project/tampil_risiko')}}?id={{$data->id}}");
-        $(document).ready(function(e) {
-          var nom = {{$nom}};
-            $("#add").click(function(){
-                var no = nom++;
-                $("#tampil_risiko").append('<tr style="background:#fff" class="added">'
-                                              +'<td style="width: 10px">'+no+'</td>'
-                                              +'<td><input type="text" name="risiko[]" placeholder="ketik disini.." class="form-control  input-sm"></td>'
-                                              +'<td style="width:5%"><span class="btn btn-danger btn-xs remove_add"><i class="fa fa-close"></i></span></td>'
-                                            +'</tr>');
-            });
-
-            
-            
-              
-        });
-
-        $(document).on('click', '.remove_add', function(){  
-            $(this).parents('tr').remove();
-        }); 
-        
         $("#nilai").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 2, 'digitsOptional': false });
         $(document).ready(function(){
 
           $("#nilai").keyup(function(){
-            var angkane=$("#nilai").val();
-            var nil = angkane.replace(/[.](?=.*?\.)/g, '');
-            var nilai=parseFloat(nil.replace(/[^0-9.]/g,''))
-            $("#out").val(terbilang(nilai));
-
-          });
+          var angkane=$("#nilai").val();
+          var nil = angkane.replace(/[.](?=.*?\.)/g, '');
+          var nilai=parseFloat(nil.replace(/[^0-9.]/g,''))
+          $("#out").val(terbilang(nilai));
 
         });
 
-
+        });
         function delete_data(id){
            
             swal({
@@ -319,52 +324,21 @@
             });
             
         } 
-        function delete_risiko(id){
-           
-            swal({
-                title: "Yakin menghapus risiko ini ?",
-                text: "data akan hilang dari daftar risiko",
-                type: "warning",
-                icon: "error",
-                showCancelButton: true,
-                align:"center",
-                confirmButtonClass: "btn-danger",
-                confirmButtonText: "Yes, delete it!",
-                closeOnConfirm: false
-            }).then((willDelete) => {
-                if (willDelete) {
-                        $.ajax({
-                            type: 'GET',
-                            url: "{{url('project/delete_risiko')}}",
-                            data: "id="+id,
-                            success: function(msg){
-                                swal("Success! berhasil terhapus!", {
-                                    icon: "success",
-                                });
-                                $('#tampil-risiko-save').load("{{url('project/tampil_risiko')}}?id={{$data->id}}");
-                            }
-                        });
-                    
-                    
-                } else {
-                    
-                }
-            });
-            
-        } 
         function show_draft(){
            
             $('#modal-draf').modal('show');
             var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('customer/getdata')}}").load();
-        }  
-        function pilih_customer(customer_code,customer){
+                tables.ajax.url("{{ url('cost/getdata')}}").load();
+        } 
+        function pilih_customer(cost,customer_code,customer,area){
            
-           $('#modal-draf').modal('hide');
-           $('#customer_code').val(customer_code);
-           $('#customer').val(customer);
-           
-        }  
+            $('#modal-draf').modal('hide');
+            $('#cost').val(cost);
+            $('#customer_code').val(customer_code);
+            $('#customer').val(customer);
+            $('#area').val(area);
+            
+        } 
        
         function simpan_data(){
             
@@ -415,7 +389,7 @@
                         
                     }
                 });
-        }
+        };
         
     </script> 
 @endpush
