@@ -26,6 +26,7 @@ Route::group(['prefix' => 'employe','middleware'    => 'auth'],function(){
     Route::get('/',[EmployeController::class, 'index']);
     Route::get('/view',[EmployeController::class, 'view_data']);
     Route::get('/getdata',[EmployeController::class, 'get_data']);
+    Route::get('/getdatapm',[EmployeController::class, 'get_data_pm']);
     Route::get('/getrole',[EmployeController::class, 'get_role']);
     Route::get('/delete',[EmployeController::class, 'delete']);
     Route::get('/create',[EmployeController::class, 'create']);

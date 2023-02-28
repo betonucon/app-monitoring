@@ -57,9 +57,47 @@
             };
         }();
 
+        var handleDataTableFixedHeaderPM = function() {
+            "use strict";
+            
+            if ($('#data-table-fixed-headerpm').length !== 0) {
+                var table=$('#data-table-fixed-headerpm').DataTable({
+                    searching:true,
+                    lengthChange:true,
+                    fixedHeader: {
+                        header: true,
+                        headerOffset: $('#header').height()
+                    },
+                    responsive: true,
+                    ajax:"{{ url('employe/getdatapm')}}",
+                      columns: [
+                        { data: 'seleksi' },
+                        { data: 'nik' },
+                        { data: 'nama' },
+                        { data: 'jabatan' },
+                        
+                      ],
+                      
+                });
+                
+                
+            }
+        };
+
+        var TableManageFixedHeaderPM = function () {
+            "use strict";
+            return {
+                //main function
+                init: function () {
+                  handleDataTableFixedHeaderPM();
+                }
+            };
+        }();
+
         
         $(document).ready(function() {
           TableManageFixedHeader.init();
+          TableManageFixedHeaderPM.init();
            
         });
 
@@ -105,15 +143,15 @@
                 <div class="col-md-12">
                   <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
-                      <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Kontrak</a></li>
+                      <li class=""><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Kontrak</a></li>
                       <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
-                      <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> RAB</a></li>
+                      <li class="active"><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> RAB</a></li>
                       <!-- <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false">Tab 3</a></li> -->
                       
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
                     </ul>
                     <div class="tab-content" style="background: #fff3f3;">
-                      <div class="tab-pane active" id="tab_1">
+                      <div class="tab-pane " id="tab_1">
                         <div class="box-body">
                           
                           <div class="form-group">
@@ -190,12 +228,11 @@
                                   </tr>
                                 </thead>
                                 <tbody id="tampil-risiko-save"></tbody>
-                                <tbody id="tampil_risiko"></tbody>
                               </table>
                             </div>
                         </div>
                       </div>
-                      <div class="tab-pane" id="tab_3" >
+                      <div class="tab-pane active" id="tab_3" >
                         <div id="tampil_pengeluaran"></div>
                         @include('kontrak.rab')
                       </div>
@@ -239,6 +276,37 @@
                             <th width="20%">Cust Code</th>
                             <th width="30%" >Nama Customer</th>
                             <th >Area</th>
+                        </tr>
+                    </thead>
+                    
+                </table>
+              
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+          <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+      </div>
+      <div class="modal fade" id="modal-drafpm" style="display: none;">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Project Manager</h4>
+            </div>
+            <div class="modal-body">
+              
+                <table id="data-table-fixed-headerpm" width="100%" class="cell-border display">
+                    <thead>
+                        <tr>
+                            <th width="5%"></th>
+                            <th width="15%">NIK</th>
+                            <th>Nama</th>
+                            <th width="15%">Jabatan</th>
                         </tr>
                     </thead>
                     
@@ -384,6 +452,7 @@
         
         $("#nilai").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 2, 'digitsOptional': false });
         $("#margin").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 1, 'digitsOptional': false });
+        $("#biaya_pm").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 1, 'digitsOptional': false });
         $(document).ready(function(){
 
           $("#nilai").keyup(function(){
@@ -506,13 +575,26 @@
             var tables=$('#data-table-fixed-header').DataTable();
                 tables.ajax.url("{{ url('cost/getdata')}}?customer_code={{$data->customer_code}}").load();
         }  
+        function show_draft_pm(){
+           
+            $('#modal-drafpm').modal('show');
+            var tables=$('#data-table-fixed-headerpm').DataTable();
+                tables.ajax.url("{{ url('employe/getdatapm')}}").load();
+        }  
         function pilih_customer(cost,customer_code,customer,area){
            
            $('#modal-draf').modal('hide');
            $('#cost').val(cost);
            $('#area_cost').val(area);
            
-       } 
+        } 
+        function pilih_employe(nik,nama){
+           
+           $('#modal-drafpm').modal('hide');
+           $('#nik_pm').val(nik);
+           $('#nama_pm').val(nama);
+           
+        } 
        
         function simpan_data(){
             

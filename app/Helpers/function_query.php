@@ -25,7 +25,7 @@ function sum_operasional($id){
     return $data;
 }
 function get_job(){
-    $data=App\Models\Job::orderBy('id','Asc')->get();
+    $data=App\Models\Job::where('id','!=',1)->orderBy('id','Asc')->get();
     return $data;
 }
 function get_kategori(){
@@ -375,7 +375,7 @@ function tombol_kontrak_act($id,$status_id){
         }
     }
     if(Auth::user()->role_id==7){
-        if($status_id==3){
+        if($status_id==10){
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('kontrak/view').'?id='.encoder($id).'`)">Approve & Konfirmasi</a></li>';
         }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('kontrak/view').'?id='.encoder($id).'`)">View</a></li>';

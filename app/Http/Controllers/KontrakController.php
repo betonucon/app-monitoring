@@ -95,7 +95,7 @@ class KontrakController extends Controller
             }
         }
         if(Auth::user()->role_id==7){
-            if($data->status_id==3){
+            if($data->status_id==10){
                 return view('kontrak.view_approve_operasional',compact('template','data','disabled','nom','nomper'));
             }else{
                 return view('kontrak.view',compact('template','data','disabled','nom','nomper'));
@@ -670,8 +670,16 @@ class KontrakController extends Controller
         $messages['margin.required']= 'Masukan margin';
         $messages['margin.not_in']= 'Masukan margin';
         
+        
         $rules['start_date_retensi']= 'required';
         $messages['start_date_retensi.required']= 'Masukan start date retensi';
+
+        $rules['nik_pm']= 'required';
+        $messages['nik_pm.required']= 'Tentukan Project Manager';
+
+        $rules['biaya_pm']= 'required|min:0|not_in:0';
+        $messages['biaya_pm.required']= 'Masukan salery PM';
+        $messages['biaya_pm.not_in']= 'Masukan salery PM';
 
         $rules['end_date_retensi']= 'required';
         $messages['end_date_retensi.required']= 'Masukan end date retensi';
@@ -705,19 +713,29 @@ class KontrakController extends Controller
                         $data=HeaderProject::where('id',$request->id)->update([
                             'cost'=>$request->cost,
                             'cost_center'=>$penomoran,
-                            'status_id'=>9,
+                            'status_id'=>10,
                             'margin'=>ubah_uang($request->margin),
+                            'biaya_pm'=>ubah_uang($request->biaya_pm),
                             'start_date_retensi'=>$request->start_date_retensi,
                             'end_date_retensi'=>$request->end_date_retensi,
+                            'nik_pm'=>$request->nik_pm,
+                            'nama_pm'=>$request->nama_pm,
                             'create_rab'=>date('Y-m-d H:i:s'),
                         ]);
 
-                        
+                        $pm=ProjectPersonal::UpdateOrcreate([
+                            'project_header_id'=>$request->id,
+                            'nik'=>$request->nik_pm,
+                        ],[
+                            'nama'=>$request->nama_pm,
+                            'job_id'=>1,
+                            'biaya'=>ubah_uang($request->biaya_pm),
+                        ]);
                         $log=LogPengajuan::create([
                             'cost_center'=>$penomoran,
                             'project_header_id'=>$request->id,
-                            'deskripsi'=>'RAB behasil dibuat dan diproses',
-                            'status_id'=>9,
+                            'deskripsi'=>'RAB dan Cost Center behasil dibuat dan diproses',
+                            'status_id'=>10,
                             'nik'=>Auth::user()->username,
                             'role_id'=>Auth::user()->role_id,
                             'revisi'=>1,

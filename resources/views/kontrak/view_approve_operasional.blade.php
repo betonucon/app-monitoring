@@ -11,19 +11,73 @@
   </style>
 @endpush
 @push('datatable')
+<script type="text/javascript">
+        /*
+        Template Name: Color Admin - Responsive Admin Dashboard Template build with Twitter Bootstrap 4
+        Version: 4.6.0
+        Author: Sean Ngu
+        Website: http://www.seantheme.com/color-admin/admin/
+        */
+        
+        var handleDataTableFixedHeader = function() {
+            "use strict";
+            
+            if ($('#data-table-fixed-header').length !== 0) {
+                var table=$('#data-table-fixed-header').DataTable({
+                    searching:true,
+                    lengthChange:false,
+                    fixedHeader: {
+                        header: true,
+                        headerOffset: $('#header').height()
+                    },
+                    responsive: true,
+                    ajax:"{{ url('cost/getdata')}}?customer_code={{$data->customer_code}}",
+                      columns: [
+                        { data: 'seleksi' },
+                        { data: 'no_cost' },
+                        { data: 'customer_code' },
+                        { data: 'customer' },
+                        { data: 'area' },
+                        
+                      ],
+                      
+                });
+                
+                
+            }
+        };
 
+        var TableManageFixedHeader = function () {
+            "use strict";
+            return {
+                //main function
+                init: function () {
+                    handleDataTableFixedHeader();
+                }
+            };
+        }();
+
+        
+        $(document).ready(function() {
+          TableManageFixedHeader.init();
+           
+        });
+
+        
+        
+    </script>
 @endpush
 @section('content')
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        View Rencana Pekerjaan
+        Kontrak
         
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">View Rencana Pekerjaan</li>
+        <li class="active">Kontrak</li>
       </ol>
     </section>
 
@@ -51,18 +105,19 @@
                 <div class="col-md-12">
                   <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
-                      <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
+                      <li class=""><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Kontrak</a></li>
                       <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
+                      <li class="active"><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> RAB</a></li>
                       <!-- <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false">Tab 3</a></li> -->
                       
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
                     </ul>
                     <div class="tab-content" style="background: #fff3f3;">
-                      <div class="tab-pane active" id="tab_1">
+                      <div class="tab-pane " id="tab_1">
                         <div class="box-body">
                           
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Rencana Pekerjaan</label>
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Detail Kontrak</label>
 
                           </div>
                           <div class="form-group">
@@ -101,16 +156,20 @@
                             
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Progress</label>
-
-                            <div class="col-sm-5">
-                              
-                                <input type="text"  readonly value="{{$data->status}}" style="color:{{$data->color}}" class="form-control  input-sm" placeholder="yyyy-mm-dd">
-                              
+                            <label for="inputEmail3" class="col-sm-2 control-label">CreateBy</label>
+                              <div class="col-sm-5">
+                              <input  class="form-control input-sm" disabled  value="{{$data->createby}}" placeholder="Ketik..." >
                             </div>
-                            
                           </div>
-                          
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Kontrak (Rp) </label>
+                            <div class="col-sm-2">
+                              <input type="text"  style="text-align:right" name="nilai" disabled  class="form-control  input-sm" value="{{uang($data->nilai)}}" placeholder="">
+                            </div>
+                            <div class="col-sm-7">
+                              <input type="text"   readonly name="terbilang" value="{{terbilang($data->nilai)}}" class="form-control  input-sm" placeholder="">
+                            </div>
+                          </div>
                           
                         </div>
                       </div>
@@ -131,15 +190,17 @@
                                   </tr>
                                 </thead>
                                 <tbody id="tampil-risiko-save"></tbody>
-                                
+                                <tbody id="tampil_risiko"></tbody>
                               </table>
                             </div>
                         </div>
                       </div>
+                      <div class="tab-pane active" id="tab_3" >
+                        <div id="tampil_pengeluaran"></div>
+                        @include('kontrak.rab_view')
+                      </div>
                     </div>
-                    <!-- /.box-body -->
                     
-                    <!-- /.box-footer -->
                   
                 </div>
                 
@@ -149,8 +210,8 @@
         </div>
         <div class="box-footer">
         
-            <div class="btn-group">
-              <button type="button" class="btn btn-sm btn-danger" onclick="location.assign(`{{url('project')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
+        <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-danger" onclick="location.assign(`{{url('kontrak')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
               <button type="button" class="btn btn-sm btn-primary" onclick="approve_data()"><i class="fa  fa-check-square"></i> Approve</button>
             </div>
                  
@@ -160,8 +221,7 @@
      
 
     </section>
-    
-    <div class="modal file" id="modal-approve" style="display: none;">
+      <div class="modal file" id="modal-approve" style="display: none;">
         <div class="modal-dialog" style="max-width:70%">
           <div class="modal-content">
             <div class="modal-header">
@@ -170,7 +230,7 @@
               <h4 class="modal-title">Konfirmasi / Approve</h4>
             </div>
             <div class="modal-body" style="padding: 0px 25px">
-              <form class="form-horizontal" id="mydataapprove" method="post" action="{{ url('project/approve_kadis_operasional') }}" enctype="multipart/form-data" >
+              <form class="form-horizontal" id="mydataapprove" method="post" action="{{ url('project/approve_mgr_operasional') }}" enctype="multipart/form-data" >
                   @csrf
                   <input type="hidden" name="id" value="{{$id}}">
                   <div class="row">
@@ -190,8 +250,8 @@
                                 <span class="input-group-addon" ><i class="fa  fa-chevron-down"></i></span>
                                 <select name="status_id" onchange="pilih_status(this.value)" class="form-control  input-sm" placeholder="0000">
                                   <option value="">Pilih------</option>
-                                  <option value="4">Setujui</option>
-                                  <option value="1">Kembalikan</option>
+                                  <option value="11">Setujui</option>
+                                  <option value="8">Kembalikan</option>
                                   
                                 </select>
                               </div>
@@ -227,14 +287,18 @@
           <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
-      </div>
+      </div>  
   </div>
 @endsection
 
 @push('ajax')
     <script> 
        
-        $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}");
+        
+        
+        $('#tampil_pengeluaran').load("{{url('kontrak/tampil_pengeluaran')}}?id={{$data->id}}&act=1");
+        $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}&act=1");
+        $('#tampil-personal-save').load("{{url('kontrak/tampil_personal')}}?id={{$data->id}}&act=1");
         $('#tampil-catatan').hide()
 
         function approve_data(){
@@ -242,64 +306,19 @@
         }
 
         function pilih_status(id){
-          if(id==1){
+          if(id==8){
             $('#tampil-catatan').show()
           }else{
             $('#tampil-catatan').hide()
           }
           
         }
-
         
-        function approve_proses(){
-            
-            var form=document.getElementById('mydataapprove');
-            
-                
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ url('project/approve_kadis_operasional') }}",
-                    data: new FormData(form),
-                    contentType: false,
-                    cache: false,
-                    processData:false,
-                    beforeSend: function() {
-                        document.getElementById("loadnya").style.width = "100%";
-                    },
-                    success: function(msg){
-                        var bat=msg.split('@');
-                        if(bat[1]=='ok'){
-                            document.getElementById("loadnya").style.width = "0px";
-                            swal({
-                              title: "Success! berhasil diproses!",
-                              icon: "success",
-                            });
-                            location.assign("{{url('project')}}");
-                        }else{
-                            document.getElementById("loadnya").style.width = "0px";
-                            swal({
-                                title: 'Notifikasi',
-                               
-                                html:true,
-                                text:'ss',
-                                icon: 'error',
-                                buttons: {
-                                    cancel: {
-                                        text: 'Tutup',
-                                        value: null,
-                                        visible: true,
-                                        className: 'btn btn-dangers',
-                                        closeModal: true,
-                                    },
-                                    
-                                }
-                            });
-                            $('.swal-text').html('<div style="width:100%;background:#f2f2f5;padding:1%;text-align:left;font-size:13px">'+msg+'</div>')
-                        }
-                        
-                        
-                    }
-                });
-        }
+
+        $('#tampil-operasional-save').load("{{url('kontrak/tampil_operasional')}}?id={{$data->id}}&act=1");
+       
+        $("#nilai").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 2, 'digitsOptional': false });
+        $("#margin").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 1, 'digitsOptional': false });
+        
     </script> 
 @endpush

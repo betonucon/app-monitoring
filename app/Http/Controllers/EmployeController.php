@@ -55,6 +55,10 @@ class EmployeController extends Controller
         $data = $query->orderBy('nama','Asc')->get();
 
         return Datatables::of($data)
+            ->addColumn('seleksi', function ($row) {
+                $btn='<span class="btn btn-success btn-xs" onclick="pilih_employe(`'.$row->nik.'`,`'.$row->nama.'`)">Pilih</span>';
+                return $btn;
+            })
             ->addColumn('action', function ($row) {
                 if($row->active==1){
                     $btn='
@@ -83,7 +87,54 @@ class EmployeController extends Controller
                 return $btn;
             })
             
-            ->rawColumns(['action'])
+            ->rawColumns(['action','seleksi'])
+            ->make(true);
+    }
+    public function get_data_pm(request $request)
+    {
+        error_reporting(0);
+        $query = ViewEmploye::query();
+        if($request->hide==1){
+            $data = $query->where('active',0);
+        }else{
+            $data = $query->where('active',1);
+        }
+        $data = $query->orderBy('nama','Asc')->get();
+
+        return Datatables::of($data)
+            ->addColumn('seleksi', function ($row) {
+                $btn='<span class="btn btn-success btn-xs" onclick="pilih_employe(`'.$row->nik.'`,`'.$row->nama.'`)">Pilih</span>';
+                return $btn;
+            })
+            ->addColumn('action', function ($row) {
+                if($row->active==1){
+                    $btn='
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Act <i class="fa fa-sort-desc"></i> 
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" onclick="location.assign(`'.url('employe/view').'?id='.encoder($row->id).'`)">View</a></li>
+                                <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,`0`)">Hidden</a></li>
+                            </ul>
+                        </div>
+                    ';
+                }else{
+                    $btn='
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Act <i class="fa fa-sort-desc"></i> 
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,1)">Un Hidden</a></li>
+                            </ul>
+                        </div>
+                    ';
+                }
+                return $btn;
+            })
+            
+            ->rawColumns(['action','seleksi'])
             ->make(true);
     }
 

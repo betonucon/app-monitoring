@@ -34,7 +34,7 @@
                     },
                     dom: 'lrtip',
                     responsive: true,
-                    ajax:"{{ url('project/getdata')}}",
+                    ajax:"{{ url('kontrak/getdata')}}",
                       columns: [
                         { data: 'id', render: function (data, type, row, meta) 
                             {
@@ -74,7 +74,7 @@
 
         function pilih_jenis(KD_Divisi){
           var tables=$('#data-table-fixed-header').DataTable();
-          tables.ajax.url("{{ url('project/getdata')}}?status_id="+KD_Divisi).load();
+          tables.ajax.url("{{ url('kontrak/getdata')}}?status_id="+KD_Divisi).load();
           tables.on( 'draw', function () {
               var count=tables.data().count();
                 $('#count_data').html('Total data :'+count)  
@@ -89,11 +89,11 @@
 
         function show_hide(){
             var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('project/getdata')}}?hide=1").load();
+                tables.ajax.url("{{ url('kontrak/getdata')}}?hide=1").load();
         }
         function refresh_data(){
             var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('project/getdata')}}").load();
+                tables.ajax.url("{{ url('kontrak/getdata')}}").load();
         }
     </script>
 @endpush
@@ -102,12 +102,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        List Project
+        List Kontrak
         
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">List Project</li>
+        <li class="active">List Kontrak</li>
       </ol>
     </section>
 
@@ -123,7 +123,7 @@
             <div class="col-md-4">
               <ul class="nav nav-stacked">
                 
-              @foreach(get_status_board(1) as $get)
+              @foreach(get_status_board(4) as $get)
               <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>  
               @endforeach
                
@@ -133,7 +133,7 @@
             <div class="col-md-4">
               <ul class="nav nav-stacked">
                 
-              @foreach(get_status_board(2) as $get)
+              @foreach(get_status_board(5) as $get)
               <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
               @endforeach
                
@@ -143,7 +143,7 @@
             <div class="col-md-4">
               <ul class="nav nav-stacked">
                 
-              @foreach(get_status_board(3) as $get)
+              @foreach(get_status_board(6) as $get)
               <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
               @endforeach
                
@@ -167,7 +167,7 @@
                 <label>Status Progres</label>
                   <select onchange="pilih_jenis(this.value)" class="form-control  input-sm">
                     <option value="">All Data</option>
-                    @foreach(get_status_event() as $get)
+                    @foreach(get_status_event_kontrak() as $get)
                       <option value="{{$get->id}}">{{$get->status}}</option>
                     @endforeach
                   </select>
@@ -353,6 +353,41 @@
             });
             
         } 
+      function send_data_to(id){
+            
+            swal({
+                title: "Yakin akan mengirim data keporses berikutnya ?",
+                text: "",
+                type: "warning",
+                icon: "info",
+                showCancelButton: true,
+                align:"center",
+                confirmButtonClass: "btn-info",
+                confirmButtonText: "Yes, cancel it!",
+                closeOnConfirm: false
+            }).then((willDelete) => {
+                if (willDelete) {
+                      
+                        $.ajax({
+                            type: 'GET',
+                            url: "{{url('project/kirim_kadis_komersil')}}",
+                            data: "id="+id,
+                            success: function(msg){
+                                swal("Success! berhasil terkirim!", {
+                                    icon: "success",
+                                });
+                                var tables=$('#data-table-fixed-header').DataTable();
+                                    tables.ajax.url("{{ url('project/getdata')}}").load();
+                            }
+                        });
+                    
+                      
+                } else {
+                    
+                }
+            });
+            
+      } 
         function show_file(file){
           $('#modal-file').modal('show');
           $('#tampil_file').show();

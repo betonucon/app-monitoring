@@ -41,7 +41,18 @@
                   </div>
                   
                 </div>
-                
+                <div class="form-group">
+                  <label for="inputEmail3" class="col-sm-2 control-label">Project Manager</label>
+
+                  <div class="col-sm-2">
+                    <div class="input-group">
+                      <input type="text" id="nik_pm" name="nik_pm" value="{{$data->nik_pm}}" readonly class="form-control  input-sm" placeholder="0000">
+                    </div>
+                  </div>
+                  <div class="col-sm-7">
+                    <input type="text" id="nama_pm" name="nama_pm" readonly class="form-control input-sm"  value="{{$data->nama_pm}}" placeholder="Ketik...">
+                  </div>
+                </div>
                 <div class="form-group">
                   <label for="inputEmail3" class="col-sm-2 control-label">Retensi (Start / End)</label>
 

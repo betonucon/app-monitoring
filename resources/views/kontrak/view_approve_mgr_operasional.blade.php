@@ -161,7 +161,7 @@
 
     </section>
     
-    <div class="modal file" id="modal-approve" style="display: none;">
+      <div class="modal file" id="modal-approve" style="display: none;">
         <div class="modal-dialog" style="max-width:70%">
           <div class="modal-content">
             <div class="modal-header">

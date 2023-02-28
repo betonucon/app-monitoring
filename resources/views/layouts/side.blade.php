@@ -65,5 +65,6 @@
         @endif
         @if(Auth::user()->role_id==7)
           <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
+          <li @if(Request::is('kontrak')==1 || Request::is('kontrak/*')==1) class="active" @endif><a href="{{url('kontrak')}}"><i class="fa fa-clone text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Kontrak</span></a></li>
         @endif
       </ul>
