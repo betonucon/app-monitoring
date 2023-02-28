@@ -270,7 +270,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary pull-right" onclick="simpan_data_personal_periode()" >Approve</button>
+              <button type="button" class="btn btn-primary pull-right" onclick="simpan_data_personal_periode()" >Proses</button>
             </div>
           </div>
           <!-- /.modal-content -->
@@ -293,7 +293,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary pull-right" onclick="simpan_data_operasional_periode()" >Approve</button>
+              <button type="button" class="btn btn-primary pull-right" onclick="simpan_data_operasional_periode()" >Proses</button>
             </div>
           </div>
           <!-- /.modal-content -->
