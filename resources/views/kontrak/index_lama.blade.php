@@ -43,12 +43,13 @@
                         },
                         
                         { data: 'action' },
-                        { data: 'timeline' },
+                        { data: 'file' },
+                        { data: 'cost_center' },
                         { data: 'customer' },
-                        { data: 'kategori_project' },
-                        { data: 'deskripsi_project' },
                         { data: 'start_date' },
                         { data: 'end_date' },
+                        { data: 'selisih' },
+                        { data: 'area' },
                         { data: 'status_now' },
                         
                       ],
@@ -74,17 +75,23 @@
 
         function pilih_jenis(KD_Divisi){
           var tables=$('#data-table-fixed-header').DataTable();
-          tables.ajax.url("{{ url('project/getdata')}}?status_id="+KD_Divisi).load();
+          tables.ajax.url("{{ url('barang/getdata')}}?KD_Divisi="+KD_Divisi).load();
           tables.on( 'draw', function () {
               var count=tables.data().count();
                 $('#count_data').html('Total data :'+count)  
           } );
               
         }
-        
+        function load_data(){  
+              $.getJSON("{{ url('project/get_status_data')}}", function(data){
+                  $.each(data, function(i, result){
+                      $("#tampil-dashboard-role").append(result.action);
+                  });
+              });
+        }
         $(document).ready(function() {
           TableManageFixedHeader.init();
-              
+          load_data();     
         });
 
         function show_hide(){
@@ -102,12 +109,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        List Project
+        Cost Center
         
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">List Project</li>
+        <li class="active">Cost Center</li>
       </ol>
     </section>
 
@@ -118,61 +125,36 @@
         
       </div>
       <div class="box box-default">
-        <div class="box-header with-border" style="border: dotted 2px #bebecb; background: #e8e8ef;">
-          <div class="row" >
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(1) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>  
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(2) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(3) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            
+        <div class="box-header with-border">
+          <div class="btn-group">
+            <button type="button" class="btn btn-sm btn-default" onclick="show_hide()" title="Log Hidden"><i class="fa fa-trash-o"></i></button>
+            <button type="button" class="btn btn-sm btn-default" onclick="refresh_data()"  title="Refresh Page"><i class="fa fa-refresh"></i></button>
+            <button type="button" class="btn btn-sm btn-default"><i class="fa fa-cog"></i></button>
           </div>
 
+          <div class="box-tools pull-right">
+            <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-remove"></i></button>
+          </div>
         </div>
         <div class="box-header with-border">
           <div class="row">
-            <div class="col-md-5">
+            <div class="col-md-6">
               <div class="btn-group" style="margin-top:5%">
+                <button type="button" class="btn btn-success btn-sm" onclick="location.assign(`{{url('project/view')}}?id={{encoder(0)}}`)"><i class="fa fa-plus"></i> Buat Baru</button>
                 <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
               </div>
               
             </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label>Status Progres</label>
+            <div class="col-md-2">
+              <!-- <div class="form-group">
+                <label>Divisi</label>
                   <select onchange="pilih_jenis(this.value)" class="form-control  input-sm">
                     <option value="">All Data</option>
-                    @foreach(get_status_event() as $get)
-                      <option value="{{$get->id}}">{{$get->status}}</option>
-                    @endforeach
+                    
                   </select>
                
-              </div>
+              </div> -->
             </div>
             <div class="col-md-4">
               <div class="form-group">
@@ -189,19 +171,20 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="110%" class="cell-border display">
+                <table id="data-table-fixed-header" width="120%" class="cell-border display">
                     <thead>
                         <tr>
                             <th width="5%">No</th>
                             
-                            <th width="5%"></th>
                             <th width="4%"></th>
-                            <th width="15%">Customer</th>
-                            <th width="10%">Kategori</th>
-                            <th >Ruang Lingkup</th>
+                            <th width="4%">File</th>
+                            <th width="10%">Cost Center</th>
+                            <th width="18%">Customer</th>
                             <th width="10%">Start</th>
                             <th width="10%">End</th>
-                            <th width="14%">Status</th>
+                            <th width="7%">T.Hari</th>
+                            <th >Area</th>
+                            <th width="10%">Status</th>
                         </tr>
                     </thead>
                     
@@ -241,69 +224,12 @@
         </div>
         <!-- /.modal-dialog -->
       </div>
-      <div class="modal file" id="modal-send" style="display: none;">
-        <div class="modal-dialog" style="max-width:70%">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">×</span></button>
-              <h4 class="modal-title">Send To Komersil</h4>
-            </div>
-            <div class="modal-body">
-              <form class="form-horizontal" id="mydatakirim" method="post" action="{{ url('project/kirim_komersil') }}" enctype="multipart/form-data" >
-                  @csrf
-                  <div id="tampil_form"></div>
-              </form>
-               
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary pull-right" onclick="kirim_data()" >Kirim</button>
-            </div>
-          </div>
-          <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-      </div>
-      <div class="modal file" id="modal-timeline" style="display: none;">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">×</span></button>
-              <h4 class="modal-title">Time Line</h4>
-            </div>
-            <div class="modal-body">
-              <form class="form-horizontal" id="" method="post" action="{{ url('project/kirim_komersil') }}" enctype="multipart/form-data" >
-                  @csrf
-                  <div id="tampil_timeline"></div>
-              </form>
-               
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
-              
-            </div>
-          </div>
-          <!-- /.modal-content -->
-        </div>
-        <!-- /.modal-dialog -->
-      </div>
 
   </div>
 @endsection
 
 @push('ajax')
     <script> 
-      function send_data(id){
-          $('#modal-send').modal('show')
-          $('#tampil_form').load("{{url('project/form_send')}}?id="+id)
-      }
-      function show_timeline(id){
-          $('#modal-timeline').modal('show')
-          $('#tampil_timeline').load("{{url('project/timeline')}}?id="+id)
-      }
-
       function delete_data(id,act){
             
             swal({
@@ -355,63 +281,7 @@
         } 
         function show_file(file){
           $('#modal-file').modal('show');
-          $('#tampil_file').show();
           $('#tampil_file').html('<iframe src="{{url_plug()}}/_file_kontrak/'+file+'" height="500px" width="100%"></iframe>');
         }  
-
-        function kirim_data(){
-            
-            var form=document.getElementById('mydatakirim');
-            
-                
-                $.ajax({
-                    type: 'POST',
-                    url: "{{ url('project/kirim_komersil') }}",
-                    data: new FormData(form),
-                    contentType: false,
-                    cache: false,
-                    processData:false,
-                    beforeSend: function() {
-                        document.getElementById("loadnya").style.width = "100%";
-                    },
-                    success: function(msg){
-                        var bat=msg.split('@');
-                        if(bat[1]=='ok'){
-                            document.getElementById("loadnya").style.width = "0px";
-                            swal({
-                              title: "Success! berhasil dikirim!",
-                              icon: "success",
-                            });
-                            $('#modal-send').modal('hide');
-                            $('#tampil_form').hide();
-                            
-                            var tables=$('#data-table-fixed-header').DataTable();
-                                tables.ajax.url("{{ url('project/getdata')}}").load();
-                        }else{
-                            document.getElementById("loadnya").style.width = "0px";
-                            swal({
-                                title: 'Notifikasi',
-                               
-                                html:true,
-                                text:'ss',
-                                icon: 'error',
-                                buttons: {
-                                    cancel: {
-                                        text: 'Tutup',
-                                        value: null,
-                                        visible: true,
-                                        className: 'btn btn-dangers',
-                                        closeModal: true,
-                                    },
-                                    
-                                }
-                            });
-                            $('.swal-text').html('<div style="width:100%;background:#f2f2f5;padding:1%;text-align:left;font-size:13px">'+msg+'</div>')
-                        }
-                        
-                        
-                    }
-                });
-        };
     </script>   
 @endpush

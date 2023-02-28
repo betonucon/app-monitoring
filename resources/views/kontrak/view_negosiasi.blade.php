@@ -18,12 +18,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        View Rencana Pekerjaan
+        Konfirmasi Proses Negosiasi
         
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">View Rencana Pekerjaan</li>
+        <li class="active">Negosiasi</li>
       </ol>
     </section>
 
@@ -51,15 +51,16 @@
                 <div class="col-md-12">
                   <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
-                      <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
+                      <li class=""><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
                       <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
                       @if($data->status_id>6)
                       <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Review Bidding</a></li>
+                      <li class="active"><a href="#tab_4" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Negosiasi Penawaran</a></li>
                       @endif
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
                     </ul>
                     <div class="tab-content" style="background: #fff3f3;">
-                      <div class="tab-pane active" id="tab_1">
+                      <div class="tab-pane " id="tab_1">
                         <div class="box-body">
                           
                           <div class="form-group">
@@ -157,7 +158,7 @@
                               <input type="text"  style="text-align:right" name="nilai_bidding" disabled  class="form-control  input-sm" value="{{uang($data->nilai_bidding)}}" placeholder="">
                             </div>
                             <div class="col-sm-7">
-                              <input type="text"  id="out" readonly name="terbilang" value="{{terbilang($data->nilai_bidding)}}" class="form-control  input-sm" placeholder="">
+                              <input type="text"   readonly name="terbilang" value="{{terbilang($data->nilai_bidding)}}" class="form-control  input-sm" placeholder="">
                             </div>
                             
                             
@@ -186,6 +187,29 @@
                           
                         </div>
                       </div>
+                      <div class="tab-pane active" id="tab_4">
+                        <div class="box-body">
+                          
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Informasi Hasil Negosiasi</label>
+
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Kontrak (Rp)</label>
+
+                            <div class="col-sm-2">
+                              <input type="text"  id="nilai" name="nilai"  class="form-control  input-sm" value="" placeholder="">
+                            </div>
+                            <div class="col-sm-7">
+                              <input type="text"  id="out" readonly name="terbilang" value="" class="form-control  input-sm" placeholder="">
+                            </div>
+                            
+                            
+                          </div>
+                          
+                          
+                        </div>
+                      </div>
                     </div>
                     <!-- /.box-body -->
                     
@@ -200,6 +224,8 @@
         <div class="box-footer">
         
             <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-info" onclick="simpan_data()"><i class="fa fa-save"></i> Simpan</button>
+              
               <button type="button" class="btn btn-danger btn-sm" onclick="location.assign(`{{url('project')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
             </div>
                  
@@ -237,5 +263,92 @@
     <script> 
        
        $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}");
+       $('#start_date').datepicker({
+          autoclose: true,
+          format:'yyyy-mm-dd'
+        });
+
+        $("#nilai").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 2, 'digitsOptional': false });
+        $(document).ready(function(){
+
+          $("#nilai").keyup(function(){
+            var angkane=$("#nilai").val();
+            var nil = angkane.replace(/[.](?=.*?\.)/g, '');
+            var nilai=parseFloat(nil.replace(/[^0-9.]/g,''))
+            $("#out").val(terbilang(nilai));
+
+          });
+
+        });
+
+        function simpan_data(id){
+            
+            swal({
+                title: "Yakin data yang diinputkan sudah benar ?",
+                text: "",
+                type: "warning",
+                icon: "info",
+                showCancelButton: true,
+                align:"center",
+                confirmButtonClass: "btn-info",
+                confirmButtonText: "Yes, cancel it!",
+                closeOnConfirm: false
+            }).then((willDelete) => {
+                if (willDelete) {
+                      
+                  var form=document.getElementById('mydata');
+                    $.ajax({
+                        type: 'POST',
+                        url: "{{ url('project/store_negosiasi') }}",
+                        data: new FormData(form),
+                        contentType: false,
+                        cache: false,
+                        processData:false,
+                        beforeSend: function() {
+                            document.getElementById("loadnya").style.width = "100%";
+                        },
+                        success: function(msg){
+                            var bat=msg.split('@');
+                            if(bat[1]=='ok'){
+                                document.getElementById("loadnya").style.width = "0px";
+                                swal({
+                                  title: "Success! berhasil diproses dan dilanjutkan keproses komtrak!",
+                                  icon: "success",
+                                });
+                                location.assign("{{url('project')}}");
+                            }else{
+                                document.getElementById("loadnya").style.width = "0px";
+                                swal({
+                                    title: 'Notifikasi',
+                                  
+                                    html:true,
+                                    text:'ss',
+                                    icon: 'error',
+                                    buttons: {
+                                        cancel: {
+                                            text: 'Tutup',
+                                            value: null,
+                                            visible: true,
+                                            className: 'btn btn-dangers',
+                                            closeModal: true,
+                                        },
+                                        
+                                    }
+                                });
+                                $('.swal-text').html('<div style="width:100%;background:#f2f2f5;padding:1%;text-align:left;font-size:13px">'+msg+'</div>')
+                            }
+                            
+                            
+                        }
+                    });
+                    
+                      
+                } else {
+                    
+                }
+            });
+            
+      } 
+        
     </script> 
 @endpush

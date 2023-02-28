@@ -35,6 +35,53 @@ function jam($date=null){
 function sekarang(){
    return date('Y-m-d H:i:s');
 }
+function penyebut($nilai) {
+   $nilai = abs($nilai);
+   $huruf = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+   $temp = "";
+   if ($nilai < 12) {
+      $temp = " ". $huruf[$nilai];
+   } else if ($nilai <20) {
+      $temp = penyebut($nilai - 10). " belas";
+   } else if ($nilai < 100) {
+      $temp = penyebut($nilai/10)." puluh". penyebut($nilai % 10);
+   } else if ($nilai < 200) {
+      $temp = " seratus" . penyebut($nilai - 100);
+   } else if ($nilai < 1000) {
+      $temp = penyebut($nilai/100) . " ratus" . penyebut($nilai % 100);
+   } else if ($nilai < 2000) {
+      $temp = " seribu" . penyebut($nilai - 1000);
+   } else if ($nilai < 1000000) {
+      $temp = penyebut($nilai/1000) . " ribu" . penyebut($nilai % 1000);
+   } else if ($nilai < 1000000000) {
+      $temp = penyebut($nilai/1000000) . " juta" . penyebut($nilai % 1000000);
+   } else if ($nilai < 1000000000000) {
+      $temp = penyebut($nilai/1000000000) . " milyar" . penyebut(fmod($nilai,1000000000));
+   } else if ($nilai < 1000000000000000) {
+      $temp = penyebut($nilai/1000000000000) . " trilyun" . penyebut(fmod($nilai,1000000000000));
+   }     
+   return $temp;
+}
+
+function total_bulan($start,$end) {
+   $sdate = $start;
+   $edate = $end;
+   $timeStart = strtotime("$sdate");
+   $timeEnd = strtotime("$edate");
+   // Menambah bulan ini + semua bulan pada tahun sebelumnya
+   $numBulan = 1 + (date("Y",$timeEnd)-date("Y",$timeStart))*12;
+   // menghitung selisih bulan
+   $numBulan += date("m",$timeEnd)-date("m",$timeStart);
+   return $numBulan;
+}
+function terbilang($nilai) {
+   if($nilai<0) {
+      $hasil = "minus ". trim(penyebut($nilai));
+   } else {
+      $hasil = trim(penyebut($nilai));
+   }     		
+   return $hasil;
+}
 function selisih_waktu($waktu1,$waktu2){
    $waktu_awal        =strtotime($waktu1);
    $waktu_akhir    =strtotime($waktu2); // bisa juga waktu sekarang now()
@@ -118,6 +165,16 @@ function bulan($bulan)
          Break;
       }
    return $bulan;
+}
+function nextbulan($date,$ir){
+   $tanggal=$date;
+   $data    =date('m', strtotime("+$ir month", strtotime($tanggal)));
+   return $data;
+}
+function nexttahun($date,$ir){
+   $tanggal=$date;
+   $data    =date('Y', strtotime("+$ir month", strtotime($tanggal)));
+   return $data;
 }
 function uang_pembulat($nil){
    return number_format($nil);

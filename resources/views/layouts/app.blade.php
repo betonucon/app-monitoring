@@ -181,6 +181,25 @@
         line-height: 50px;
         background: rgba(0,0,0,0.2);
     }
+    .td-detail {
+        background: #e3e3e9 !important;
+        padding: 4px 4px 4px 7px !important;
+        border: solid 1px #979090 !important;
+    }
+    .th-detail {
+        padding: 4px 0px 4px 7px !important;
+        border: solid 1px #979090 !important;
+    }
+    .tdd-detail {
+        background: #fff !important;
+        padding: 4px 4px 4px 7px !important;
+        border: solid 1px #979090 !important;
+    }
+    .thh-detail {
+        background: aqua !important;
+        padding: 4px 0px 4px 7px !important;
+        border: solid 1px #979090 !important;
+    }
     .nav-tabs-custom>.nav-tabs>li.active>a, .nav-tabs-custom>.nav-tabs>li.active:hover>a {
         background-color: #fff3f3;
         color: #444;

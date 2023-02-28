@@ -47,9 +47,9 @@ class CostController extends Controller
     {
         error_reporting(0);
         $query = ViewCost::query();
-        // if($request->KD_Divisi!=""){
-        //     $data = $query->where('kd_divisi',$request->KD_Divisi);
-        // }
+        if($request->customer_code!=""){
+            $data = $query->where('customer_code',$request->customer_code);
+        }
         $data = $query->orderBy('cost','Asc')->get();
 
         return Datatables::of($data)

@@ -45,6 +45,7 @@
                         { data: 'action' },
                         { data: 'timeline' },
                         { data: 'customer' },
+                        { data: 'kategori_project' },
                         { data: 'deskripsi_project' },
                         { data: 'start_date' },
                         { data: 'end_date' },
@@ -123,7 +124,7 @@
               <ul class="nav nav-stacked">
                 
               @foreach(get_status_board(1) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->id}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>  
+              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>  
               @endforeach
                
                 
@@ -133,7 +134,7 @@
               <ul class="nav nav-stacked">
                 
               @foreach(get_status_board(2) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->id}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
+              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
               @endforeach
                
                 
@@ -143,7 +144,7 @@
               <ul class="nav nav-stacked">
                 
               @foreach(get_status_board(3) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->id}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
+              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
               @endforeach
                
                 
@@ -188,14 +189,15 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="100%" class="cell-border display">
+                <table id="data-table-fixed-header" width="110%" class="cell-border display">
                     <thead>
                         <tr>
                             <th width="5%">No</th>
                             
                             <th width="5%"></th>
-                            <th width="5%"></th>
-                            <th width="18%">Customer</th>
+                            <th width="4%"></th>
+                            <th width="15%">Customer</th>
+                            <th width="10%">Kategori</th>
                             <th >Ruang Lingkup</th>
                             <th width="10%">Start</th>
                             <th width="10%">End</th>
