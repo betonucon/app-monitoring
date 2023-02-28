@@ -368,7 +368,7 @@ class ProjectController extends Controller
         $act='';
         foreach(get_risiko($request->id) as $no=>$o){
             $act.='
-            <tr style="background:#fff">
+            <tr style="background:#fff ">
                 <td>'.($no+1).'</td>
                 <td>'.$o->risiko.'</td>
             </tr>';
