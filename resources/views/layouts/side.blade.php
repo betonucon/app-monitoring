@@ -38,33 +38,36 @@
               </span>
             </a>
             <ul class="treeview-menu" style="display:@if((Request::is('project/*')==1 || Request::is('project')==1)) block @endif">
-              <li><a href="{{url('project')}}">{!!notifikasi_side()!!}&nbsp;<i class="fa  fa-sort-down"></i>List Project</a></li>
+              <li><a href="{{url('project')}}">{!!notifikasi_side(1)!!}&nbsp;<i class="fa  fa-sort-down"></i>List Project</a></li>
               <li><a href="{{url('salesorder/approved')}}">&nbsp;<i class="fa  fa-sort-down"></i> Approved Request</a></li>
             </ul>
           </li>
         @endif
 
         @if(Auth::user()->role_id==2)
-          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
+          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
         @endif
 
         @if(Auth::user()->role_id==3)
-          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
+          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
         @endif
 
         @if(Auth::user()->role_id==4)
-          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
+          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
         @endif
 
         @if(Auth::user()->role_id==5)
-          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
+          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
         @endif
         @if(Auth::user()->role_id==6)
-          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
-          <li @if(Request::is('kontrak')==1 || Request::is('kontrak/*')==1) class="active" @endif><a href="{{url('kontrak')}}"><i class="fa fa-clone text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Kontrak</span></a></li>
+          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
+          <li @if(Request::is('kontrak')==1 || Request::is('kontrak/*')==1) class="active" @endif><a href="{{url('kontrak')}}"><i class="fa fa-clone text-white"></i>{!!notifikasi_side(2)!!}&nbsp;<span>Kontrak</span></a></li>
         @endif
         @if(Auth::user()->role_id==7)
-          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
-          <li @if(Request::is('kontrak')==1 || Request::is('kontrak/*')==1) class="active" @endif><a href="{{url('kontrak')}}"><i class="fa fa-clone text-white"></i>{!!notifikasi_side()!!}&nbsp;<span>Kontrak</span></a></li>
+          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-briefcase text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Rencana Pekerjaan</span></a></li>
+          <li @if(Request::is('kontrak')==1 || Request::is('kontrak/*')==1) class="active" @endif><a href="{{url('kontrak')}}"><i class="fa fa-clone text-white"></i>{!!notifikasi_side(2)!!}&nbsp;<span>Kontrak</span></a></li>
+        @endif
+        @if(Auth::user()->role_id==8)
+          <li @if(Request::is('projectcontrol')==1 || Request::is('projectcontrol/*')==1) class="active" @endif><a href="{{url('projectcontrol')}}"><i class="fa fa-clone text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Project Control</span></a></li>
         @endif
       </ul>

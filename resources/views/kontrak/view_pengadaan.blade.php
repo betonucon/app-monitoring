@@ -99,7 +99,7 @@
             <form class="form-horizontal" id="mydata" method="post" action="{{ url('project') }}" enctype="multipart/form-data" >
               @csrf
               <!-- <input type="submit"> -->
-              <input type="hidden" name="id" value="{{$id}}">
+              <input type="hidden" name="id" value="{{$data->id}}">
               <div class="row">
               
                 <div class="col-md-12">
@@ -107,13 +107,14 @@
                     <ul class="nav nav-tabs">
                       <li class=""><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Kontrak</a></li>
                       <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
-                      <li class="active"><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> RAB</a></li>
+                      <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> RAB</a></li>
+                      <li class="active"><a href="#tab_4" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Pengadaan Material</a></li>
                       <!-- <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false">Tab 3</a></li> -->
                       
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
                     </ul>
                     <div class="tab-content" style="background: #fff3f3;">
-                      <div class="tab-pane " id="tab_1">
+                      <div class="tab-pane" id="tab_1">
                         <div class="box-body">
                           
                           <div class="form-group">
@@ -195,9 +196,42 @@
                             </div>
                         </div>
                       </div>
-                      <div class="tab-pane active" id="tab_3" >
+                      <div class="tab-pane" id="tab_3" >
                         <div id="tampil_pengeluaran"></div>
                         @include('kontrak.rab_view')
+                      </div>
+                      <div class="tab-pane active" id="tab_4">
+                        <div class="form-group">
+                          <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Material Project</label>
+
+                        </div>
+                        <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-1 control-label"></label>
+                            
+                            <div class="col-sm-10">
+                            <span class="btn btn-info btn-sm" id="addmaterial"><i class="fa fa-plus"></i> Add Material</span>
+                              <table class="table table-bordered" id="">
+                                <thead>
+                                  <tr style="background:#bcbcc7">
+                                    <th style="width: 10px">No</th>
+                                    <th>Material</th>
+                                    <th style="width:10%">Qty</th>
+                                    <th style="width:14%">Order</th>
+                                    <th style="width:15%">Biaya</th>
+                                    <th style="width:5%"></th>
+                                  </tr>
+                                </thead>
+                                <tbody id="tampil_material"></tbody>
+                                <tbody id="save-material">
+                                  <tr>
+                                      <td colspan="6"><span class="btn btn-success btn-sm" onclick="simpan_material()">Save Material</span>
+                                  </tr>
+                                </tbody>
+                                <tbody id="tampil-material-save"></tbody>
+                                
+                              </table>
+                            </div>
+                        </div>
                       </div>
                     </div>
                     
@@ -210,9 +244,9 @@
         </div>
         <div class="box-footer">
         
-        <div class="btn-group">
-              <button type="button" class="btn btn-sm btn-danger" onclick="location.assign(`{{url('kontrak')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
-              <button type="button" class="btn btn-sm btn-primary" onclick="approve_data()"><i class="fa  fa-check-square"></i> Approve</button>
+          <div class="btn-group">
+              <button type="button" class="btn btn-sm btn-info" onclick="simpan_data()"><i class="fa fa-save"></i> Simpan</button>
+              <button type="button" class="btn btn-sm btn-danger" onclick="location.assign(`{{url('projectcontrol')}}`)"><i class="fa fa-arrow-left"></i> Kembali</button>
             </div>
                  
         </div>
@@ -221,113 +255,139 @@
      
 
     </section>
-      <div class="modal file" id="modal-approve" style="display: none;">
-        <div class="modal-dialog" style="max-width:70%">
+      <div class="modal fade" id="modal-draf" style="display: none;">
+        <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">×</span></button>
-              <h4 class="modal-title">Konfirmasi / Approve</h4>
+              <h4 class="modal-title">Header Cost</h4>
             </div>
-            <div class="modal-body" style="padding: 0px 25px">
-              <form class="form-horizontal" id="mydataapprove" method="post" action="{{ url('kontrak/approve_mgr_operasional') }}" enctype="multipart/form-data" >
-                  @csrf
-                  <input type="hidden" name="id" value="{{$data->id}}">
-                  <div class="row">
-                  
-                    <div class="col-md-12">
-                      
-                        <div class="box-body">
-                          <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label-modal"><i class="fa fa-bars"></i> Approval</label>
-
-                          </div>
-                          <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-3 control-label">Status Approve</label>
-
-                            <div class="col-sm-8">
-                              <div class="input-group">
-                                <span class="input-group-addon" ><i class="fa  fa-chevron-down"></i></span>
-                                <select name="status_id" onchange="pilih_status(this.value)" class="form-control  input-sm" placeholder="0000">
-                                  <option value="">Pilih------</option>
-                                  <option value="11">Setujui</option>
-                                  <option value="8">Kembalikan</option>
-                                  
-                                </select>
-                              </div>
-                            </div>
-                            
-                          </div>
-                          
-                          <div class="form-group" id="tampil-catatan" style="margin-top:1%">
-                            <label for="inputEmail3" class="col-sm-3 control-label">Alasan Kembalian</label>
-                            <div class="col-sm-8">
-                              <textarea  class="form-control input-sm" name="catatan" placeholder="ketik disini....."  rows="5"></textarea>
-                            </div>
-                          </div>
-                          
-                          
-                        </div>
-                        <!-- /.box-body -->
-                        
-                        <!-- /.box-footer -->
-                      
-                    </div>
+            <div class="modal-body">
+              
+                <table id="data-table-fixed-header" width="100%" class="cell-border display">
+                    <thead>
+                        <tr>
+                            <th width="5%"></th>
+                            <th width="15%">Cost</th>
+                            <th width="20%">Cust Code</th>
+                            <th width="30%" >Nama Customer</th>
+                            <th >Area</th>
+                        </tr>
+                    </thead>
                     
-                    
-                  </div>
-              </form>
-               
+                </table>
+              
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Tutup</button>
-              <button type="button" class="btn btn-primary pull-right" onclick="approve_proses()" >Approve</button>
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
             </div>
           </div>
           <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
-      </div>  
+      </div>
   </div>
 @endsection
 
 @push('ajax')
-    <script> 
+<script> 
        
         
         
-        $('#tampil_pengeluaran').load("{{url('kontrak/tampil_pengeluaran')}}?id={{$data->id}}&act=1");
-        $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}&act=1");
-        $('#tampil-personal-save').load("{{url('kontrak/tampil_personal')}}?id={{$data->id}}&act=1");
-        $('#tampil-catatan').hide()
+       $('#tampil_pengeluaran').load("{{url('kontrak/tampil_pengeluaran')}}?id={{$data->id}}&act=1");
+       $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}&act=1");
+       $('#tampil-personal-save').load("{{url('kontrak/tampil_personal')}}?id={{$data->id}}&act=1");
+       $('#tampil-catatan').hide()
 
-        function approve_data(){
-          $('#modal-approve').modal('show')
-        }
+       function approve_data(){
+         $('#modal-approve').modal('show')
+       }
 
-        function pilih_status(id){
-          if(id==8){
-            $('#tampil-catatan').show()
-          }else{
-            $('#tampil-catatan').hide()
-          }
-          
-        }
-        
-
-        $('#tampil-operasional-save').load("{{url('kontrak/tampil_operasional')}}?id={{$data->id}}&act=1");
+       function pilih_status(id){
+         if(id==8){
+           $('#tampil-catatan').show()
+         }else{
+           $('#tampil-catatan').hide()
+         }
+         
+       }
        
-        $("#nilai").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 2, 'digitsOptional': false });
-        $("#margin").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 1, 'digitsOptional': false });
-        
-        function approve_proses(){
+
+       $('#tampil-operasional-save').load("{{url('kontrak/tampil_operasional')}}?id={{$data->id}}&act=1");
+       $('#save-material').hide();
+       $("#nilai").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 2, 'digitsOptional': false });
+       $("#margin").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 1, 'digitsOptional': false });
+       
+       $('#tampil-material-save').load("{{url('kontrak/tampil_material')}}?id={{$data->id}}");
+        $(document).ready(function(e) {
+          var nom = {{$nommat}};
+            $("#addmaterial").click(function(){
+                var no = nom++;
+                $("#tampil_material").append('<tr style="background:#fff" class="addmaterial">'
+                                              +'<td style="width: 10px">'+no+'</td>'
+                                              +'<td><input type="text" name="keterangan[]" placeholder="ketik disini.." class="form-control  input-sm"></td>'
+                                              +'<td><input type="text" name="qty[]" id="qtynya'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
+                                              +'<td><select name="status_material_id[]" placeholder="ketik disini.." class="form-control  input-sm">'
+                                                +'<option value="">Pilih status---</option>'
+                                                @foreach(get_status_material() as $jb)
+                                                  +'<option value="{{$jb->id}}">{{$jb->status_material}}</option>'
+                                                @endforeach
+                                              +'</select></td>'
+                                              +'<td><input type="text" name="biaya[]" id="biayanya'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
+                                              +'<td style="width:5%"><span class="btn btn-danger btn-xs remove_material"><i class="fa fa-close"></i></span></td>'
+                                            +'</tr>');
+                                            $("#biayanya"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
+                                            $("#qtynya"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
+                if(no>0){
+                  $('#save-material').show();
+                } 
+            });
+        });
+        $(document).on('click', '.remove_material', function(){  
+            $(this).parents('.addmaterial').remove();
+        });
+        function delete_material(id){
+           
+           swal({
+               title: "Yakin menghapus materiall ini ?",
+               text: "data akan hilang dari daftar material",
+               type: "warning",
+               icon: "error",
+               showCancelButton: true,
+               align:"center",
+               confirmButtonClass: "btn-danger",
+               confirmButtonText: "Yes, delete it!",
+               closeOnConfirm: false
+           }).then((willDelete) => {
+               if (willDelete) {
+                       $.ajax({
+                           type: 'GET',
+                           url: "{{url('kontrak/delete_material')}}",
+                           data: "id="+id,
+                           success: function(msg){
+                               swal("Success! berhasil terhapus!", {
+                                   icon: "success",
+                               });
+                               $('#tampil-material-save').load("{{url('kontrak/tampil_material')}}?id={{$data->id}}");
+                           }
+                       });
+                   
+                   
+               } else {
+                   
+               }
+           });
+           
+       }
+        function simpan_data(){
             
-            var form=document.getElementById('mydataapprove');
+            var form=document.getElementById('mydata');
             
                 
                 $.ajax({
                     type: 'POST',
-                    url: "{{ url('kontrak/approve_kadis_operasional') }}",
+                    url: "{{ url('kontrak/store_pengadaan') }}",
                     data: new FormData(form),
                     contentType: false,
                     cache: false,
@@ -340,10 +400,64 @@
                         if(bat[1]=='ok'){
                             document.getElementById("loadnya").style.width = "0px";
                             swal({
-                              title: "Success! berhasil diproses!",
+                              title: "Success! RAB Berhasil diproses!",
                               icon: "success",
                             });
                             location.assign("{{url('kontrak')}}");
+                        }else{
+                            document.getElementById("loadnya").style.width = "0px";
+                            swal({
+                                title: 'Notifikasi',
+                               
+                                html:true,
+                                text:'ss',
+                                icon: 'error',
+                                buttons: {
+                                    cancel: {
+                                        text: 'Tutup',
+                                        value: null,
+                                        visible: true,
+                                        className: 'btn btn-dangers',
+                                        closeModal: true,
+                                    },
+                                    
+                                }
+                            });
+                            $('.swal-text').html('<div style="width:100%;background:#f2f2f5;padding:1%;text-align:left;font-size:13px">'+msg+'</div>')
+                        }
+                        
+                        
+                    }
+                });
+        }
+        function simpan_material(){
+            
+            var form=document.getElementById('mydata');
+            
+                
+                $.ajax({
+                    type: 'POST',
+                    url: "{{ url('kontrak/store_material') }}",
+                    data: new FormData(form),
+                    contentType: false,
+                    cache: false,
+                    processData:false,
+                    beforeSend: function() {
+                        document.getElementById("loadnya").style.width = "100%";
+                    },
+                    success: function(msg){
+                        var bat=msg.split('@');
+                        if(bat[1]=='ok'){
+                            document.getElementById("loadnya").style.width = "0px";
+                            swal({
+                              title: "Success! berhasil disimpan!",
+                              icon: "success",
+                            });
+                            $("#tampil_material").html('');
+                            $('#save-material').hide();
+          
+                            $('#tampil_pengeluaran').load("{{url('kontrak/tampil_pengeluaran')}}?id={{$data->id}}");
+                            $('#tampil-material-save').load("{{url('kontrak/tampil_material')}}?id={{$data->id}}");
                         }else{
                             document.getElementById("loadnya").style.width = "0px";
                             swal({

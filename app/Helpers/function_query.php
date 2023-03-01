@@ -8,8 +8,22 @@ function get_periode($id){
     $data=App\Models\ViewProjectperiode::where('project_header_id',$id)->orderBy('id','Asc')->get();
     return $data;
 }
+function deskripsi_alasan($id,$status_id){
+    $cek=App\Models\LogPengajuan::where('project_header_id',$id)->where('status_id',$status_id)->where('revisi',2)->count();
+    if($cek>0){
+        $data=App\Models\LogPengajuan::where('project_header_id',$id)->where('status_id',$status_id)->orderBy('id','Desc')->firstOrfail();
+        return $data->deskripsi;
+    }else{
+        return "0";
+    }
+    
+}
 function get_personal($id){
     $data=App\Models\ViewPersonal::where('project_header_id',$id)->orderBy('id','Asc')->get();
+    return $data;
+}
+function get_status_material(){
+    $data=App\Models\Statusmaterial::orderBy('id','Asc')->get();
     return $data;
 }
 function sum_personal($id){
@@ -18,6 +32,14 @@ function sum_personal($id){
 }
 function get_operasional($id){
     $data=App\Models\ProjectOperasional::where('project_header_id',$id)->orderBy('id','Asc')->get();
+    return $data;
+}
+function get_material($id){
+    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->orderBy('id','Asc')->get();
+    return $data;
+}
+function count_material($id){
+    $data=App\Models\ProjectMaterial::where('project_header_id',$id)->count();
     return $data;
 }
 function sum_operasional($id){
@@ -42,6 +64,10 @@ function get_risiko($id){
 }
 function get_satuan(){
     $data=App\Models\Satuan::orderBy('satuan','Asc')->get();
+    return $data;
+}
+function count_pm(){
+    $data=App\Models\ProjectPersonal::where('nik',Auth::user()->username)->where('job_id',1)->count();
     return $data;
 }
 function get_status(){
@@ -90,9 +116,14 @@ function get_all_project_cancel(){
     $data=App\Models\ViewHeaderProject::where('active',1)->where('status_id',50)->orderBy('id','Asc')->get();
     return $data;
 }
-function notifikasi_side(){
+function notifikasi_side($act){
     if(Auth::user()->role_id==1){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array())->count();
+        if($act==2){
+            $array=array();
+        }else{
+            $array=array();
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -102,7 +133,12 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==2){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(5))->count();
+        if($act==2){
+            $array=array();
+        }else{
+            $array=array(5);
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -112,7 +148,12 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==3){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(4))->count();
+        if($act==2){
+            $array=array();
+        }else{
+            $array=array(4);
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -122,7 +163,12 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==4){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(2))->count();
+        if($act==2){
+            $array=array();
+        }else{
+            $array=array(2);
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -132,7 +178,12 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==5){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(3))->count();
+        if($act==2){
+            $array=array();
+        }else{
+            $array=array(3);
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -142,7 +193,12 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==6){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array())->count();
+        if($act==2){
+            $array=array(8,9);
+        }else{
+            $array=array(1,6,7);
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -152,7 +208,12 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==7){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array(3))->count();
+        if($act==2){
+            $array=array();
+        }else{
+            $array=array(3);
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -162,7 +223,12 @@ function notifikasi_side(){
         }
     }
     if(Auth::user()->role_id==8){
-        $coun=App\Models\ViewHeaderProject::whereIn('status_id',array())->count();
+        if($act==2){
+            $array=array(9);
+        }else{
+            $array=array();
+        }
+        $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){
             return '<span class="pull-right-container">
                         <span class="label label-primary pull-right">'.$coun.'</span>
@@ -382,8 +448,8 @@ function tombol_kontrak_act($id,$status_id){
         }
     }
     if(Auth::user()->role_id==8){
-        if($status_id==1){
-            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('kontrak/view').'?id='.encoder($id).'`)">View</a></li>';
+        if($status_id==11){
+            $data='<li><a href="javascript:;" onclick="location.assign(`'.url('kontrak/view').'?id='.encoder($id).'`)">Create Pengadaan</a></li>';
         }else{
             $data='<li><a href="javascript:;" onclick="location.assign(`'.url('kontrak/view').'?id='.encoder($id).'`)">View</a></li>';
         }

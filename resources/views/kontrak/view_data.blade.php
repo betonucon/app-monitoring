@@ -645,7 +645,7 @@
                         
                     }
                 });
-        };
+        }
         
         function simpan_personal(){
             

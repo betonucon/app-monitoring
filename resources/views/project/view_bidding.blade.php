@@ -45,7 +45,7 @@
             <form class="form-horizontal" id="mydataproses" method="post" action="{{ url('project') }}" enctype="multipart/form-data" >
               @csrf
               <!-- <input type="submit"> -->
-              <input type="text" name="id" value="{{$id}}">
+              <input type="hidden" name="id" value="{{$id}}">
               <div class="row">
               
                 <div class="col-md-12">

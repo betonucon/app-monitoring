@@ -29,6 +29,7 @@ Route::group(['prefix' => 'employe','middleware'    => 'auth'],function(){
     Route::get('/getdatapm',[EmployeController::class, 'get_data_pm']);
     Route::get('/getrole',[EmployeController::class, 'get_role']);
     Route::get('/delete',[EmployeController::class, 'delete']);
+    Route::get('/switch_to',[EmployeController::class, 'switch_to']);
     Route::get('/create',[EmployeController::class, 'create']);
     Route::get('/modal',[EmployeController::class, 'modal']);
     Route::post('/',[EmployeController::class, 'store']);
@@ -96,12 +97,16 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::post('/store_bidding',[ProjectController::class, 'store_bidding']);
     Route::post('/store_negosiasi',[ProjectController::class, 'store_negosiasi']);
 });
+Route::group(['prefix' => 'projectcontrol','middleware'    => 'auth'],function(){
+    Route::get('/',[KontrakController::class, 'index_control']);
+});
 Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::get('/',[KontrakController::class, 'index']);
     Route::get('/view',[KontrakController::class, 'view_data']);
     Route::get('/form_send',[KontrakController::class, 'form_send']);
     Route::get('/timeline',[KontrakController::class, 'timeline']);
     Route::get('/getdata',[KontrakController::class, 'get_data']);
+    Route::get('/getdatacontrol',[KontrakController::class, 'get_data_control']);
     Route::get('/get_status_data',[KontrakController::class, 'get_status_data']);
     Route::get('/getdatamaterial',[KontrakController::class, 'getdatamaterial']);
     Route::get('/create',[KontrakController::class, 'create']);
@@ -131,6 +136,7 @@ Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::post('/store_material',[KontrakController::class, 'store_material']);
     Route::post('/store_personal',[KontrakController::class, 'store_personal']);
     Route::post('/store_operasional',[KontrakController::class, 'store_operasional']);
+    Route::post('/store_pengadaan',[KontrakController::class, 'store_pengadaan']);
     Route::post('/store_periode_personal',[KontrakController::class, 'store_periode_personal']);
     Route::post('/store_periode_operasional',[KontrakController::class, 'store_periode_operasional']);
     Route::post('/store_negosiasi',[KontrakController::class, 'store_negosiasi']);

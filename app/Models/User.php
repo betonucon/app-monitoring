@@ -38,9 +38,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // function role(){
-	// 	return $this->belongsTo('App\Models\Role','role_id','id');
-    // }
+    function role(){
+		return $this->belongsTo('App\Models\Role','role_id','id');
+    }
+    function roleutama(){
+		return $this->belongsTo('App\Models\Role','role_utama','id');
+    }
     // function person(){
 	// 	return $this->belongsTo('App\Models\MContactPerson','person_id','id');
     // }

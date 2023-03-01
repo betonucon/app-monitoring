@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>{{Auth::user()->name}} | AGP</title>
+  <title>E-PROM</title>
   <!-- Tell the browser to be responsive to screen width -->
-  <link href="{{url_plug()}}/img/logo.png" rel="icon">
+  <link href="{{url_plug()}}/img/ks.png" rel="icon">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="{{url_plug()}}/bower_components/bootstrap/dist/css/bootstrap.min.css">
@@ -231,9 +231,9 @@
 
   <header class="main-header">
     <!-- Logo -->
-    <a href="{{url_plug()}}/index2.html" class="logo">
+    <a href="#" class="logo">
       <span class="logo-mini"><b>A</b>LT</span>
-      <span class="logo-lg"><b>E-PROM</b></span>
+      <span class="logo-lg"><b><img src="{{url_plug()}}/img/ks.png"  alt="User Image"> E-PROM</b></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -256,25 +256,31 @@
             <ul class="dropdown-menu">
               <!-- User image -->
               <li class="user-header">
-                <img src="{{url_plug()}}/dist/img/akun.png" class="img-circle" alt="User Image">
+                <img src="{{url_plug()}}/img/akun.png" class="img-circle" alt="User Image">
 
                 <p>
-                  @ {{Auth::user()->name}} - Web Developer
-                  <small>Member since Nov. 2012</small>
+                  @ {{Auth::user()->name}} - {{Auth::user()->role['role']}}
+                  <small>Online</small>
                 </p>
               </li>
               <!-- Menu Body -->
               <li class="user-body">
                 <div class="row">
                   <div class="col-xs-4 text-center">
-                    <a href="#">Followers</a>
+                    <a href="#"  onclick="switch_to({{Auth::user()->role_utama}})"><span class="btn btn-primary btn-xs">{{Auth::user()->roleutama['short']}}</span></a>
                   </div>
                   <div class="col-xs-4 text-center">
-                    <a href="#">Sales</a>
+                    <a href="#">switch</a>
                   </div>
+                  @if(count_pm()>0)
                   <div class="col-xs-4 text-center">
-                    <a href="#">Friends</a>
+                    <a href="#" onclick="switch_to(8)"><span class="btn btn-primary btn-xs">PM</span></a>
                   </div>
+                  @else
+                  <div class="col-xs-4 text-center">
+                    <a href="#"></a>
+                  </div>
+                  @endif
                 </div>
                 <!-- /.row -->
               </li>
@@ -606,6 +612,17 @@
           }else{
             return true;
           }
+          
+        }
+        function switch_to(role_id) {
+          $.ajax({
+              type: 'GET',
+              url: "{{url('employe/switch_to')}}",
+              data: "role_id="+role_id,
+              success: function(msg){
+                  location.assign("{{url('/')}}")
+              }
+          });
           
         }
         

@@ -162,6 +162,20 @@
                             
                             
                           </div>
+                          @if($data->status_id>7)
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Kontrak (Rp) </label>
+
+                            <div class="col-sm-2">
+                              <input type="text"  style="text-align:right" name="nilai" disabled  class="form-control  input-sm" value="{{uang($data->nilai)}}" placeholder="">
+                            </div>
+                            <div class="col-sm-7">
+                              <input type="text"  id="out" readonly name="terbilang" value="{{terbilang($data->nilai)}}" class="form-control  input-sm" placeholder="">
+                            </div>
+                            
+                            
+                          </div>
+                          @endif
                           <div class="form-group">
                             <label for="inputEmail3" class="col-sm-2 control-label">Tanggal Bidding</label>
 

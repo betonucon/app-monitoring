@@ -15,6 +15,7 @@ use App\Models\Viewstatus;
 use App\Models\Role;
 use App\Models\HeaderProject;
 use App\Models\ViewHeaderProject;
+use App\Models\ProjectPeriode;
 use App\Models\ProjectMaterial;
 use App\Models\ProjectPersonal;
 use App\Models\ViewProjectMaterial;
@@ -245,11 +246,52 @@ class ProjectController extends Controller
 
         return Datatables::of($data)
             ->addColumn('action', function ($row) {
+                if(Auth::user()->role_id==1){
+
+                }
+                if(Auth::user()->role_id==2){
+                    if($row->status_id==5){
+                        $color='success';
+                    }else{
+                        $color='default';
+                    }
+                }
+                if(Auth::user()->role_id==3){
+                    if($row->status_id==4){
+                        $color='success';
+                    }else{
+                        $color='default';
+                    }
+                }
+                if(Auth::user()->role_id==4){
+                    if($row->status_id==2){
+                        $color='success';
+                    }else{
+                        $color='default';
+                    }
+                }
+                if(Auth::user()->role_id==5){
+
+                }
+                if(Auth::user()->role_id==6){
+                    if(in_array($row->status_id, array(1,6,7))){
+                        $color='success';
+                    }else{
+                        $color='default';
+                    }
+                }
+                if(Auth::user()->role_id==7){
+                    if($row->status_id==3){
+                        $color='success';
+                    }else{
+                        $color='default';
+                    }
+                }
                 if($row->active==1){
                     
                         $btn='
                             <div class="btn-group">
-                                <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <button type="button" class="btn btn-'.$color.' btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                 Act <i class="fa fa-sort-desc"></i> 
                                 </button>
                                 <ul class="dropdown-menu">';
@@ -286,7 +328,12 @@ class ProjectController extends Controller
                 return $btn;
             })
             ->addColumn('timeline', function ($row) {
-                $btn='<span class="btn btn-success btn-xs" onclick="show_timeline(`'.encoder($row->id).'`)" title="Log Aktifitas"><i class="fa fa-history"></i></span>';
+                if(deskripsi_alasan($row->id,$row->status_id)!=0){
+                    $col='danger';
+                }else{
+                    $col='success';
+                }
+                $btn='<span class="btn btn-'.$col.' btn-xs" onclick="show_timeline(`'.encoder($row->id).'`)" title="Log Aktifitas"><i class="fa fa-history"></i></span>';
                 return $btn;
             })
             ->addColumn('status_now', function ($row) {
