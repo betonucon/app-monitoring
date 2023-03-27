@@ -44,6 +44,7 @@
                         { data: 'action' },
                         { data: 'kode_material' },
                         { data: 'nama_material' },
+                        { data: 'kategori' },
                         { data: 'harga' },
                         { data: 'satuan' },
                         { data: 'stok' },
@@ -161,9 +162,10 @@
                             <th width="5%">No</th>
                             
                             <th width="5%"></th>
-                            <th width="10%">Kode</th>
+                            <th width="7%">Kode</th>
                             <th>Nama material</th>
-                            <th width="15%">Harga</th>
+                            <th width="10%">Kategori</th>
+                            <th width="9%">Harga</th>
                             <th width="8%">Satuan</th>
                             <th width="8%">Stok</th>
                             <th width="8%">In</th>

@@ -60,11 +60,15 @@ Route::group(['prefix' => 'material','middleware'    => 'auth'],function(){
     Route::get('/keluar',[MaterialController::class, 'index_keluar']);
     Route::get('/view',[MaterialController::class, 'view_data']);
     Route::get('/getdata',[MaterialController::class, 'get_data']);
+    Route::get('/get_material',[MaterialController::class, 'get_material']);
+    Route::get('/get_data_stok',[MaterialController::class, 'get_data_stok']);
     Route::get('/getdataevent',[MaterialController::class, 'get_data_event']);
-    Route::get('/create',[MaterialController::class, 'create']);
+    Route::get('/create_stok',[MaterialController::class, 'create_stok']);
     Route::get('/delete',[MaterialController::class, 'delete']);
+    Route::get('/delete_stok',[MaterialController::class, 'delete_stok']);
     Route::get('/modal',[MaterialController::class, 'modal']);
     Route::post('/',[MaterialController::class, 'store']);
+    Route::post('/store_stok',[MaterialController::class, 'store_stok']);
 });
 
 Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
@@ -77,13 +81,13 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::get('/getdatamaterial',[ProjectController::class, 'getdatamaterial']);
     Route::get('/create',[ProjectController::class, 'create']);
     Route::get('/total_item',[ProjectController::class, 'total_item']);
-    Route::get('/tampil_material',[ProjectController::class, 'tampil_material']);
     Route::get('/total_qty',[ProjectController::class, 'total_qty']);
     Route::get('/delete',[ProjectController::class, 'delete']);
     Route::get('/tampil_risiko',[ProjectController::class, 'tampil_risiko']);
     Route::get('/tampil_risiko_view',[ProjectController::class, 'tampil_risiko_view']);
     Route::get('/delete_risiko',[ProjectController::class, 'delete_risiko']);
     Route::get('/delete_material',[ProjectController::class, 'delete_material']);
+    Route::get('/delete_operasional',[ProjectController::class, 'delete_operasional']);
     Route::get('/modal',[ProjectController::class, 'modal']);
     Route::post('/',[ProjectController::class, 'store']);
     Route::get('/kirim_kadis_komersil',[ProjectController::class, 'kirim_kadis_komersil']);
@@ -93,8 +97,14 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::post('/approve_mgr_operasional',[ProjectController::class, 'approve_mgr_operasional']);
     Route::post('/approve_direktur_operasional',[ProjectController::class, 'approve_direktur_operasional']);
     Route::get('/kirim_procurement',[ProjectController::class, 'kirim_procurement']);
+    Route::get('/tampil_material',[ProjectController::class, 'tampil_material']);
+    Route::get('/tampil_material_in',[ProjectController::class, 'tampil_material_in']);
+    Route::get('/tampil_operasional',[ProjectController::class, 'tampil_operasional']);
     Route::post('/store_material',[ProjectController::class, 'store_material']);
+    Route::post('/store_operasional',[ProjectController::class, 'store_operasional']);
+    Route::post('/store_risiko',[ProjectController::class, 'store_risiko']);
     Route::post('/store_bidding',[ProjectController::class, 'store_bidding']);
+    Route::post('/publish',[ProjectController::class, 'publish']);
     Route::post('/store_negosiasi',[ProjectController::class, 'store_negosiasi']);
 });
 Route::group(['prefix' => 'projectcontrol','middleware'    => 'auth'],function(){
@@ -106,6 +116,7 @@ Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::get('/form_send',[KontrakController::class, 'form_send']);
     Route::get('/timeline',[KontrakController::class, 'timeline']);
     Route::get('/getdata',[KontrakController::class, 'get_data']);
+    Route::get('/modal_material',[KontrakController::class, 'modal_material']);
     Route::get('/getdatacontrol',[KontrakController::class, 'get_data_control']);
     Route::get('/get_status_data',[KontrakController::class, 'get_status_data']);
     Route::get('/getdatamaterial',[KontrakController::class, 'getdatamaterial']);

@@ -24,25 +24,34 @@
             
             if ($('#data-table-fixed-header').length !== 0) {
                 var table=$('#data-table-fixed-header').DataTable({
+                    lengthMenu: [20,50,100],
                     searching:true,
-                    lengthChange:false,
+                    lengthChange:true,
                     fixedHeader: {
                         header: true,
                         headerOffset: $('#header').height()
                     },
                     responsive: true,
-                    ajax:"{{ url('cost/getdata')}}?customer_code={{$data->customer_code}}",
+                    ajax:"{{ url('material/getdata')}}",
                       columns: [
+                        { data: 'id', render: function (data, type, row, meta) 
+                            {
+                              return meta.row + meta.settings._iDisplayStart + 1;
+                            } 
+                        },
+                        
                         { data: 'seleksi' },
-                        { data: 'no_cost' },
-                        { data: 'customer_code' },
-                        { data: 'customer' },
-                        { data: 'area' },
+                        { data: 'kode_material' },
+                        { data: 'nama_material' },
+                        { data: 'harga' },
+                        { data: 'satuan' },
+                        { data: 'stok' },
                         
                       ],
                       
                 });
                 
+
                 
             }
         };
@@ -63,8 +72,6 @@
            
         });
 
-        
-        
     </script>
 @endpush
 @section('content')
@@ -202,22 +209,23 @@
                       </div>
                       <div class="tab-pane active" id="tab_4">
                         <div class="form-group">
-                          <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Material Project</label>
+                          <label for="inputEmail3" class="col-sm-12 control-label" id="header-label-material"><i class="fa fa-bars"></i> Material Project</label>
 
                         </div>
                         <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-1 control-label"></label>
-                            
-                            <div class="col-sm-10">
+                            <div class="col-sm-12" style="margin-left: 0%;">
                             <span class="btn btn-info btn-sm" id="addmaterial"><i class="fa fa-plus"></i> Add Material</span>
                               <table class="table table-bordered" id="">
                                 <thead>
                                   <tr style="background:#bcbcc7">
                                     <th style="width: 10px">No</th>
+                                    <th style="width:15%">Kode</th>
                                     <th>Material</th>
-                                    <th style="width:10%">Qty</th>
-                                    <th style="width:14%">Order</th>
-                                    <th style="width:15%">Biaya</th>
+                                    <th style="width:8%">Stok</th>
+                                    <th style="width:15%">H.Satuan</th>
+                                    <th style="width:8%">Qty</th>
+                                    <th style="width:10%">Order</th>
+                                    <th style="width:15%">Total</th>
                                     <th style="width:5%"></th>
                                   </tr>
                                 </thead>
@@ -261,22 +269,27 @@
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">×</span></button>
-              <h4 class="modal-title">Header Cost</h4>
+              <h4 class="modal-title">Show Material</h4>
             </div>
             <div class="modal-body">
-              
-                <table id="data-table-fixed-header" width="100%" class="cell-border display">
-                    <thead>
-                        <tr>
-                            <th width="5%"></th>
-                            <th width="15%">Cost</th>
-                            <th width="20%">Cust Code</th>
-                            <th width="30%" >Nama Customer</th>
-                            <th >Area</th>
-                        </tr>
-                    </thead>
-                    
-                </table>
+              <input type="text" id="no-draf">
+              <div class="table-responsive">
+                  <table id="data-table-fixed-header" width="100%" class="cell-border display">
+                      <thead>
+                          <tr>
+                              <th width="5%">No</th>
+                              
+                              <th width="5%"></th>
+                              <th width="10%">Kode</th>
+                              <th>Nama material</th>
+                              <th width="15%">Harga</th>
+                              <th width="8%">Satuan</th>
+                              <th width="8%">Stok</th>
+                          </tr>
+                      </thead>
+                      
+                  </table>
+                </div>
               
             </div>
             <div class="modal-footer">
@@ -326,19 +339,25 @@
                 var no = nom++;
                 $("#tampil_material").append('<tr style="background:#fff" class="addmaterial">'
                                               +'<td style="width: 10px">'+no+'</td>'
-                                              +'<td><input type="text" name="keterangan[]" placeholder="ketik disini.." class="form-control  input-sm"></td>'
+                                              +'<td><div class="input-group"><span class="input-group-addon" onclick="show_material('+no+')"><i class="fa fa-search"></i></span><input type="text" readonly id="kode_material'+no+'"  name="kode_material[]" placeholder="ketik disini.." class="form-control  input-sm"></div></td>'
+                                              +'<td><input type="text" name="nama_material[]"  readonly  id="nama_material'+no+'" placeholder="ketik disini.." class="form-control  input-sm"></td>'
+                                              +'<td><input type="text" name="stok[]" readonly id="stok'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
+                                              +'<td><input type="text" name="biaya[]"  readonly  id="harga_material'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
+                                              +'<input type="text"   readonly  id="normal_harga_material'+no+'" placeholder="ketik disini.." class="form-control input-sm">'
                                               +'<td><input type="text" name="qty[]" id="qtynya'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
                                               +'<td><select name="status_material_id[]" placeholder="ketik disini.." class="form-control  input-sm">'
-                                                +'<option value="">Pilih status---</option>'
+                                                +'<option value="">status--</option>'
                                                 @foreach(get_status_material() as $jb)
                                                   +'<option value="{{$jb->id}}">{{$jb->status_material}}</option>'
                                                 @endforeach
                                               +'</select></td>'
-                                              +'<td><input type="text" name="biaya[]" id="biayanya'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
+                                              +'<td><input type="text" name="total[]" id="total'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
                                               +'<td style="width:5%"><span class="btn btn-danger btn-xs remove_material"><i class="fa fa-close"></i></span></td>'
                                             +'</tr>');
-                                            $("#biayanya"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
+                                            $("#harga_material"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
+                                            $("#total"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
                                             $("#qtynya"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
+                                            $("#stok"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
                 if(no>0){
                   $('#save-material').show();
                 } 
@@ -347,6 +366,24 @@
         $(document).on('click', '.remove_material', function(){  
             $(this).parents('.addmaterial').remove();
         });
+        function show_material(no){
+
+          $('#no-draf').val(no);
+          $('#modal-draf').modal('show');
+          var tables=$('#data-table-fixed-header').DataTable();
+              tables.ajax.url("{{ url('material/getdata')}}").load();
+        }
+        function pilih_material(kode_material,nama_material,harga,stok){
+
+          var no=$('#no-draf').val();
+          $('#modal-draf').modal('hide');
+          $('#nama_material'+no).val(nama_material);
+          $('#kode_material'+no).val(kode_material);
+          $('#harga_material'+no).val(harga);
+          $('#normal_harga_material'+no).val(harga);
+          $('#stok'+no).val(stok);
+          
+        }
         function delete_material(id){
            
            swal({

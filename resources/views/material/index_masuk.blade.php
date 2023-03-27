@@ -33,7 +33,7 @@
                     },
                     dom: 'lrtip',
                     responsive: true,
-                    ajax:"{{ url('material/getdataevent')}}?status=1",
+                    ajax:"{{ url('material/get_data_stok')}}",
                       columns: [
                         { data: 'id', render: function (data, type, row, meta) 
                             {
@@ -41,13 +41,9 @@
                             } 
                         },
                         
-                        { data: 'kode_material' },
-                        { data: 'nama_material' },
-                        { data: 'satuan' },
-                        { data: 'harga_uang' },
-                        { data: 'qty' },
-                        { data: 'total_uang' },
+                        { data: 'action' },
                         { data: 'cost_center' },
+                        { data: 'desk' },
                         { data: 'created_at' },
                         
                         
@@ -126,7 +122,7 @@
           <div class="row">
             <div class="col-md-6">
               <div class="btn-group" style="margin-top:5%">
-                <!-- <button type="button" class="btn btn-success btn-sm" onclick="location.assign(`{{url('material/view')}}?id={{encoder(0)}}`)"><i class="fa fa-plus"></i> Buat Baru</button> -->
+                <button type="button" class="btn btn-success btn-sm" onclick="location.assign(`{{url('material/create_stok')}}?id={{encoder(0)}}`)"><i class="fa fa-plus"></i> Add Stok</button>
                 <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
               </div>
               
@@ -160,14 +156,10 @@
                     <thead>
                         <tr>
                             <th width="5%">No</th>
+                            <th width="5%"></th>
                             
-                            <th width="8%">Kode</th>
-                            <th>Nama material</th>
-                            <th width="8%">Satuan</th>
-                            <th width="12%">Harga</th>
-                            <th width="8%">Qty</th>
-                            <th width="12%">Total</th>
-                            <th width="10%">Cost Center</th>
+                            <th width="11%">Cost </th>
+                            <th>Deskripsi</th>
                             <th width="15%">Waktu</th>
                         </tr>
                     </thead>
@@ -210,14 +202,14 @@
                     if(act=='0'){
                        $.ajax({
                            type: 'GET',
-                           url: "{{url('material/delete')}}",
+                           url: "{{url('material/delete_stok')}}",
                            data: "id="+id+"&act="+act,
                            success: function(msg){
                                swal("Success! berhasil terhapus!", {
                                    icon: "success",
                                });
                                var tables=$('#data-table-fixed-header').DataTable();
-                                  tables.ajax.url("{{ url('material/getdata')}}").load();
+                                  tables.ajax.url("{{ url('material/get_data_stok')}}").load();
                            }
                        });
                    

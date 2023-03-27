@@ -255,6 +255,23 @@ function penomoran_customer(){
     }
     return $nomor;
 }
+function kd_material($id){
+   $data=App\Models\MaterialKategori::where('id',$id)->first();
+   return $data->kd_kategori;
+}
+function penomoran_material($kategori){
+    
+    $cek=App\Models\Material::where('kategori_material_id',$kategori)->count();
+    if($cek>0){
+        $mst=App\Models\Material::where('kategori_material_id',$kategori)->orderBy('kode_material','Desc')->firstOrfail();
+        $urutan = (int) substr($mst['kode_material'], 1, 5);
+        $urutan++;
+        $nomor=kd_material($kategori).sprintf("%05s",  $urutan);
+    }else{
+        $nomor=kd_material($kategori).sprintf("%05s",  1);
+    }
+    return $nomor;
+}
 
 function penomoran_cost_center($cost){
    $cs=strlen($cost);

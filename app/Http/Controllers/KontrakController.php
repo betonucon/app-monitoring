@@ -45,6 +45,8 @@ class KontrakController extends Controller
             return view('kontrak.index_procurement',compact('template'));
         }elseif(Auth::user()->role_id==2){
             return view('kontrak.index_direktur_operasional',compact('template'));
+        }elseif(Auth::user()->role_id==8){
+            return view('kontrak.index_komersil',compact('template'));
         }elseif(Auth::user()->role_id==3){
             return view('kontrak.index_mgr_operasional',compact('template'));
         }else{
@@ -166,6 +168,13 @@ class KontrakController extends Controller
         }
         return view('kontrak.form_send',compact('template','data','disabled','id'));
     }
+    public function modal_material(request $request)
+    {
+        error_reporting(0);
+        $template='top';
+        $no=$request->no;
+        return view('kontrak.modal_material',compact('no'));
+    }
 
     public function tampil_material(request $request)
     {
@@ -174,19 +183,25 @@ class KontrakController extends Controller
             if($request->act==1){
                 $act.='
                 <tr style="background:#fff">
-                    <td class="td-detail">'.($no+1).'</td>
-                    <td class="td-detail">'.$o->qty.'</td>
-                    <td class="td-detail">'.$o->status_material.'</td>
-                    <td class="td-detail">'.$o->keterangan.'</td>
-                    <td class="td-detail">'.uang($o->biaya).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->stok.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->status_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
                 </tr>';
             }else{
                 $act.='
                 <tr style="background:#fff" >
                     <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->keterangan.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->stok.'</td>
                     <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
                     <td style="padding: 2px 2px 2px 8px;">'.$o->status_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
                     <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
                     <td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>
                         

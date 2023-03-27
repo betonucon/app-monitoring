@@ -11,9 +11,13 @@ use Validator;
 use App\Models\ViewEmploye;
 use App\Models\ViewProjectMaterial;
 use App\Models\ViewMaterial;
+use App\Models\MaterialStok;
+use App\Models\ProjectMaterial;
+use App\Models\ViewHeaderStok;
 use App\Models\Viewrole;
 use App\Models\Role;
 use App\Models\Customer;
+use App\Models\ExampleMaterial;
 use App\Models\Material;
 use App\Models\User;
 
@@ -57,6 +61,23 @@ class MaterialController extends Controller
         }
         return view('material.view_data',compact('template','data','disabled','id'));
     }
+    public function create_stok(request $request)
+    {
+        error_reporting(0);
+        $template='top';
+        $id=decoder($request->id);
+        
+        $data=ViewHeaderStok::where('id',$id)->first();
+        
+        $cn=ProjectMaterial::where('project_header_id',$id)->where('status',2)->count();
+        $count=$cn+1;
+        if($id==0){
+            $disabled='';
+        }else{
+            $disabled='readonly';
+        }
+        return view('material.view_data_stok',compact('template','data','count','disabled','id'));
+    }
    
 
     public function delete(request $request)
@@ -66,7 +87,30 @@ class MaterialController extends Controller
         $data=Material::where('id',$id)->update(['active'=>$request->act]);
     }
     
-
+    public function delete_stok(request $request)
+    {
+        $id=decoder($request->id);
+        
+        $data=MaterialStok::where('id',$id)->delete();
+        $sub=ProjectMaterial::where('project_header_id',$id)->where('status',2)->delete();
+    }
+    public function get_material(){
+        $data=ExampleMaterial::orderBy('kategori','Asc')->get();
+        
+        foreach($data as $no=>$o){
+            $material=$o->material.' ('.$o->last_name.')';
+            $deskripsi='Spec '.$o->material.' ('.$o->last_name.') '.$o->jenis;
+            $data=Material::create([
+                
+                'kode_material'=>penomoran_material($o->kategori),
+                'nama_material'=>$material,
+                'deskripsi'=>$deskripsi,
+                'kategori_material_id'=>$o->kategori,
+                'update'=>date('Y-m-d H:i:s'),
+                'active'=>1,
+            ]);
+        }
+    }
     public function get_data(request $request)
     {
         error_reporting(0);
@@ -80,7 +124,7 @@ class MaterialController extends Controller
 
         return Datatables::of($data)
             ->addColumn('seleksi', function ($row) {
-                $btn='<span class="btn btn-success btn-xs" onclick="pilih_material(`'.$row->kode_material.'`,`'.$row->nama_material.'`,`'.$row->harga.'`)">Pilih</span>';
+                $btn='<span class="btn btn-success btn-xs" onclick="pilih_material(`'.$row->kode_material.'`,`'.$row->nama_material.'`,`'.$row->harga_normal.'`,'.$row->stok.')">Pilih</span>';
                 return $btn;
             })
             ->addColumn('stok', function ($row) {
@@ -115,6 +159,33 @@ class MaterialController extends Controller
                         </div>
                     ';
                 }
+                return $btn;
+            })
+            
+            ->rawColumns(['action','seleksi','stok'])
+            ->make(true);
+    }
+    public function get_data_stok(request $request)
+    {
+        error_reporting(0);
+        $query = ViewHeaderStok::query();
+        $data = $query->orderBy('id','Desc')->get();
+
+        return Datatables::of($data)
+            ->addColumn('action', function ($row) {
+               
+                    $btn='
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-info btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            Act <i class="fa fa-sort-desc"></i> 
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="javascript:;" onclick="location.assign(`'.url('material/create_stok').'?id='.encoder($row->id).'`)">View</a></li>
+                                <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,`0`)">Hidden</a></li>
+                            </ul>
+                        </div>
+                    ';
+                
                 return $btn;
             })
             
@@ -251,6 +322,146 @@ class MaterialController extends Controller
                     'update'=>date('Y-m-d H:i:s')
                 ]);
                 echo'@ok';
+            }
+           
+        }
+    }
+
+    public function store_stok(request $request){
+        error_reporting(0);
+        $rules = [];
+        $messages = [];
+        if($request->id=='0'){
+            $rules['kategori_stok_id']= 'required';
+            $messages['kategori_stok_id.required']= 'Masukan sumber kategori';
+        }
+        if($request->kategori_stok_id==2){
+            $rules['cost_center']= 'required';
+            $messages['cost_center.required']= 'Masukan cost center project';
+        }
+        
+        $rules['tanggal']= 'required';
+        $messages['tanggal.required']= 'Masukan tanggal proses';
+
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
+
+
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
+                    
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
+                    }
+                }
+            echo'</div></div>';
+        }else{
+            $count=(int) count($request->kode_material);
+            if($request->id=='0'){
+                if($request->kategori_stok_id==2){
+                    $cost_center=$request->cost_center;
+                }else{
+                    $cost_center='00000';
+                }
+                
+                if($count>0){
+                    $cek=0;
+                    for($x=0;$x<$count;$x++){
+                        if($request->kode_material[$x]==""  || $request->biaya[$x]=="" || $request->qty[$x]==""   || $request->total[$x]=="" || $request->total[$x]==0){
+                            $cek+=0;
+                        }else{
+                            $cek+=1;
+                        }
+                    }
+
+                    if($cek==$count){
+                        $data=MaterialStok::create([
+                            'kategori_stok_id'=>$request->kategori_stok_id,
+                            'cost_center'=>$cost_center,
+                            'tanggal'=>$request->tanggal,
+                            'customer_code'=>$request->customer_code,
+                            'created_at'=>date('Y-m-d H:i:s'),
+                        ]);
+                        for($x=0;$x<$count;$x++){
+                        
+                            $data=ProjectMaterial::UpdateOrcreate([
+                                'project_header_id'=>$data->id,
+                                'kode_material'=>$request->kode_material[$x],
+                                'status'=>2,
+                                
+                            ],[
+                                'biaya'=>ubah_uang($request->biaya[$x]),
+                                'qty'=>ubah_uang($request->qty[$x]),
+                                'total'=>ubah_uang($request->total[$x]),
+                                'stok'=>0,
+                                'status_material_id'=>3,
+                                'nama_material'=>$request->nama_material[$x],
+                                'created_at'=>date('Y-m-d H:i:s'),
+                            ]);
+                        
+                        }
+                        echo'@ok';
+                    }else{
+                        echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+                    }
+                }else{
+                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+                }
+                
+            }else{
+                
+
+                if($count>0){
+                    $cek=0;
+                    for($x=0;$x<$count;$x++){
+                        if($request->kode_material[$x]==""  || $request->biaya[$x]=="" || $request->qty[$x]==""   || $request->total[$x]=="" || $request->total[$x]==0){
+                            $cek+=0;
+                        }else{
+                            $cek+=1;
+                        }
+                    }
+
+                    if($cek==$count){
+                        $data=MaterialStok::UpdateOrcreate([
+                            'id'=>$request->id,
+                        ],[
+                            'tanggal'=>$request->tanggal,
+                            'created_at'=>date('Y-m-d H:i:s')
+                        ]);
+                        for($x=0;$x<$count;$x++){
+                        
+                            $data=ProjectMaterial::UpdateOrcreate([
+                                'project_header_id'=>$data->id,
+                                'kode_material'=>$request->kode_material[$x],
+                                'status'=>2,
+                                
+                            ],[
+                                'biaya'=>ubah_uang($request->biaya[$x]),
+                                'qty'=>ubah_uang($request->qty[$x]),
+                                'total'=>ubah_uang($request->total[$x]),
+                                'stok'=>0,
+                                'status_material_id'=>3,
+                                'nama_material'=>$request->nama_material[$x],
+                                'created_at'=>date('Y-m-d H:i:s'),
+                            ]);
+                        
+                        }
+                        echo'@ok';
+                    }else{
+                        echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+                    }
+                }else{
+                    $data=MaterialStok::UpdateOrcreate([
+                        'id'=>$request->id,
+                    ],[
+                        'tanggal'=>$request->tanggal,
+                        'created_at'=>date('Y-m-d H:i:s')
+                    ]);
+                    echo'@ok';
+                }
+                
             }
            
         }

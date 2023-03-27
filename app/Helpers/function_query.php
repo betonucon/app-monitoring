@@ -4,6 +4,10 @@ function get_jabatan(){
     $data=App\Models\Jabatan::orderBy('id','Asc')->get();
     return $data;
 }
+function get_kategori_stok(){
+    $data=App\Models\StokKategori::orderBy('id','Asc')->get();
+    return $data;
+}
 function get_periode($id){
     $data=App\Models\ViewProjectperiode::where('project_header_id',$id)->orderBy('id','Asc')->get();
     return $data;
@@ -34,8 +38,8 @@ function get_operasional($id){
     $data=App\Models\ProjectOperasional::where('project_header_id',$id)->orderBy('id','Asc')->get();
     return $data;
 }
-function get_material($id){
-    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->orderBy('id','Asc')->get();
+function get_material($id,$status){
+    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('status',$status)->orderBy('id','Asc')->get();
     return $data;
 }
 function count_material($id){
@@ -46,12 +50,20 @@ function sum_operasional($id){
     $data=App\Models\ProjectOperasional::where('project_header_id',$id)->sum('biaya');
     return $data;
 }
+function sum_material($id){
+    $data=App\Models\ProjectMaterial::where('project_header_id',$id)->sum('total');
+    return $data;
+}
 function get_job(){
     $data=App\Models\Job::where('id','!=',1)->orderBy('id','Asc')->get();
     return $data;
 }
 function get_kategori(){
     $data=App\Models\Kategori::orderBy('id','Asc')->get();
+    return $data;
+}
+function get_tipe(){
+    $data=App\Models\Tipe::orderBy('id','Asc')->get();
     return $data;
 }
 function get_role(){
@@ -72,6 +84,10 @@ function count_pm(){
 }
 function get_status(){
     $data=App\Models\Viewstatus::orderBy('id','Asc')->get();
+    return $data;
+}
+function get_status_risiko(){
+    $data=App\Models\Statusrisiko::orderBy('id','Asc')->get();
     return $data;
 }
 function get_status_board($id){

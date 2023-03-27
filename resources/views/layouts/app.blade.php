@@ -51,7 +51,7 @@
           background: #e7e7f3;
           border-top: 1px solid rgb(0 0 0 / 15%) !important;
           border-bottom: 1px solid rgb(0 0 0 / 15%) !important;
-          border-right: solid 1px #dbdbdf;
+          /* border-right: solid 1px #dbdbdf; */
       }
       .form-group {
           margin-bottom: 3px;
@@ -112,6 +112,17 @@
           font-size: 16px;
           margin: 20px 0px 20px 40px;
           border-bottom: solid 2px #dadadf;
+      }
+      #header-label-material {
+        text-align: left;
+        font-family: inherit;
+        font-weight: 700;
+        padding: 0px 0px;
+        width: 97%;
+        color: #77779b;
+        font-size: 16px;
+        margin: 20px 0px 20px 20px;
+        border-bottom: solid 2px #dadadf;
       }
       #header-label-modal{
           text-align: left;

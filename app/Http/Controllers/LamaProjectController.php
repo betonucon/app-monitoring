@@ -84,7 +84,7 @@ class ProjectController extends Controller
                 return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab'));
             }else{
                 if($id==0){
-                    return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab'));
+                    return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat'));
                 }else{
                     if($data->status_id==6){
                         return view('project.view_bidding',compact('template','data','disabled','id'));
@@ -157,6 +157,23 @@ class ProjectController extends Controller
         return view('project.form_send',compact('template','data','disabled','id'));
     }
 
+    public function tampil_material(request $request)
+    {
+        error_reporting(0);
+        $template='top';
+        $id=decoder($request->id);
+        
+        $data=ViewHeaderProject::where('id',$id)->first();
+        $total=ViewProjectMaterial::where('project_header_id',$id)->sum('total');
+        $getdata=ViewProjectMaterial::where('project_header_id',$id)->get();
+        
+        if($id==0){
+            $disabled='';
+        }else{
+            $disabled='readonly';
+        }
+        return view('project.tampil_material',compact('template','data','disabled','id','getdata','total'));
+    }
 
 
     public function timeline(request $request)
@@ -220,7 +237,7 @@ class ProjectController extends Controller
             if($request->status_id!=""){
                 $data = $query->where('status_id',$request->status_id);
             }else{
-                $data = $query->where('status_id','>',3);
+                $data = $query->where('status_id','>',1);
             }
         }
         if(Auth::user()->role_id==7){
@@ -240,10 +257,6 @@ class ProjectController extends Controller
         $data = $query->orderBy('id','Desc')->get();
 
         return Datatables::of($data)
-            ->addColumn('seleksi', function ($row) {
-                $btn='<span class="btn btn-success btn-xs" onclick="pilih_cost(`'.$row->cost_center.'`,`'.$row->customer_code.'`,`'.$row->customer.'`,`'.$row->deskripsi_project.'`)">Pilih</span>';
-                return $btn;
-            })
             ->addColumn('action', function ($row) {
                 if(Auth::user()->role_id==1){
 
@@ -297,6 +310,7 @@ class ProjectController extends Controller
                                     if($row->status_id==1){
                                         $btn.='
                                         <li><a href="javascript:;" onclick="location.assign(`'.url('project/view').'?id='.encoder($row->id).'`)">View</a></li>
+                                        <li><a href="javascript:;"  onclick="send_data_to(`'.encoder($row->id).'`,`0`)">Send Komersil</a></li>
                                         <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,`0`)">Hidden</a></li>
                                         ';
                                     }else{
@@ -335,16 +349,11 @@ class ProjectController extends Controller
                 return $btn;
             })
             ->addColumn('status_now', function ($row) {
-                if($row->tab>4){
-                    $btn='<font color="'.$row->color.'" style="font-style:italic">'.$row->singkatan.'</font>';
-                
-                }else{
-                    $btn='<font color="green" style="font-style:italic">Penyusunan</font>';
-                }
+                $btn='<font color="'.$row->color.'" style="font-style:italic">'.$row->singkatan.'</font>';
                 return $btn;
             })
             
-            ->rawColumns(['action','seleksi','status_now','file','timeline'])
+            ->rawColumns(['action','status_now','file','timeline'])
             ->make(true);
     }
     public function getdatamaterial(request $request)
@@ -399,143 +408,6 @@ class ProjectController extends Controller
         return response()->json($success, 200);
     }
 
-    public function tampil_operasional(request $request)
-    {
-        $act='';
-        $sum=0;
-        foreach(get_operasional($request->id) as $no=>$o){
-            $sum+=$o->biaya;
-            if($request->act==1){
-                $act.='
-                <tr style="background:#fff">
-                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->keterangan.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                </tr>';
-            }else{
-                $act.='
-                <tr style="background:#fff">
-                    <td>'.($no+1).'</td>
-                    <td>'.$o->keterangan.'</td>
-                    <td class="text-right">'.uang($o->biaya).'</td>
-                    <td><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                        
-                </tr>';
-            }
-            
-        }
-        if($request->act==1){
-            $act.='
-            <tr style="background:#fff">
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-            </tr>';
-        }else{
-            $act.='
-            <tr style="background:#fff">
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-            </tr>';
-        }
-        return $act;
-    }
-
-    public function tampil_material(request $request)
-    {
-        $act='';
-        $sum=0;
-        foreach(get_material($request->id,1) as $no=>$o){
-            $sum+=$o->total;
-            if($request->act==1){
-                $act.='
-                <tr style="background:#fff">
-                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                    
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                </tr>';
-            }else{
-                $act.='
-                <tr style="background:#fff" >
-                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                    <td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                        
-                </tr>';
-            }
-            
-        }
-        if($request->act==1){
-        $act.='
-        <tr style="background:#fff">
-            <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-        </tr>';
-        }else{
-        $act.='
-        <tr style="background:#fff">
-            <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-        </tr>';
-        }
-        
-        return $act;
-    }
-    public function tampil_material_in(request $request)
-    {
-        $act='';
-        $sum=0;
-        foreach(get_material($request->id,2) as $no=>$o){
-            $sum+=$o->total;
-            if($request->act==1){
-                $act.='
-                <tr style="background:#fff">
-                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                    
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                </tr>';
-            }else{
-                $act.='
-                <tr style="background:#fff" >
-                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                    <td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                        
-                </tr>';
-            }
-            
-        }
-        if($request->act==1){
-        $act.='
-        <tr style="background:#fff">
-            <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-        </tr>';
-        }else{
-        $act.='
-        <tr style="background:#fff">
-            <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-        </tr>';
-        }
-        
-        return $act;
-    }
     public function tampil_risiko(request $request)
     {
         $act='';
@@ -544,7 +416,6 @@ class ProjectController extends Controller
             <tr style="background:#fff">
                 <td>'.($no+1).'</td>
                 <td>'.$o->risiko.'</td>
-                <td>'.$o->status_risiko.'</td>
                 <td><span class="btn btn-danger btn-xs" onclick="delete_risiko('.$o->id.')"><i class="fa fa-close"></i></span></td>
             </tr>';
         }
@@ -559,7 +430,6 @@ class ProjectController extends Controller
             <tr style="background:#fff ">
                 <td>'.($no+1).'</td>
                 <td>'.$o->risiko.'</td>
-                <td>'.$o->status_risiko.'</td>
             </tr>';
         }
         return $act;
@@ -617,16 +487,9 @@ class ProjectController extends Controller
         $data=ProjectRisiko::where('id',$id)->delete();
     }
 
-    public function delete_operasional(request $request)
-    {
-        $id=$request->id;
-        
-        $data=ProjectOperasional::where('id',$id)->delete();
-    }
-
     public function delete_material(request $request)
     {
-        $id=$request->id;
+        $id=decoder($request->id);
         
         $data=ProjectMaterial::where('id',$id)->delete();
     }
@@ -643,9 +506,6 @@ class ProjectController extends Controller
         $rules['kategori_project_id']= 'required';
         $messages['kategori_project_id.required']= 'Pilih  Kategori Project ';
        
-        $rules['tipe_project_id']= 'required';
-        $messages['tipe_project_id.required']= 'Pilih  Tipe Project ';
-
         $rules['deskripsi_project']= 'required';
         $messages['deskripsi_project.required']= 'Masukan Ruang Lingkup Project';
         
@@ -654,11 +514,33 @@ class ProjectController extends Controller
 
         $rules['end_date']= 'required';
         $messages['end_date.required']= 'Masukan end date ';
-
-        $rules['nilai_project']= 'required|min:0|not_in:0';
-        $messages['nilai_project.required']= 'Masukan nilai project ';
-        $messages['nilai_project.not_in']= 'Masukan nilai project ';
-        
+        if($request->id==0){
+            $countrisiko=count((array) $request->risiko);
+            $countketerangan=count((array) $request->keterangan);
+            $totcr=0;
+            $totop=0;
+            for($x=0;$x<$countrisiko;$x++){
+                if($request->risiko[$x]==""){
+                    $totcr+=0;
+                }else{
+                    $totcr+=1;
+                }
+            }
+            for($x=0;$x<$countketerangan;$x++){
+                if($request->keterangan[$x]=="" || $request->biaya[$x]==""){
+                    $totop+=0;
+                }else{
+                    $totop+=1;
+                }
+            }
+            if($totcr<1 || $totop<1){
+                $rules['msg']= 'required';
+                $messages['msg.required']= 'Masukan risiko pekerjaan dan biaya operasional';
+            }else{
+                
+            }
+        }
+       
         $validator = Validator::make($request->all(), $rules, $messages);
         $val=$validator->Errors();
 
@@ -680,109 +562,87 @@ class ProjectController extends Controller
                     'customer_code'=>$request->customer_code,
                     'deskripsi_project'=>$request->deskripsi_project,
                     'start_date'=>$request->start_date,
-                    'kategori_project_id'=>$request->kategori_project_id, 
-                    'tipe_project_id'=>$request->tipe_project_id, 
-                    'end_date'=>$request->end_date,
-                    'nilai_project'=>ubah_uang($request->nilai_project),
-                    'username'=>Auth::user()->username,
-                    'active'=>1,
-                    'tab'=>1,
-                    'status_id'=>1,
-                    'create'=>date('Y-m-d H:i:s'),
-                ]);
-
-                echo'@ok@'.encoder($data->id);
-                   
-                
-            }else{
-                $data=HeaderProject::UpdateOrcreate([
-                    'id'=>$request->id,
-                ],[
-                    'customer_code'=>$request->customer_code,
-                    'deskripsi_project'=>$request->deskripsi_project,
-                    'start_date'=>$request->start_date,
                     'kategori_project_id'=>$request->kategori_project_id,
-                    'tipe_project_id'=>$request->tipe_project_id, 
                     'end_date'=>$request->end_date,
-                    'nilai_project'=>ubah_uang($request->nilai_project),
                     'username'=>Auth::user()->username,
                     'active'=>1,
                     'status_id'=>1,
                     'create'=>date('Y-m-d H:i:s'),
                 ]);
 
-                
-                echo'@ok@'.encoder($request->id);
-                
-            }
-           
-        }
-    }
-   
-    public function publish(request $request){
-        error_reporting(0);
-        $rules = [];
-        $messages = [];
-        
-        
-        $rules['customer_code']= 'required';
-        $messages['customer_code.required']= 'Pilih  customer ';
-
-        $rules['kategori_project_id']= 'required';
-        $messages['kategori_project_id.required']= 'Pilih  Kategori Project ';
-
-        $rules['tipe_project_id']= 'required';
-        $messages['tipe_project_id.required']= 'Pilih  Tipe Project ';
-       
-        $rules['deskripsi_project']= 'required';
-        $messages['deskripsi_project.required']= 'Masukan Ruang Lingkup Project';
-        
-        $rules['start_date']= 'required';
-        $messages['start_date.required']= 'Masukan start date ';
-
-        $rules['end_date']= 'required';
-        $messages['end_date.required']= 'Masukan end date ';
-        
-        $validator = Validator::make($request->all(), $rules, $messages);
-        $val=$validator->Errors();
-
-
-        if ($validator->fails()) {
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-                foreach(parsing_validator($val) as $value){
-                    
-                    foreach($value as $isi){
-                        echo'-&nbsp;'.$isi.'<br>';
+                for($x=0;$x<$countrisiko;$x++){
+                    if($request->risiko[$x]!=""){
+                        $ris=ProjectRisiko::create([
+                            'risiko'=>$request->risiko[$x],
+                            'project_header_id'=>$data->id,
+                            'urut'=>($x+1),
+                        ]);
                     }
+                    
                 }
-            echo'</div></div>';
-        }else{
-            
-                $data=HeaderProject::UpdateOrcreate([
-                    'id'=>$request->id,
-                ],[
-                    'customer_code'=>$request->customer_code,
-                    'deskripsi_project'=>$request->deskripsi_project,
-                    'start_date'=>$request->start_date,
-                    'kategori_project_id'=>$request->kategori_project_id,
-                    'tipe_project_id'=>$request->tipe_project_id,
-                    'end_date'=>$request->end_date,
-                    'username'=>Auth::user()->username,
-                    'active'=>1,
-                    'status_id'=>2,
-                    'update'=>date('Y-m-d H:i:s'),
-                ]);
-
+                for($x=0;$x<$countketerangan;$x++){
+                    if($request->keterangan[$x]!="" || $request->biaya[$x]!=""){
+                        $opers=ProjectOperasional::UpdateOrcreate([
+                            'project_header_id'=>$data->id,
+                            'keterangan'=>$request->keterangan[$x],
+                        ],[
+                            'biaya'=>ubah_uang($request->biaya[$x]),
+                        ]);
+                    }
+                    
+                }
                 $log=LogPengajuan::create([
-                    'project_header_id'=>$request->id,
-                    'deskripsi'=>'Pengajuan telah dipublish dan dikirim kekadis operasional',
-                    'status_id'=>2,
+                    'cost_center'=>null,
+                    'project_header_id'=>$data->id,
+                    'deskripsi'=>'Rencana Pekerjaan baru',
+                    'status_id'=>1,
                     'nik'=>Auth::user()->username,
                     'role_id'=>Auth::user()->role_id,
+                    'revisi'=>1,
                     'created_at'=>date('Y-m-d H:i:s'),
                 ]);
                 echo'@ok';
-             
+                   
+                
+            }else{
+                $con=ProjectRisiko::where('project_header_id',$request->id)->count();
+                $sum=(int) $con;
+                $mst=HeaderProject::where('id',$request->id)->first();
+                $data=HeaderProject::UpdateOrcreate([
+                    'id'=>$request->id,
+                ],[
+                    'customer_code'=>$request->customer_code,
+                    'deskripsi_project'=>$request->deskripsi_project,
+                    'start_date'=>$request->start_date,
+                    'kategori_project_id'=>$request->kategori_project_id,
+                    'end_date'=>$request->end_date,
+                    'username'=>Auth::user()->username,
+                    'update'=>date('Y-m-d H:i:s'),
+                ]);
+
+                $countrisiko=count((array) $request->risiko);
+                for($x=0;$x<$countrisiko;$x++){
+                    if($request->risiko[$x]!=""){
+                        $ris=ProjectRisiko::create([
+                            'risiko'=>$request->risiko[$x],
+                            'project_header_id'=>$request->id,
+                            'urut'=> ($sum+($x+1)),
+                        ]);
+                    }
+                    
+                }
+                $log=LogPengajuan::create([
+                    'project_header_id'=>$request->id,
+                    'deskripsi'=>'Perubahan Rencana pekerjaan',
+                    'status_id'=>1,
+                    'nik'=>Auth::user()->username,
+                    'role_id'=>Auth::user()->role_id,
+                    'revisi'=>1,
+                    'created_at'=>date('Y-m-d H:i:s'),
+                ]);
+                echo'@ok';
+                
+            }
            
         }
     }
@@ -843,202 +703,6 @@ class ProjectController extends Controller
                 ]);
                 echo'@ok';
         }
-               
-        
-        
-    }
-
-    public function store_operasional(request $request){
-        error_reporting(0);
-        $id=$request->id;
-        $rules = [];
-        $messages = [];
-        if($id==0){
-            $rules['catatan']= 'required';
-            $messages['catatan.required']= 'Harap isi rencana kerja terlebih dahulu';
-        }
-        $validator = Validator::make($request->all(), $rules, $messages);
-        $val=$validator->Errors();
-
-
-        if ($validator->fails()) {
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-                foreach(parsing_validator($val) as $value){
-                    
-                    foreach($value as $isi){
-                        echo'-&nbsp;'.$isi.'<br>';
-                    }
-                }
-            echo'</div></div>';
-        }else{
-            $count=(int) count($request->keterangan);
-            if($count>0){
-                $cek=0;
-                for($x=0;$x<$count;$x++){
-                    if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
-                        $cek+=0;
-                    }else{
-                        $cek+=1;
-                    }
-                }
-
-                if($cek==$count){
-                    $mst=HeaderProject::where('id',$id)->first();
-                    if($mst->tab>1){
-                        $tab=$mst->tab;
-                    }else{
-                        $tab=3;
-                    }
-                    $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
-                    for($x=0;$x<$count;$x++){
-                        if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
-                            
-                        }else{
-                            $data=ProjectOperasional::UpdateOrcreate([
-                                'project_header_id'=>$id,
-                                'keterangan'=>$request->keterangan[$x],
-                            ],[
-                                'biaya'=>ubah_uang($request->biaya[$x]),
-                            ]);
-                        }
-                    }
-                    echo'@ok';  
-                }else{
-                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-                }
-            }else{
-                echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-            }
-        }    
-        
-    }
-
-    public function store_risiko(request $request){
-        error_reporting(0);
-        $id=$request->id;
-        $rules = [];
-        $messages = [];
-        if($id==0){
-            $rules['risiko']= 'required';
-            $messages['risiko.required']= 'Harap isi rencana kerja terlebih dahulu';
-        }
-        $validator = Validator::make($request->all(), $rules, $messages);
-        $val=$validator->Errors();
-
-
-        if ($validator->fails()) {
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-                foreach(parsing_validator($val) as $value){
-                    
-                    foreach($value as $isi){
-                        echo'-&nbsp;'.$isi.'<br>';
-                    }
-                }
-            echo'</div></div>';
-        }else{
-            $count=(int) count($request->risiko);
-            if($count>0){
-                $cek=0;
-                for($x=0;$x<$count;$x++){
-                    if($request->risiko[$x]==""  || $request->status_risiko[$x]==""){
-                        $cek+=0;
-                    }else{
-                        $cek+=1;
-                    }
-                }
-
-                if($cek==$count){
-                    
-                        $tab=5;
-                    
-                    $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
-                    for($x=0;$x<$count;$x++){
-                        
-                            $data=ProjectRisiko::UpdateOrcreate([
-                                'project_header_id'=>$id,
-                                'risiko'=>$request->risiko[$x],
-                            ],[
-                                'status_risiko'=>$request->status_risiko[$x],
-                            ]);
-                        
-                    }
-                    echo'@ok';  
-                }else{
-                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-                }
-            }else{
-                echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-            }
-        }    
-        
-    }
-
-    public function store_material(request $request){
-        error_reporting(0);
-        $id=$request->id;
-        $rules = [];
-        $messages = [];
-        if($id==0){
-            $rules['catatan']= 'required';
-            $messages['catatan.required']= 'Harap isi rencana kerja terlebih dahulu';
-        }
-        $validator = Validator::make($request->all(), $rules, $messages);
-        $val=$validator->Errors();
-
-
-        if ($validator->fails()) {
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-                foreach(parsing_validator($val) as $value){
-                    
-                    foreach($value as $isi){
-                        echo'-&nbsp;'.$isi.'<br>';
-                    }
-                }
-            echo'</div></div>';
-        }else{
-            $count=(int) count($request->kode_material);
-            if($count>0){
-                $cek=0;
-                for($x=0;$x<$count;$x++){
-                    if($request->kode_material[$x]==""  || $request->qty[$x]==""   || $request->total[$x]=="" || $request->total[$x]==0){
-                        $cek+=0;
-                    }else{
-                        $cek+=1;
-                    }
-                }
-
-                if($cek==$count){
-                    if($mst->tab>2){
-                        $tab=$mst->tab;
-                    }else{
-                        $tab=4;
-                    }
-                    $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
-                    for($x=0;$x<$count;$x++){
-                        
-                            $data=ProjectMaterial::UpdateOrcreate([
-                                'project_header_id'=>$id,
-                                'kode_material'=>$request->kode_material[$x],
-                                'status'=>1,
-                                
-                            ],[
-                                'biaya'=>ubah_uang($request->biaya[$x]),
-                                'qty'=>ubah_uang($request->qty[$x]),
-                                'total'=>ubah_uang($request->total[$x]),
-                                'nama_material'=>$request->nama_material[$x],
-                                'created_at'=>date('Y-m-d H:i:s'),
-                            ]);
-                        
-                    }
-                    echo'@ok';  
-                }else{
-                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-                }
-            }else{
-                echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-            }
-        }
-        
                
         
         
@@ -1335,6 +999,52 @@ class ProjectController extends Controller
         
     }
 
+    public function store_material(request $request){
+        error_reporting(0);
+        $rules = [];
+        $messages = [];
+        
+        
+        $rules['kode_material']= 'required';
+        $messages['kode_material.required']= 'Pilih material';
+        
+        $rules['qty']= 'required';
+        $messages['qty.required']= 'Masukan qty';
+
+
+       
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
+
+
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
+                    
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
+                    }
+                }
+            echo'</div></div>';
+        }else{
+            
+                $mst=Material::where('kode_material',$request->kode_material)->first();
+                $data=ProjectMaterial::UpdateOrcreate([
+                    'kode_material'=>$request->kode_material,
+                    'project_header_id'=>$request->id,
+                ],[
+                    'qty'=>$request->qty,
+                    'nama_material'=>$mst->nama_material,
+                    'status_material'=>2,
+                    'created_at'=>date('Y-m-d H:i:s'),
+                ]);
+
+                echo'@ok';
+               
+           
+        }
+        
+    }
     
     public function store_bidding(request $request){
         error_reporting(0);
