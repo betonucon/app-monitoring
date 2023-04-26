@@ -42,16 +42,15 @@
                             } 
                         },
                         
-                        { data: 'action' },
-                        { data: 'file' },
-                        { data: 'timeline' },
-                        { data: 'cost_center' },
+                        { data: 'action' ,className: "text-center" },
+                        { data: 'timeline',className: "text-center" },
                         { data: 'customer' },
-                        { data: 'start_date' },
-                        { data: 'end_date' },
-                        { data: 'selisih' },
-                        { data: 'area' },
-                        { data: 'status_now' },
+                        { data: 'kategori_project' },
+                        { data: 'deskripsi_project' },
+                        { data: 'start_date_at', className: "text-center" },
+                        { data: 'end_date_at', className: "text-center" },
+                        { data: 'status_now', className: "text-center" },
+                        { data: 'created_at', className: "text-center" },
                         
                       ],
                       
@@ -104,12 +103,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        List Project
+        Verifikasi Project
         
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">List Project</li>
+        <li class="active">Verifikasi Project</li>
       </ol>
     </section>
 
@@ -120,7 +119,7 @@
         
       </div>
       <div class="box box-default">
-        <div class="box-header with-border" style="border: dotted 2px #bebecb; background: #e8e8ef;">
+        <div class="box-header with-border"  id="header-monitoring" style="border: dotted 2px #bebecb; background: #e8e8ef;">
           <div class="row" >
             <div class="col-md-4">
               <ul class="nav nav-stacked">
@@ -160,7 +159,7 @@
           <div class="row">
             <div class="col-md-5">
               <div class="btn-group" style="margin-top:5%">
-                <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
+                
               </div>
               
             </div>
@@ -191,21 +190,20 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="122%" class="cell-border display">
+                <table id="data-table-fixed-header" width="110%" class="cell-border display">
                     <thead>
                         <tr>
                             <th width="5%">No</th>
                             
-                            <th width="4%"></th>
-                            <th width="4%">File</th>
-                            <th width="4%">Log</th>
-                            <th width="10%">Cost Center</th>
-                            <th width="18%">Customer</th>
-                            <th width="10%">Start</th>
-                            <th width="10%">End</th>
-                            <th width="7%">T.Hari</th>
-                            <th >Area</th>
-                            <th width="10%">Status</th>
+                            <th width="5%"></th>
+                            <th width="2%"></th>
+                            <th width="15%">Customer</th>
+                            <th width="10%">Kategori</th>
+                            <th >Ruang Lingkup</th>
+                            <th width="8%">Start</th>
+                            <th width="8%">End</th>
+                            <th width="12%">Status</th>
+                            <th width="12%">Create</th>
                         </tr>
                     </thead>
                     

@@ -76,7 +76,7 @@
 
                             <div class="col-sm-2">
                               <div class="input-group">
-                                <input type="text" id="customer_code" name="cost" readonly value="{{$data->cost_header}}" class="form-control  input-sm" placeholder="0000">
+                                <input type="text" id="customer_code" name="cost" readonly value="{{$data->header_cost}}" class="form-control  input-sm" placeholder="0000">
                               </div>
                             </div>
                             <div class="col-sm-4">

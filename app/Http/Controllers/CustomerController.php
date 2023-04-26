@@ -13,6 +13,7 @@ use App\Models\Viewrole;
 use App\Models\Role;
 use App\Models\Customer;
 use App\Models\Barang;
+use App\Models\ViewCustomer;
 use App\Models\User;
 
 class CustomerController extends Controller
@@ -53,7 +54,7 @@ class CustomerController extends Controller
     public function get_data(request $request)
     {
         error_reporting(0);
-        $query = Customer::query();
+        $query = ViewCustomer::query();
         if($request->hide==1){
             $data = $query->where('active',0);
         }else{
@@ -64,6 +65,10 @@ class CustomerController extends Controller
         return Datatables::of($data)
             ->addColumn('seleksi', function ($row) {
                 $btn='<span class="btn btn-success btn-xs" onclick="pilih_customer(`'.$row->customer_code.'`,`'.$row->customer.'`)">Pilih</span>';
+                return $btn;
+            })
+            ->addColumn('seleksi_kontrak', function ($row) {
+                $btn='<span class="btn btn-success btn-xs" onclick="pilih_customer(`'.$row->customer_code.'`,`'.$row->customer.'`,`'.penomoran_cost_center($row->customer_code).'`)">Pilih</span>';
                 return $btn;
             })
             ->addColumn('action', function ($row) {
@@ -94,7 +99,7 @@ class CustomerController extends Controller
                 return $btn;
             })
             
-            ->rawColumns(['action','seleksi'])
+            ->rawColumns(['action','seleksi','seleksi_kontrak'])
             ->make(true);
     }
 

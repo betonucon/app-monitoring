@@ -86,7 +86,7 @@
     <section class="content">
       
         <div class="row">
-            <div class="col-lg-2 col-xs-6">
+            <div class="col-lg-3 col-xs-6">
             <!-- small box -->
               <div class="small-box bg-aqua">
                   <div class="inner">
@@ -101,41 +101,11 @@
               </div>
             </div>
             <!-- ./col -->
-            <div class="col-lg-2 col-xs-6">
+            <div class="col-lg-3 col-xs-6">
             <!-- small box -->
               <div class="small-box bg-green">
                   <div class="inner">
                       <h3>{{count_project(2)}}</h3>
-
-                      <p>Rencana Project</p>
-                  </div>
-                  <div class="icon">
-                      <i class="ion ion-pie-graph"></i>
-                  </div>
-                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-2 col-xs-6">
-            <!-- small box -->
-              <div class="small-box bg-yellow">
-                  <div class="inner">
-                      <h3>{{count_project(3)}}</h3>
-
-                      <p>Kontrak</p>
-                  </div>
-                  <div class="icon">
-                      <i class="ion ion-pie-graph"></i>
-                  </div>
-                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
-            <!-- ./col -->
-            <div class="col-lg-2 col-xs-6">
-            <!-- small box -->
-              <div class="small-box bg-red">
-                  <div class="inner">
-                      <h3>{{count_project(4)}}</h3>
 
                       <p>Pengerjaan</p>
                   </div>
@@ -145,11 +115,27 @@
                   <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
               </div>
             </div>
-            <div class="col-lg-2 col-xs-6">
+            <!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-              <div class="small-box bg-blue">
+              <div class="small-box bg-yellow">
                   <div class="inner">
-                      <h3>{{count_project(5)}}</h3>
+                      <h3>{{count_project(3)}}</h3>
+
+                      <p>Out Standing</p>
+                  </div>
+                  <div class="icon">
+                      <i class="ion ion-pie-graph"></i>
+                  </div>
+                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+            <!-- ./col -->
+            <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+              <div class="small-box bg-red">
+                  <div class="inner">
+                      <h3>{{count_project(4)}}</h3>
 
                       <p>Selesai</p>
                   </div>
@@ -159,97 +145,10 @@
                   <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
               </div>
             </div>
-            <div class="col-lg-2 col-xs-6">
-            <!-- small box -->
-              <div class="small-box bg-aqua">
-                  <div class="inner">
-                      <h3>{{count_project(6)}}</h3>
-
-                      <p>Tagihan</p>
-                  </div>
-                  <div class="icon">
-                      <i class="ion ion-pie-graph"></i>
-                  </div>
-                  <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-              </div>
-            </div>
+            
         </div>
         <div class="row">
-            <div class="col-md-8">
-                <div class="box box-success">
-                    <div class="box-header with-border">
-                    <h3 class="box-title">Progres Project</h3>
-
-                    <div class="box-tools pull-right">
-                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                    </div>
-                    </div>
-                    <div class="box-body">
-                    <div class="chart">
-                        <canvas id="barChart" style="height:430px"></canvas>
-                    </div>
-                    </div>
-                    <!-- /.box-body -->
-                </div>
-
-                <div class="box">
-                  <div class="box-header with-border">
-                    <h3 class="box-title">Rencana Project</h3>
-                  </div>
-                  <!-- /.box-header -->
-                  <div class="box-body responsive-bawah">
-                    <table class="table table-bordered">
-                      <tbody>
-                        <tr style="background:blue;color:#fff">
-                          <th style="width: 5%">#</th>
-                          <th style="width: 15%">Customer</th>
-                          <th>Project</th>
-                          <th style="width: 20%">Status</th>
-                        </tr>
-                        @foreach(get_all_project() as $no=>$dr)
-                        <tr @if($dr->outstanding>0) style="background:#ef9898" @endif>
-                          <td>{{$no+1}}</td>
-                          <td><b>{{$dr->singkatan_customer}}</b></td>
-                          <td>{{$dr->deskripsi_project}}</td>
-                          <td style="background:{{$dr->color}}">{{$dr->singkatan}}</td>
-                        </tr>
-                        @endforeach
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                </div>
-                <div class="box">
-                  <div class="box-header with-border">
-                    <h3 class="box-title">Rencana Project Cancel</h3>
-                  </div>
-                  <!-- /.box-header -->
-                  <div class="box-body responsive-bawah">
-                    <table class="table table-bordered">
-                      <tbody>
-                        <tr style="background:red;color:#fff">
-                          <th style="width: 5%">#</th>
-                          <th style="width: 15%">Customer</th>
-                          <th>Project</th>
-                          <th style="width: 20%">Status</th>
-                        </tr>
-                        @foreach(get_all_project_cancel() as $no=>$dr)
-                        <tr @if($dr->outstanding>0) style="background:#ef9898" @endif>
-                          <td>{{$no+1}}</td>
-                          <td><b>{{$dr->singkatan_customer}}</b></td>
-                          <td>{{$dr->deskripsi_project}}</td>
-                          <td style="background:{{$dr->color}}">Cancel</td>
-                        </tr>
-                        @endforeach
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                </div>
-            </div>
-            <div class="col-md-4">
+          <div class="col-md-7">
               <div class="box box-success">
                 <div class="box-header with-border">
                   <h3 class="box-title">Progres Project</h3>
@@ -261,19 +160,60 @@
                   </div>
                 </div>
                 <div class="box-body">
-                  @foreach(get_status() as $o)
+                  @foreach(get_progres_project() as $o)
                     <div class="progress-group">
-                      <span class="progress-text">{{$o->status}}</span>
-                      <span class="progress-number"><b>{{count_status_project($o->id)}}</b>/{{count_all_project()}}</span>
+                      <span class="progress-text"><b>({{$o->cost_center_project}})</b> {{$o->deskripsi_project}}</span>
+                      <span class="progress-number"><b>{{$o->total_task_progres}}</b>/100</span>
 
                       <div class="progress sm">
-                        <div class="progress-bar progress-bar-{{$o->color}}" style="width: {{round((100/count_all_project())*count_status_project($o->id))}}%"></div>
+                        <div class="progress-bar progress-bar-{{$o->color}}" style="width: {{$o->total_task_progres}}%"></div>
                       </div>
                     </div>
                   @endforeach
                 </div>
               </div>
             </div>
+            <div class="col-md-5">
+                <div class="box box-success">
+                    <div class="box-header with-border">
+                    <h3 class="box-title">Customer Project</h3>
+
+                    <div class="box-tools pull-right">
+                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                        </button>
+                        <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                    </div>
+                    </div>
+                    <div class="box-body">
+                    <table class="table table-bordered">
+                          <tbody>
+                          <tr>
+                            <th style="width: 5%">#</th>
+                            <th>Customer</th>
+                            <th style="width: 10%">Project</th>
+                            <th style="width: 10%">Outstand</th>
+                            <th style="width: 10%">InProg</th>
+                            <th style="width: 10%">Selesai</th>
+                          </tr>
+                          @foreach( get_customer_project() as $no=>$o)
+                            <tr>
+                              <td>{{$no+1}}</td>
+                              <td>{{$o->customer}}</td>
+                              <td><span class="badge bg-red">{{$o->total}}</span></td>
+                              <td><span class="badge bg-red">{{$o->outstanding}}</span></td>
+                              <td><span class="badge bg-red">{{$o->inprogres}}</span></td>
+                              <td><span class="badge bg-red">{{$o->selesai}}</span></td>
+                            
+                            </tr>
+                          @endforeach
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- /.box-body -->
+                </div>
+
+            </div>
+            
         </div>
      
     </section>

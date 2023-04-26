@@ -8,6 +8,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\CostController;
 use App\Http\Controllers\KontrakController;
+use App\Http\Controllers\PengadaanController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\Auth\LogoutController;
 /*
@@ -92,13 +93,18 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::post('/',[ProjectController::class, 'store']);
     Route::get('/kirim_kadis_komersil',[ProjectController::class, 'kirim_kadis_komersil']);
     Route::post('/kembali_komersil',[ProjectController::class, 'kembali_komersil']);
+    Route::post('/store_procurement',[ProjectController::class, 'store_procurement']);
     Route::post('/approve_kadis_komersil',[ProjectController::class, 'approve_kadis_komersil']);
+    Route::post('/verifikasi_material',[ProjectController::class, 'verifikasi_material']);
     Route::post('/approve_kadis_operasional',[ProjectController::class, 'approve_kadis_operasional']);
     Route::post('/approve_mgr_operasional',[ProjectController::class, 'approve_mgr_operasional']);
     Route::post('/approve_direktur_operasional',[ProjectController::class, 'approve_direktur_operasional']);
     Route::get('/kirim_procurement',[ProjectController::class, 'kirim_procurement']);
     Route::get('/tampil_material',[ProjectController::class, 'tampil_material']);
     Route::get('/tampil_material_in',[ProjectController::class, 'tampil_material_in']);
+    Route::get('/tampil_material_proc',[ProjectController::class, 'tampil_material_proc']);
+    Route::get('/form_material',[ProjectController::class, 'form_material']);
+    Route::get('/cetak',[ProjectController::class, 'cetak']);
     Route::get('/tampil_operasional',[ProjectController::class, 'tampil_operasional']);
     Route::post('/store_material',[ProjectController::class, 'store_material']);
     Route::post('/store_operasional',[ProjectController::class, 'store_operasional']);
@@ -109,15 +115,35 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
 });
 Route::group(['prefix' => 'projectcontrol','middleware'    => 'auth'],function(){
     Route::get('/',[KontrakController::class, 'index_control']);
+    Route::get('/task',[KontrakController::class, 'task']);
+    Route::get('/form_material',[KontrakController::class, 'form_material']);
+    Route::get('/modal_task',[KontrakController::class, 'modal_task']);
+    Route::get('/modal_progres',[KontrakController::class, 'modal_progres']);
+    Route::get('/getdata',[KontrakController::class, 'get_data_control']);
+    Route::get('/getdatatask',[KontrakController::class, 'get_data_task']);
+    Route::post('/store_task',[KontrakController::class, 'store_task']);
+    Route::post('/store_progres',[KontrakController::class, 'store_progres']);
+});
+Route::group(['prefix' => 'pengadaan','middleware'    => 'auth'],function(){
+    Route::get('/',[PengadaanController::class, 'index']);
+    Route::get('/getdata',[PengadaanController::class, 'get_data']);
+    Route::get('/getdatamaterial',[PengadaanController::class, 'get_data_material']);
+    Route::get('/view',[PengadaanController::class, 'view']);
+    Route::get('/dashboard_task',[PengadaanController::class, 'dashboard_task']);
+    Route::get('/tampil_material',[PengadaanController::class, 'tampil_material']);
+    Route::post('/store_material',[PengadaanController::class, 'store_material']);
+    Route::post('/store_material_pm',[PengadaanController::class, 'store_material_pm']);
+    Route::get('/modal_verifikasi',[PengadaanController::class, 'modal_verifikasi']);
 });
 Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::get('/',[KontrakController::class, 'index']);
+    Route::get('/form_kontrak',[KontrakController::class, 'form_kontrak']);
     Route::get('/view',[KontrakController::class, 'view_data']);
-    Route::get('/form_send',[KontrakController::class, 'form_send']);
+   
     Route::get('/timeline',[KontrakController::class, 'timeline']);
     Route::get('/getdata',[KontrakController::class, 'get_data']);
     Route::get('/modal_material',[KontrakController::class, 'modal_material']);
-    Route::get('/getdatacontrol',[KontrakController::class, 'get_data_control']);
+    
     Route::get('/get_status_data',[KontrakController::class, 'get_status_data']);
     Route::get('/getdatamaterial',[KontrakController::class, 'getdatamaterial']);
     Route::get('/create',[KontrakController::class, 'create']);
@@ -125,6 +151,7 @@ Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::get('/tampil_personal_periode',[KontrakController::class, 'tampil_personal_periode']);
     Route::get('/tampil_operasional_periode',[KontrakController::class, 'tampil_operasional_periode']);
     Route::get('/tampil_material',[KontrakController::class, 'tampil_material']);
+    Route::get('/tampil_material_kontrak',[KontrakController::class, 'tampil_material_kontrak']);
     Route::get('/total_qty',[KontrakController::class, 'total_qty']);
     Route::get('/delete',[KontrakController::class, 'delete']);
     Route::get('/tampil_periode',[KontrakController::class, 'tampil_periode']);
@@ -145,12 +172,15 @@ Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::post('/approve_direktur_operasional',[KontrakController::class, 'approve_direktur_operasional']);
     Route::get('/kirim_procurement',[KontrakController::class, 'kirim_procurement']);
     Route::post('/store_material',[KontrakController::class, 'store_material']);
+    Route::post('/store_material_kontrak',[KontrakController::class, 'store_material_kontrak']);
+    Route::post('/store_kontrak',[KontrakController::class, 'store_kontrak']);
     Route::post('/store_personal',[KontrakController::class, 'store_personal']);
     Route::post('/store_operasional',[KontrakController::class, 'store_operasional']);
     Route::post('/store_pengadaan',[KontrakController::class, 'store_pengadaan']);
     Route::post('/store_periode_personal',[KontrakController::class, 'store_periode_personal']);
     Route::post('/store_periode_operasional',[KontrakController::class, 'store_periode_operasional']);
     Route::post('/store_negosiasi',[KontrakController::class, 'store_negosiasi']);
+    Route::post('/publish',[KontrakController::class, 'publish']);
 });
 
 Route::group(['middleware' => 'auth'], function() {

@@ -273,17 +273,17 @@ function penomoran_material($kategori){
     return $nomor;
 }
 
-function penomoran_cost_center($cost){
-   $cs=strlen($cost);
-    
-    $cek=App\Models\HeaderProject::where('cost',$cost)->count();
+function penomoran_cost_center($customer_code){
+   $master=App\Models\Cost::where('customer_code',$customer_code)->first();
+   $cs=strlen($master->cost);
+    $cek=App\Models\HeaderProject::where('status_id',9)->where('customer_code',$customer_code)->count();
     if($cek>0){
-        $mst=App\Models\HeaderProject::where('cost',$cost)->orderBy('cost_center','Desc')->firstOrfail();
-        $urutan = (int) substr($mst['cost_center'], (int)$cs, 3);
+        $mst=App\Models\HeaderProject::where('status_id',9)->where('customer_code',$customer_code)->orderBy('cost_center_project','Desc')->firstOrfail();
+        $urutan = (int) substr($mst['cost_center_project'],$cs, 3);
         $urutan++;
-        $nomor=$cost.sprintf("%03s",  $urutan);
+        $nomor=$master->cost.sprintf("%03s",  $urutan);
     }else{
-        $nomor=$cost.sprintf("%03s",  1);
+        $nomor=$master->cost.sprintf("%03s",  1);
     }
     return $nomor;
 }

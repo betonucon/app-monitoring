@@ -42,14 +42,15 @@
                             } 
                         },
                         
-                        { data: 'action' },
-                        { data: 'timeline' },
+                        { data: 'action' ,className: "text-center" },
+                        { data: 'timeline',className: "text-center" },
                         { data: 'customer' },
                         { data: 'kategori_project' },
                         { data: 'deskripsi_project' },
-                        { data: 'start_date' },
-                        { data: 'end_date' },
-                        { data: 'status_now' },
+                        { data: 'start_date_at', className: "text-center" },
+                        { data: 'end_date_at', className: "text-center" },
+                        { data: 'status_now', className: "text-center" },
+                        { data: 'created_at', className: "text-center" },
                         
                       ],
                       
@@ -118,7 +119,7 @@
         
       </div>
       <div class="box box-default">
-        <div class="box-header with-border" style="border: dotted 2px #bebecb; background: #e8e8ef;">
+        <div class="box-header with-border"  id="header-monitoring" style="border: dotted 2px #bebecb; background: #e8e8ef;">
           <div class="row" >
             <div class="col-md-4">
               <ul class="nav nav-stacked">
@@ -158,7 +159,7 @@
           <div class="row">
             <div class="col-md-5">
               <div class="btn-group" style="margin-top:5%">
-                <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
+                
               </div>
               
             </div>
@@ -195,13 +196,14 @@
                             <th width="5%">No</th>
                             
                             <th width="5%"></th>
-                            <th width="4%"></th>
+                            <th width="2%"></th>
                             <th width="15%">Customer</th>
                             <th width="10%">Kategori</th>
                             <th >Ruang Lingkup</th>
-                            <th width="10%">Start</th>
-                            <th width="10%">End</th>
-                            <th width="14%">Status</th>
+                            <th width="8%">Start</th>
+                            <th width="8%">End</th>
+                            <th width="12%">Status</th>
+                            <th width="12%">Create</th>
                         </tr>
                     </thead>
                     

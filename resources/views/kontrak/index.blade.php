@@ -42,14 +42,15 @@
                             } 
                         },
                         
-                        { data: 'action' },
-                        { data: 'timeline' },
+                        { data: 'action' ,className: "text-center" },
+                        { data: 'timeline',className: "text-center" },
                         { data: 'customer' },
                         { data: 'kategori_project' },
                         { data: 'deskripsi_project' },
-                        { data: 'start_date' },
-                        { data: 'end_date' },
-                        { data: 'status_now' },
+                        { data: 'start_date_at', className: "text-center" },
+                        { data: 'end_date_at', className: "text-center" },
+                        { data: 'status_now', className: "text-center" },
+                        { data: 'created_at', className: "text-center" },
                         
                       ],
                       
@@ -74,7 +75,7 @@
 
         function pilih_jenis(KD_Divisi){
           var tables=$('#data-table-fixed-header').DataTable();
-          tables.ajax.url("{{ url('kontrak/getdata')}}?status_id="+KD_Divisi).load();
+          tables.ajax.url("{{ url('project/getdata')}}?status_id="+KD_Divisi).load();
           tables.on( 'draw', function () {
               var count=tables.data().count();
                 $('#count_data').html('Total data :'+count)  
@@ -89,11 +90,11 @@
 
         function show_hide(){
             var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('kontrak/getdata')}}?hide=1").load();
+                tables.ajax.url("{{ url('project/getdata')}}?hide=1").load();
         }
         function refresh_data(){
             var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('kontrak/getdata')}}").load();
+                tables.ajax.url("{{ url('project/getdata')}}").load();
         }
     </script>
 @endpush
@@ -118,47 +119,14 @@
         
       </div>
       <div class="box box-default">
-        <div class="box-header with-border" style="border: dotted 2px #bebecb; background: #e8e8ef;">
-          <div class="row" >
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(4) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>  
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(5) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(6) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            
-          </div>
-
-        </div>
+        
         <div class="box-header with-border">
           <div class="row">
             <div class="col-md-5">
               <div class="btn-group" style="margin-top:5%">
-                <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
+                <button type="button" class="btn btn-success btn-sm" onclick="location.assign(`{{url('kontrak/form_kontrak')}}?id={{encoder(0)}}`)"><i class="fa fa-plus"></i> Buat Kontrak</button>
+                
+                
               </div>
               
             </div>
@@ -167,7 +135,7 @@
                 <label>Status Progres</label>
                   <select onchange="pilih_jenis(this.value)" class="form-control  input-sm">
                     <option value="">All Data</option>
-                    @foreach(get_status_event_kontrak() as $get)
+                    @foreach(get_status_event() as $get)
                       <option value="{{$get->id}}">{{$get->status}}</option>
                     @endforeach
                   </select>
@@ -189,7 +157,7 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="110%" class="cell-border display">
+                <table id="data-table-fixed-header" width="100%" class="display">
                     <thead>
                         <tr>
                             <th width="5%">No</th>
@@ -199,9 +167,10 @@
                             <th width="15%">Customer</th>
                             <th width="10%">Kategori</th>
                             <th >Ruang Lingkup</th>
-                            <th width="10%">Start</th>
-                            <th width="10%">End</th>
+                            <th width="8%">Start</th>
+                            <th width="8%">End</th>
                             <th width="14%">Status</th>
+                            <th width="12%">Create</th>
                         </tr>
                     </thead>
                     

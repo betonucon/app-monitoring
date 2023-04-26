@@ -124,7 +124,7 @@ class MaterialController extends Controller
 
         return Datatables::of($data)
             ->addColumn('seleksi', function ($row) {
-                $btn='<span class="btn btn-success btn-xs" onclick="pilih_material(`'.$row->kode_material.'`,`'.$row->nama_material.'`,`'.$row->harga_normal.'`,'.$row->stok.')">Pilih</span>';
+                $btn='<span class="btn btn-success btn-xs" onclick="pilih_material(`'.$row->kode_material.'`,`'.$row->nama_material.'`,`'.$row->harga.'`,'.$row->stok.')">Pilih</span>';
                 return $btn;
             })
             ->addColumn('stok', function ($row) {

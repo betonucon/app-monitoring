@@ -47,13 +47,23 @@
 
                     <p>Penyusunan nilai anggaran rencana project yang terdiri dari 4 aspek (Rencana , Biaya Operasional, Material Cos dan Risiko Project)</p>
                   </div>
+                  @if($data->status_id>8)
+                  <div class="btn-group" style="margin-bottom:1%">
+                    <button type="button" class="btn btn-success btn-sm" onclick="window.open(`{{url('project/cetak')}}?id={{encoder($data->id)}}`)"><i class="fa fa-clone"></i> Cetak RABOP</button>
+                  </div>
+                  @endif
                   <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
                       <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
                       <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Operasional Project</a></li>
                       <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Material Cost</a></li>
                       <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
-                      
+                      @if($data->status_id>7)
+                      <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Bidding</a></li>
+                      @endif
+                      @if($data->status_id>8)
+                      <li class=""><a href="#tab_6" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Negosiasi</a></li>
+                      @endif
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
                     </ul>
                     <div class="tab-content" style="background: #fff3f3;">
@@ -221,16 +231,33 @@
                             
                             <div class="col-sm-11">
                               <table class="table table-bordered" id="">
+                                @if($data->status_id>6)
                                 <thead>
                                   <tr style="background:#bcbcc7">
                                     <th style="width: 10px">No</th>
-                                    <th style="width:15%">Kode</th>
+                                    <th style="width:10%">Kode</th>
                                     <th>Material</th>
-                                    <th style="width:15%">H.Satuan</th>
                                     <th style="width:8%">Qty</th>
-                                    <th style="width:15%">Total</th>
+                                    
+                                    <th style="width:12%">H Pengajuan</th>
+                                    <th style="width:12%">Total</th>
+                                    <th style="width:12%">H Actual</th>
+                                    <th style="width:12%">Total</th>
+                                    <th style="width:5%">Sts</th>
                                   </tr>
                                 </thead>
+                                @else
+                                  <thead>
+                                    <tr style="background:#bcbcc7">
+                                      <th style="width: 10px">No</th>
+                                      <th style="width:15%">Kode</th>
+                                      <th>Material</th>
+                                      <th style="width:15%">H.Satuan</th>
+                                      <th style="width:8%">Qty</th>
+                                      <th style="width:15%">Total</th>
+                                    </tr>
+                                  </thead>
+                                @endif
                                 <tbody id="tampil-material-save"></tbody>
                                 
                               </table>
@@ -265,6 +292,89 @@
                             </div>
                           </div>
                           
+                      </div>
+                      <div class="tab-pane " id="tab_5">
+                      
+                        <div class="box-body">
+                          
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Deskripsi Bidding</label>
+
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Bidding (Rp)</label>
+
+                            <div class="col-sm-2">
+                              <input type="text"   name="nilai_bidding" readonly class="form-control  input-sm" value="{{uang($data->nilai_bidding)}}" placeholder="">
+                            </div>
+                            <div class="col-sm-7">
+                              <input type="text"  id="out" readonly name="terbilang" value="{{terbilang($data->nilai_bidding)}} rupiah" class="form-control  input-sm" placeholder="">
+                            </div>
+                            
+                            
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Tanggal Bidding</label>
+
+                            <div class="col-sm-2">
+                              <div class="input-group">
+                                <span class="input-group-addon" ><i class="fa fa-calendar"></i></span>
+                                <input type="text" id="bidding_date" readonly name="bidding_date"  value="{{$data->bidding_date}}" class="form-control  input-sm" placeholder="yyyy-mm-dd">
+                              </div>
+                            </div>
+                            
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Status Bidding</label>
+
+                            <div class="col-sm-4">
+                              <div class="input-group">
+                                <span class="input-group-addon" ><i class="fa  fa-chevron-down"></i></span>
+                                @if($data->status_id==50)
+                                <input type="text" id="bidding_date" readonly name="bidding_date"  value="Cancel Proses" class="form-control  input-sm" placeholder="yyyy-mm-dd">
+                                @else
+                                <input type="text" id="bidding_date" readonly name="bidding_date"  value="Lolos dan lanjut" class="form-control  input-sm" placeholder="yyyy-mm-dd">
+                                @endif
+                                
+                              </div>
+                            </div>
+                            
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Catatan Hasil Bidding</label>
+                              <div class="col-sm-10">
+                              <textarea  class="form-control input-sm" disabled name="hasil_bidding" placeholder="Ketik..." rows="7">{{$data->hasil_bidding}}</textarea>
+                            </div>
+                          </div>
+                          
+                          
+                          
+                          
+                        </div>
+                          
+                      </div>
+                      <div class="tab-pane" id="tab_6">
+                        <div class="box-body">
+                          
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Informasi Hasil Negosiasi</label>
+
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Kontrak (Rp)</label>
+
+                            <div class="col-sm-2">
+                              <input type="text"  id="nilai_negosiasi" readonly name="nilai_negosiasi"  class="form-control  input-sm" value="{{uang($data->nilai_project)}}" placeholder="">
+                            </div>
+                            <div class="col-sm-7">
+                              <input type="text"  id="out" readonly name="terbilang" value="{{terbilang($data->nilai_project)}} rupiah" class="form-control  input-sm" placeholder="">
+                            </div>
+                            
+                            
+                          </div>
+                          
+                          
+                        </div>
                       </div>
                     </div>
                     <!-- /.box-body -->

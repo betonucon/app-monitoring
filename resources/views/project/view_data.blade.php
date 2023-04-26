@@ -583,6 +583,8 @@
           $('#kode_material'+no).val(kode_material);
           $('#harga_material'+no).val(harga);
           $('#normal_harga_material'+no).val(harga);
+          $('#qty'+no).val(0);
+          $('#total'+no).val(0);
           $('#stok'+no).val(stok);
 
         }

@@ -130,7 +130,7 @@
             <div class="col-md-6">
               <div class="btn-group" style="margin-top:5%">
                 <button type="button" class="btn btn-success btn-sm" onclick="location.assign(`{{url('employe/view')}}?id={{encoder(0)}}`)"><i class="fa fa-plus"></i> Buat Baru</button>
-                <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
+                
               </div>
               
             </div>

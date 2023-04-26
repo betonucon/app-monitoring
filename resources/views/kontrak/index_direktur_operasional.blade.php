@@ -158,7 +158,7 @@
           <div class="row">
             <div class="col-md-5">
               <div class="btn-group" style="margin-top:5%">
-                <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
+                
               </div>
               
             </div>

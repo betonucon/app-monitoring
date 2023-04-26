@@ -46,12 +46,36 @@
           min-height: 300px !important;
           overflow-x: auto;
       }
+      .info-box {
+        display: block;
+        min-height: 90px;
+        background-image: linear-gradient(to right top, #ffffff, #f4f1fb, #eae3f7, #e2d5f2, #dbc6ec);
+        width: 100%;
+        color: #817070;
+        box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        border-radius: 2px;
+        margin-bottom: 15px;
+        border: solid 2px #e9e2f1;
+        border-radius: 10px 10px 10px 10px !important;
+        cursor: pointer;
+      }
+      .info-box .progress {
+          background: blue;
+          margin: 5px -10px 5px -10px;
+          height: 9px;
+      }
+      .info-box .progress .progress-bar {
+          background: #e5330b;
+      }
       table.dataTable thead  th {
           padding: 8px 10px !important;
           background: #e7e7f3;
           border-top: 1px solid rgb(0 0 0 / 15%) !important;
           border-bottom: 1px solid rgb(0 0 0 / 15%) !important;
           /* border-right: solid 1px #dbdbdf; */
+      }
+      #header-monitoring{
+        display:none;
       }
       .form-group {
           margin-bottom: 3px;
@@ -61,7 +85,8 @@
           box-shadow: none;
       }
       table.dataTable tbody td {
-          padding: 0.1% 1% !important;
+          padding: 2px 3px !important;
+          background:#fff !important;
           border-bottom: 0px solid rgb(0 0 0 / 15%) !important;
       }
       .swal-text {
@@ -161,9 +186,12 @@
           padding: 3px 15px !important;
       }
       .table-responsive {
-          background: #f5f5ff;
+          background: #e8e9fd;
           min-height: 300px !important;
           overflow-x: auto;
+      }
+      table.dataTable.row-border tbody th, table.dataTable.row-border tbody td, table.dataTable.display tbody th, table.dataTable.display tbody td {
+        font-size: 11.5px !important;
       }
       @media only screen and (min-width: 600px) {
 
@@ -595,7 +623,10 @@
 		window.setTimeout(function () {
 			document.getElementById("loadpage").style.width = "0%";
 		}, 1000);
-
+    $('#tanggal_app').datepicker({
+      autoclose: true,
+      format:'yyyy-mm-dd'
+    });
         
         $('.dropdown-toggle').dropdown()
         $("#logout").on("click", function() {

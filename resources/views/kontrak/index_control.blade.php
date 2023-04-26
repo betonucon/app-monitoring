@@ -12,90 +12,75 @@
 @endpush
 @push('datatable')
 <script type="text/javascript">
-        /*
-        Template Name: Color Admin - Responsive Admin Dashboard Template build with Twitter Bootstrap 4
-        Version: 4.6.0
-        Author: Sean Ngu
-        Website: http://www.seantheme.com/color-admin/admin/
-        */
-        
-        var handleDataTableFixedHeader = function() {
-            "use strict";
-            
-            if ($('#data-table-fixed-header').length !== 0) {
-                var table=$('#data-table-fixed-header').DataTable({
-                    lengthMenu: [20,50,100],
-                    searching:true,
-                    lengthChange:false,
-                    ordering:false,
-                    fixedHeader: {
-                        header: true,
-                        headerOffset: $('#header').height()
-                    },
-                    dom: 'lrtip',
-                    responsive: true,
-                    ajax:"{{ url('kontrak/getdatacontrol')}}",
-                      columns: [
-                        { data: 'id', render: function (data, type, row, meta) 
-                            {
-                              return meta.row + meta.settings._iDisplayStart + 1;
-                            } 
-                        },
+     function load_data(){  
+		
+        $.getJSON("{{ url('projectcontrol/getdata')}}?text={{$text}}", function(data){
+			$('#tampil-project-load').hide();
+            $.each(data, function(i, result){
+                $("#tampil-project").append('<div class="col-md-6 col-sm-6 col-xs-12" >'
+                  +'<div class="info-box" style="padding:2%" onclick="location.assign(`{{url('projectcontrol/task')}}?id='+result.id+'`)">'
+                    
+                      +'<span class="info-box-text" style="background: #f3f362; padding: 1%;"><b>#'+result.id+' '+result.deskripsi_project+'</b></span>'
+                      +'<div class="row" style="padding:3% 4%">'
+                        +'<div class="col-md-12" style="margin-bottom: 1.2%;">'
+                        +'<b><i class="fa fa-clone"></i> '+result.customer+'</b>'
+                        +'</div>'
+                        +'<div class="col-md-12" style="margin-bottom: 1.2%;">'
+                        +'<b><i class="fa fa-calendar-times-o"></i> Time : '+result.start_date+' s/d  '+result.end_date+' ('+result.outstanding+') days</b>'
+                        +'</div>'
+                        +'<div class="col-md-12" style="margin-bottom: 1.2%;">'
+                        +'<b><i class="fa fa-calendar-times-o"></i> Task Pekerjaan : '+result.start_date+' s/d  '+result.end_date+' ('+result.outstanding+') days</b>'
+                        +'</div>'
                         
-                        { data: 'action' },
-                        { data: 'timeline' },
-                        { data: 'customer' },
-                        { data: 'kategori_project' },
-                        { data: 'deskripsi_project' },
-                        { data: 'start_date' },
-                        { data: 'end_date' },
-                        { data: 'status_now' },
+                      +'</div>'
+                      +'<div class="row" style="padding:0px 5%">'
                         
-                      ],
-                      
-                });
-                $('#cari_datatable').keyup(function(){
-                  table.search($(this).val()).draw() ;
-                })
+                        +'<div class="col-md-3 text-center" style="padding: 1%;background: #dcdceb;">'
+                        +' <h5 style="margin:0px">Total Task</h5>'
+                        +' <h3 style="margin:0px">'+result.total_task+'</h3>'
+                        +'</div>'
+                        +'<div class="col-md-1 text-center" ></div>'
+                        +'<div class="col-md-3 text-center" style="padding: 1%;background: #f1f3d5;">'
+                        +' <h5 style="margin:0px">Progres</h5>'
+                        +' <h3 style="margin:0px">'+(result.total_task-result.total_task_selesai)+'</h3>'
+                        +'</div>'
+                        +'<div class="col-md-1 text-center" ></div>'
+                        +'<div class="col-md-3 text-center" style="padding: 1%;background: #f7b2b2;">'
+                        +' <h5 style="margin:0px">Solved</h5>'
+                        +' <h3 style="margin:0px">'+result.total_task_selesai+'</h3>'
+                        +'</div>'
+                        
+                        +'<div class="col-md-12" style="margin-top:4%">'
+                          +'<div class="progress-group">'
+                            +'<span class="progress-text">Progress Bar</span>'
+                            +'<span class="progress-number"><b>'+result.total_task_progres+'</b>/100</span>'
 
-                
-            }
-        };
-
-        var TableManageFixedHeader = function () {
-            "use strict";
-            return {
-                //main function
-                init: function () {
-                    handleDataTableFixedHeader();
-                }
-            };
-        }();
-
-        function pilih_jenis(KD_Divisi){
-          var tables=$('#data-table-fixed-header').DataTable();
-          tables.ajax.url("{{ url('kontrak/getdata')}}?status_id="+KD_Divisi).load();
-          tables.on( 'draw', function () {
-              var count=tables.data().count();
-                $('#count_data').html('Total data :'+count)  
-          } );
-              
-        }
-        
-        $(document).ready(function() {
-          TableManageFixedHeader.init();
-              
+                            +'<div class="progress lg">'
+                              +'<div class="progress-bar progress-bar-aqua" style="width: '+result.total_task_progres+'%"></div>'
+                            +'</div>'
+                          +'</div>'
+                        +'</div>'
+                      +'</div>'
+                  +'</div>'
+                +'</div>');
+            });
         });
-
-        function show_hide(){
-            var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('kontrak/getdata')}}?hide=1").load();
-        }
-        function refresh_data(){
-            var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('kontrak/getdata')}}").load();
-        }
-    </script>
+	 }
+	 $(document).ready(function() {
+		
+		$('#tampil-project-load').show()
+		
+		
+	 });
+	 window.setTimeout(function () {
+		load_data();
+	 }, 1000);
+	
+   function loader(){
+    var text=$('#textcari').val();
+    location.assign("{{url('projectcontrol')}}?text="+text);
+   }
+</script>
 @endpush
 @section('content')
 <div class="content-wrapper">
@@ -113,77 +98,31 @@
 
     <!-- Main content -->
     <section class="content">
+      <div class="row">
+        <div class="col-md-7">
 
-      <div class="row" id="tampil-dashboard-role">
-        
-      </div>
-      <div class="box box-default">
-        
-        <div class="box-header with-border">
-          <div class="row">
-            <div class="col-md-5">
-              <!-- <div class="btn-group" style="margin-top:5%">
-                <button type="button" class="btn btn-info btn-sm"><i class="fa fa-print"></i> Cetak</button>
-              </div> -->
-              
-            </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label>Status Progres</label>
-                  <select onchange="pilih_jenis(this.value)" class="form-control  input-sm">
-                    <option value="">All Data</option>
-                    @foreach(get_status_event_kontrak() as $get)
-                      <option value="{{$get->id}}">{{$get->status}}</option>
-                    @endforeach
-                  </select>
-               
-              </div>
-            </div>
-            <div class="col-md-4">
-              <div class="form-group">
-                  <label>Cari data</label>
-                  <input type="text" id="cari_datatable" placeholder="Search....." class="form-control input-sm">
-                  
-              </div>
-            </div>
-          </div>
         </div>
-        <!-- /.box-header -->
-        <div class="box-body">
-          <div class="row">
-           
-            <div class="col-md-12">
-              <div class="table-responsive">
-                <table id="data-table-fixed-header" width="110%" class="cell-border display">
-                    <thead>
-                        <tr>
-                            <th width="5%">No</th>
-                            
-                            <th width="5%"></th>
-                            <th width="4%"></th>
-                            <th width="15%">Customer</th>
-                            <th width="10%">Kategori</th>
-                            <th >Ruang Lingkup</th>
-                            <th width="10%">Start</th>
-                            <th width="10%">End</th>
-                            <th width="14%">Status</th>
-                        </tr>
-                    </thead>
-                    
-                </table>
-              </div>
-            </div>
+        <div class="col-md-4">
+            <input type="text" id="textcari" placeholder="cari....." class="form-control">
+        </div>
+        <div class="col-md-1">
+          <span class="btn btn-info" onclick="loader()">Cari</span>
+        </div>
+      </div>
+      <hr style="border-top: 4px double #ced1ff;">
+      <div class="row" id="tampil-project-load" style="height: 300px;background: #f9f6f6;">
+        <div class="col-md-12">
+          <div class="loadpage-content">
+            
+            <img src="{{url_plug()}}/img/logo.png?v={[date('ymdhis')}}" width="20%"><br>
+            <img src="{{url_plug()}}/img/loading.gif" width="10%">
             
           </div>
-          <!-- /.row -->
-        </div>
-        <!-- /.box-body -->
-        <div class="box-footer">
-          
         </div>
       </div>
-      <!-- /.box -->
-
+      <div class="row" id="tampil-project">
+        
+      </div>
     </section>
     
       <div class="modal file" id="modal-file" style="display: none;">

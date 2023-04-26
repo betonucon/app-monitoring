@@ -58,6 +58,10 @@ return [
             'driver' => 'local',
             'root'   => public_path() . '/_file_kontrak',
         ],
+        'public_progres' => [
+            'driver' => 'local',
+            'root'   => public_path() . '/_file_progres',
+        ],
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
