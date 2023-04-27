@@ -503,7 +503,10 @@
             $(this).parents('tr').remove();
         }); 
 
-
+        function sentuh_biaya() {
+          $(".biayanya").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });  
+          $('#save-operasional').show();
+        }
         $('#tampil-operasional-save').load("{{url('project/tampil_operasional')}}?id={{$data->id}}");
         $(document).ready(function(e) {
           $('#save-operasional').hide();
@@ -513,15 +516,16 @@
                 $("#tampil_operasional").append('<tr style="background:#fff" class="addoperasional">'
                                               +'<td style="width: 10px">'+no+'</td>'
                                               +'<td><input type="text" name="keterangan[]" placeholder="ketik disini.." class="form-control  input-sm"></td>'
-                                              +'<td><input type="text" name="biaya[]" id="biayanya'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
+                                              +'<td><input type="text" name="biaya[]" id="biayanya'+no+'" placeholder="ketik disini.." class="form-control input-sm biayanya"></td>'
                                               +'<td style="width:5%"><span class="btn btn-danger btn-xs remove_operasional"><i class="fa fa-close"></i></span></td>'
                                             +'</tr>');
-                                            $("#biayanya"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
+                                            $(".biayanya").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
                 if(no>0){
                   $('#save-operasional').show();
                 } 
             });
         });
+        
         $(document).on('click', '.remove_operasional', function(){  
             $(this).parents('.addoperasional').remove();
         });

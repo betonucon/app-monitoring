@@ -4,6 +4,10 @@ function get_jabatan(){
     $data=App\Models\Jabatan::orderBy('id','Asc')->get();
     return $data;
 }
+function get_master_operasional(){
+    $data=App\Models\Operasional::orderBy('operasional','Asc')->get();
+    return $data;
+}
 function get_kategori_stok(){
     $data=App\Models\StokKategori::orderBy('id','Asc')->get();
     return $data;
@@ -262,9 +266,9 @@ function notifikasi_side($act){
     }
     if(Auth::user()->role_id==6){
         if($act==2){
-            $array=array(8,9);
+            $array=array(1,7,8);
         }else{
-            $array=array(1,6,7);
+            $array=array(1,7,8);
         }
         $coun=App\Models\ViewHeaderProject::whereIn('status_id',$array)->count();
         if($coun>0){

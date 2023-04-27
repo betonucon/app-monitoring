@@ -165,9 +165,9 @@
       <!-- SELECT2 EXAMPLE -->
       <div class="box box-default">
         <div class="box-body">
-            <form class="form-horizontal" id="mydata" method="post" action="{{ url('project') }}" enctype="multipart/form-data" >
+            <form class="form-horizontal" id="mydata" method="post" action="{{ url('kontrak/store_kontrak') }}" enctype="multipart/form-data" >
               @csrf
-              <!-- <input type="submit"> -->
+              <input type="submit">
               <input type="hidden" name="id" value="{{$id}}">
               <div class="row">
               
@@ -552,7 +552,7 @@
           autoclose: true,
           format:'yyyy-mm-dd'
         });
-
+        
         $("#nilai_project").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
         $('#tampil-risiko-save').load("{{url('project/tampil_risiko')}}?id={{$data->id}}");
         $(document).ready(function(e) {
@@ -585,9 +585,13 @@
             $(this).parents('tr').remove();
         }); 
 
-
+        function sentuh_biaya() {
+          $(".biayanya").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });  
+          $('#save-operasional').show();
+        }
         $('#tampil-operasional-save').load("{{url('project/tampil_operasional')}}?id={{$data->id}}");
         $(document).ready(function(e) {
+          
           $('#save-operasional').hide();
           var nom = {{$nomper}};
             $("#addoperasional").click(function(){
@@ -595,10 +599,11 @@
                 $("#tampil_operasional").append('<tr style="background:#fff" class="addoperasional">'
                                               +'<td style="width: 10px">'+no+'</td>'
                                               +'<td><input type="text" name="keterangan[]" placeholder="ketik disini.." class="form-control  input-sm"></td>'
-                                              +'<td><input type="text" name="biaya[]" id="biayanya'+no+'" placeholder="ketik disini.." class="form-control input-sm"></td>'
+                                              +'<td><input type="text" name="biaya[]" id="biayanya'+no+'" placeholder="ketik disini.." class="form-control input-sm biayanya"></td>'
                                               +'<td style="width:5%"><span class="btn btn-danger btn-xs remove_operasional"><i class="fa fa-close"></i></span></td>'
                                             +'</tr>');
-                                            $("#biayanya"+no).inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });
+                                            $(".biayanya").inputmask({ alias : "currency", prefix: '', 'autoGroup': true, 'digits': 0, 'digitsOptional': false });  
+                                            
                 if(no>0){
                   $('#save-operasional').show();
                 } 

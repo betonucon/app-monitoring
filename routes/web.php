@@ -128,11 +128,14 @@ Route::group(['prefix' => 'pengadaan','middleware'    => 'auth'],function(){
     Route::get('/',[PengadaanController::class, 'index']);
     Route::get('/getdata',[PengadaanController::class, 'get_data']);
     Route::get('/getdatamaterial',[PengadaanController::class, 'get_data_material']);
+    Route::get('/getdatapengadaan',[PengadaanController::class, 'get_data_pengadaan']);
     Route::get('/view',[PengadaanController::class, 'view']);
+    Route::get('/delete',[PengadaanController::class, 'delete']);
     Route::get('/dashboard_task',[PengadaanController::class, 'dashboard_task']);
     Route::get('/tampil_material',[PengadaanController::class, 'tampil_material']);
     Route::post('/store_material',[PengadaanController::class, 'store_material']);
     Route::post('/store_material_pm',[PengadaanController::class, 'store_material_pm']);
+    Route::post('/store_pengadaan',[PengadaanController::class, 'store_pengadaan']);
     Route::get('/modal_verifikasi',[PengadaanController::class, 'modal_verifikasi']);
 });
 Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){

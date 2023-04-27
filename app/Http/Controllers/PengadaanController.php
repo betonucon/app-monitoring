@@ -10,9 +10,10 @@ use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use App\Models\ViewEmploye;
 use App\Models\ViewLog;
+use App\Models\Pengadaan;
 use App\Models\Viewrole;
 use App\Models\Viewstatus;
-use App\Models\Role;
+use App\Models\ViewGetPengadaan;
 use App\Models\HeaderProject;
 use App\Models\ViewHeaderProject;
 use App\Models\ProjectFileprogres;
@@ -80,14 +81,19 @@ class PengadaanController extends Controller
 
         return Datatables::of($data)
         ->addColumn('pengadaan', function ($row) {
-            $btn='<b>'.$row->total_pengadaan.'/'.$row->total_selesai_pengadaan.'</b>';
+            $btn='<b>'.$row->total_selesai_pengadaan.'/'.$row->total_pengadaan.'</b>';
             return $btn;
         })
+        
         ->addColumn('action', function ($row) {
-            
+            if($row->note==0 && $row->total_verifikasi==0){
+                $color='default';
+            }else{
+                $color='success';
+            }
             $btn='
                 <div class="btn-group">
-                    <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <button type="button" class="btn btn-'.$color.' btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     Act <i class="fa fa-sort-desc"></i> 
                     </button>
                     <ul class="dropdown-menu">
@@ -112,10 +118,18 @@ class PengadaanController extends Controller
         if($request->status_aset_id>0){
             $data = $query->where('status_aset_id',$request->status_aset_id);
         }
-        $data = $query->where('project_header_id',$request->id)->orderBy('status_material_id','Asc')->get();
+        $data = $query->where('project_header_id',$request->id)->whereNotIn('status_pengadaan',array(2,3))->orderBy('status_material_id','Asc')->get();
 
         return Datatables::of($data)
-        
+        ->addColumn('pilih', function ($row) {
+            if($row->status_material_id==1 && $row->status_pengadaan==1 && $row->status_aset_id>0){
+                return '<input type="checkbox" name="project_material_id[]" value="'.$row->id.'">';
+            }else{
+                return '<input type="checkbox" disabled >';
+            }
+            
+             
+        })
         ->addColumn('action', function ($row) {
             
             $btn='
@@ -132,7 +146,39 @@ class PengadaanController extends Controller
             return $btn;
         })
         
-        ->rawColumns(['action','pengadaan'])
+        ->rawColumns(['action','pengadaan','pilih'])
+        ->make(true);
+    }
+    public function get_data_pengadaan(request $request)
+    {
+        error_reporting(0);
+        $query = ViewGetPengadaan::query();
+        // if($request->status_material_id>0){
+        //     $data = $query->where('status_material_id',$request->status_material_id);
+        // }
+        
+        $data = $query->where('cost_center',$request->cost_center)->orderBy('keterangan','Asc')->get();
+
+        return Datatables::of($data)
+        ->addColumn('pilih', function ($row) {
+            if($row->status_publish==0){
+                return '<input type="checkbox" name="ide[]" value="'.$row->ide.'">';
+            }else{
+                return '<input type="checkbox" disabled >';
+            }
+            
+             
+        })
+        ->addColumn('action', function ($row) {
+            if($row->status_publish==0){
+                return '<span class="btn btn-danger btn-xs" onclick="delete_pengadaan('.$row->id.','.$row->ide.','.$row->tipe.')">Cancel</span>';
+            }else{
+                return '<span class="btn btn-default btn-xs">Cancel</span>';
+            }
+            
+        })
+        
+        ->rawColumns(['action','pengadaan','pilih'])
         ->make(true);
     }
     public function get_data_task(request $request)
@@ -519,9 +565,15 @@ class PengadaanController extends Controller
 
     public function delete(request $request)
     {
-        $id=decoder($request->id);
-        
-        $data=HeaderProject::where('id',$id)->update(['active'=>$request->act]);
+        $id=$request->id;
+        $ide=$request->ide;
+        $tipe=$request->tipe;
+        if($tipe==1){
+            $data=ProjectMaterial::where('id',$ide)->update(['status_pengadaan'=>1]);
+        }else{
+
+        }
+        $datapeng=Pengadaan::where('id',$id)->delete();
     }
 
     public function delete_risiko(request $request)
@@ -1217,105 +1269,7 @@ class PengadaanController extends Controller
         
     }
     
-    public function store_operasional(request $request){
-        error_reporting(0);
-        $rules = [];
-        $messages = [];
-        $count=(int) count($request->keterangan);
-        if($count>0){
-            $cek=0;
-            for($x=0;$x<$count;$x++){
-                if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
-                    $cek+=0;
-                }else{
-                    $cek+=1;
-                }
-            }
-
-            if($cek==$count){
-                $id=$request->id;
-                for($x=0;$x<$count;$x++){
-                    if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
-                        
-                    }else{
-                        $data=ProjectOperasional::UpdateOrcreate([
-                            'project_header_id'=>$id,
-                            'keterangan'=>$request->keterangan[$x],
-                        ],[
-                            'biaya'=>ubah_uang($request->biaya[$x]),
-                        ]);
-                    }
-                }
-                  echo'@ok';  
-            }else{
-                echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-            }
-        }else{
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
-        }
-        
-        // $rules['nilai_bidding']= 'required|min:0|not_in:0';
-        // $messages['nilai_bidding.required']= 'Masukan nilai bidding';
-        // $messages['nilai_bidding.not_in']= 'Masukan nilai bidding';
-        
-        // $rules['terbilang']= 'required';
-        // $messages['terbilang.required']= 'Masukan terbilang';
-       
-        
-        // $rules['bidding_date']= 'required';
-        // $messages['bidding_date.required']= 'Masukan tanggal bidding';
-
-        // $rules['status_id']= 'required';
-        // $messages['status_id.required']= 'Masukan status';
-
-        // $rules['hasil_bidding']= 'required';
-        // $messages['hasil_bidding.required']= 'Masukan hasil bidding';
-        
-
-        // $validator = Validator::make($request->all(), $rules, $messages);
-        // $val=$validator->Errors();
-
-
-        // if ($validator->fails()) {
-        //     echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-        //         foreach(parsing_validator($val) as $value){
-                    
-        //             foreach($value as $isi){
-        //                 echo'-&nbsp;'.$isi.'<br>';
-        //             }
-        //         }
-        //     echo'</div></div>';
-        // }else{
-        //         $data=HeaderProject::UpdateOrcreate([
-        //             'id'=>$request->id,
-        //         ],[
-        //             'status_id'=>$request->status_id,
-        //             'bidding_date'=>$request->bidding_date,
-        //             'hasil_bidding'=>$request->hasil_bidding,
-        //             'nilai_bidding'=>ubah_uang($request->nilai_bidding),
-        //             'update'=>date('Y-m-d H:i:s'),
-        //         ]);
-
-        //         if($request->status_id==50){
-        //             $revisi=2;
-        //         }else{
-        //             $revisi=1;
-        //         }
-        //         $log=LogPengajuan::create([
-        //             'project_header_id'=>$request->id,
-        //             'deskripsi'=>$request->hasil_bidding,
-        //             'status_id'=>$request->status_id,
-        //             'nik'=>Auth::user()->username,
-        //             'role_id'=>Auth::user()->role_id,
-        //             'revisi'=>$revisi,
-        //             'created_at'=>date('Y-m-d H:i:s'),
-        //         ]);
-        //         echo'@ok';
-        // }
-               
-        
-        
-    }
+    
     public function store_material(request $request){
         error_reporting(0);
         $rules = [];
@@ -1666,13 +1620,11 @@ class PengadaanController extends Controller
         error_reporting(0);
         $rules = [];
         $messages = [];
-        
-        if(count_material($request->id)==0){
+        $count=count((array) $request->project_material_id);
+        if($count==0){
             $rules['nilai']= 'required';
             $messages['nilai.required']= 'Masukan material';
         }
-        
-        
 
         $validator = Validator::make($request->all(), $rules, $messages);
         $val=$validator->Errors();
@@ -1688,25 +1640,28 @@ class PengadaanController extends Controller
                 }
             echo'</div></div>';
         }else{
-                $data=HeaderProject::UpdateOrcreate([
-                    'id'=>$request->id,
+            
+            $data=ViewProjectMaterial::whereIn('id',$request->project_material_id)->get();
+            foreach($data as $no=>$o){
+                $data=Pengadaan::UpdateOrcreate([
+                    'ide'=>$o->id,
+                    'tipe'=>1,
+                    'cost_center'=>$o->cost_center_project,
                 ],[
-                    'status_id'=>8,
-                    'nilai'=>ubah_uang($request->nilai),
-                    'update'=>date('Y-m-d H:i:s'),
-                ]);
-
-                
-                $log=LogPengajuan::create([
-                    'project_header_id'=>$request->id,
-                    'deskripsi'=>'Proses negosiasi dan lanjut keproses kontrak',
-                    'status_id'=>8,
-                    'nik'=>Auth::user()->username,
-                    'role_id'=>Auth::user()->role_id,
-                    'revisi'=>1,
+                    'project'=>$o->deskripsi_project,
+                    'keterangan'=>$o->nama_material,
+                    'status_aset'=>$o->nama_aset,
+                    'status_publish'=>0,
+                    'qty'=>$o->qty,
+                    'harga'=>$o->biaya_actual,
+                    'total'=>$o->total_actual,
                     'created_at'=>date('Y-m-d H:i:s'),
                 ]);
-                echo'@ok';
+            }
+            $update=ProjectMaterial::whereIn('id',$request->project_material_id)->update(['status_pengadaan'=>2]);
+                
+
+                echo '@ok';
         }
                
         

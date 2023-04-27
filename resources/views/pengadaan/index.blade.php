@@ -42,10 +42,12 @@
                         },
                         
                         { data: 'action' },
-                        { data: 'cost_customer' ,className: "text-center" },
+                        { data: 'cost_center_project' ,className: "text-center" },
                         { data: 'customer' },
                         { data: 'deskripsi_project' },
-                        { data: 'total' ,className: "text-center" },
+                        { data: 'nilai_pengadaan' ,className: "text-right" },
+                        { data: 'total_verifikasi' ,className: "text-center" },
+                        { data: 'total_pengadaan' ,className: "text-center" },
                         { data: 'pengadaan' ,className: "text-center" },
                         
                       ],
@@ -156,11 +158,13 @@
                             <th width="5%">No</th>
                             
                             <th width="5%"></th>
-                            <th width="5%">Cost</th>
+                            <th width="10%">Cost Center</th>
                             <th width="20%">Customer</th>
                             
                             <th>Project</th>
-                            <th width="9%">Material</th>
+                            <th width="13%">Nilai Pengadaan</th>
+                            <th width="9%">Proses</th>
+                            <th width="9%">Item</th>
                             <th width="9%">Pengadaan</th>
                             
                         </tr>

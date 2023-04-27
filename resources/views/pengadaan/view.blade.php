@@ -21,8 +21,8 @@
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
         });
-        $(document).ready(function () {
-              var table=$('#data-table-fixed-header').DataTable({
+          $(document).ready(function () {
+                var table=$('#data-table-fixed-header').DataTable({
                     lengthMenu: [20,50,100],
                     searching:true,
                     lengthChange:false,
@@ -41,6 +41,7 @@
                             } 
                         },
                         
+                        { data: 'pilih' },
                         { data: 'action' },
                         { data: 'kode_material' ,className: "text-center" },
                         { data: 'nama_status_pengadaan' ,className: "text-center" },
@@ -69,7 +70,37 @@
                     var tables=$('#data-table-fixed-header').DataTable();
                         tables.ajax.url("{{ url('pengadaan/getdatamaterial')}}?id={{$data->id}}&status_material_id="+status_material+"&status_aset_id="+text).load();
                 })
-        });
+
+                var tablepengadaan=$('#data-table-fixed-header-pengadaan').DataTable({
+                    lengthMenu: [20,50,100],
+                    searching:true,
+                    lengthChange:false,
+                    paging:false,
+                    fixedHeader: {
+                        header: true,
+                        headerOffset: $('#header').height()
+                    },
+                    dom: 'lrtip',
+                    responsive: false,
+                    ajax:"{{ url('pengadaan/getdatapengadaan')}}?cost_center={{$data->cost_center_project}}",
+                      columns: [
+                        { data: 'id', render: function (data, type, row, meta) 
+                            {
+                              return meta.row + meta.settings._iDisplayStart + 1;
+                            } 
+                        },
+                        
+                        { data: 'pilih' },
+                        { data: 'action' },
+                        { data: 'keterangan' },
+                        { data: 'qty' ,className: "text-center" },
+                        { data: 'harga_satuan' ,className: "text-right" },
+                        { data: 'total_harga' ,className: "text-right" },
+                        
+                      ],
+                      
+                });
+          });
        
 
         
@@ -114,6 +145,7 @@
                     <ul class="nav nav-tabs">
                       <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Project</a></li>
                       <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Draft Pengadaan</a></li>
+                      <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Publish Pengadaan</a></li>
                       
                      
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
@@ -245,8 +277,10 @@
                        
                         <div class="row" style="padding:1%">
            
-                          <div class="col-md-4">
-
+                          <div class="col-md-4" style="line-height: 6;">
+                            
+                            <button type="button" class="btn btn-primary btn-sm" onclick="proses_pengadaan()"><i class="fa fa-plus"></i> Proses Pengadaan</button>
+                
                           </div>
                           <div class="col-md-2">
                             <div class="form-group">
@@ -286,10 +320,49 @@
                                       <tr>
                                           <th width="5%">No</th>
                                           
+                                          <th width="2%"></th>
                                           <th width="5%"></th>
                                           <th width="10%">Kode</th>
                                           <th width="12%">STS Pengadaan</th>
                                           <th width="6%">Aset</th>
+                                          <th>Material</th>
+                                          <th width="7%">Qty</th>
+                                          <th width="9%">H.Satuan</th>
+                                          <th width="9%">H.Total</th>
+                                          
+                                      </tr>
+                                  </thead>
+                                  
+                              </table>
+                            
+                          </div>
+                        </div>
+                          
+                        
+                      </div>
+                      <div class="tab-pane" id="tab_3">
+                       
+                        <div class="row" style="padding:1%">
+           
+                          <div class="col-md-4" >
+                            
+                            <button type="button" class="btn btn-primary btn-sm" onclick="proses_pengadaan()"><i class="fa fa-plus"></i> Proses Pengadaan</button>
+                
+                          </div>
+                          <div class="col-md-2">
+                            
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            
+                              <table id="data-table-fixed-header-pengadaan" width="100%" class="cell-border display">
+                                  <thead>
+                                      <tr>
+                                          <th width="5%">No</th>
+                                          
+                                          <th width="2%"></th>
+                                          <th width="5%"></th>
                                           <th>Material</th>
                                           <th width="7%">Qty</th>
                                           <th width="9%">H.Satuan</th>
@@ -367,6 +440,43 @@
        $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}");
        $('#tampil-operasional-save').load("{{url('project/tampil_operasional')}}?id={{$data->id}}&act=1");
        $('#tampil-material-save').load("{{url('project/tampil_material')}}?id={{$data->id}}&act=1");
+       
+       function delete_pengadaan(id,ide,tipe){
+           
+           swal({
+               title: "Yakin melakukan cancel ?",
+               text: "",
+               type: "warning",
+               icon: "error",
+               showCancelButton: true,
+               align:"center",
+               confirmButtonClass: "btn-danger",
+               confirmButtonText: "Yes, delete it!",
+               closeOnConfirm: false
+           }).then((willDelete) => {
+               if (willDelete) {
+                       $.ajax({
+                           type: 'GET',
+                           url: "{{url('pengadaan/delete')}}",
+                           data: "id="+id+"&ide="+ide+"&tipe="+tipe,
+                           success: function(msg){
+                               swal("Success! berhasil terhapus!", {
+                                   icon: "success",
+                               });
+                               var tables=$('#data-table-fixed-header').DataTable();
+                                    tables.ajax.url("{{ url('pengadaan/getdatamaterial')}}?id={{$data->id}}").load();
+                               var tablesm=$('#data-table-fixed-header-pengadaan').DataTable();
+                                  tablesm.ajax.url("{{ url('pengadaan/getdatapengadaan')}}?cost_center={{$data->cost_center_project}}").load();
+                           }
+                       });
+                   
+                   
+               } else {
+                   
+               }
+           });
+           
+        }
        function simpan_data(){
             
             var form=document.getElementById('mydatamaterial');
@@ -391,6 +501,58 @@
                         $('#tampil-form').html("");
                         var tables=$('#data-table-fixed-header').DataTable();
                         tables.ajax.url("{{ url('pengadaan/getdatamaterial')}}?id={{$data->id}}").load();
+                    }else{
+                        document.getElementById("loadnya").style.width = "0px";
+                        swal({
+                            title: 'Notifikasi',
+                           
+                            html:true,
+                            text:'ss',
+                            icon: 'error',
+                            buttons: {
+                                cancel: {
+                                    text: 'Tutup',
+                                    value: null,
+                                    visible: true,
+                                    className: 'btn btn-dangers',
+                                    closeModal: true,
+                                },
+                                
+                            }
+                        });
+                        $('.swal-text').html('<div style="width:100%;background:#f2f2f5;padding:1%;text-align:left;font-size:13px">'+msg+'</div>')
+                    }
+                    
+                    
+                }
+            });
+        }
+       function proses_pengadaan(){
+            
+            var form=document.getElementById('material');
+            $.ajax({
+                type: 'POST',
+                url: "{{ url('pengadaan/store_pengadaan') }}",
+                data: new FormData(form),
+                contentType: false,
+                cache: false,
+                processData:false,
+                beforeSend: function() {
+                    document.getElementById("loadnya").style.width = "100%";
+                },
+                success: function(msg){
+                    var bat=msg.split('@');
+                    if(bat[1]=='ok'){
+                        document.getElementById("loadnya").style.width = "0px";
+                        swal("Success! berhasil disimpan!", {
+                            icon: "success",
+                        });
+                        $('#modal-form').modal('hide');
+                        $('#tampil-form').html("");
+                        var tables=$('#data-table-fixed-header').DataTable();
+                            tables.ajax.url("{{ url('pengadaan/getdatamaterial')}}?id={{$data->id}}").load();
+                        var tablesm=$('#data-table-fixed-header-pengadaan').DataTable();
+                            tablesm.ajax.url("{{ url('pengadaan/getdatapengadaan')}}?cost_center={{$data->cost_center_project}}").load();
                     }else{
                         document.getElementById("loadnya").style.width = "0px";
                         swal({

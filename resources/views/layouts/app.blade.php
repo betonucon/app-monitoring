@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>E-PROM</title>
+  <title>E-PROM | PT KPDP</title>
   <!-- Tell the browser to be responsive to screen width -->
-  <link href="{{url_plug()}}/img/ks.png" rel="icon">
+  <link href="{{url_plug()}}/img/ks.png?v={{date('ymdhis')}}" rel="icon">
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
   <!-- Bootstrap 3.3.7 -->
   <link rel="stylesheet" href="{{url_plug()}}/bower_components/bootstrap/dist/css/bootstrap.min.css">
@@ -247,7 +247,7 @@
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<body class="hold-transition fixed sidebar-mini skin-purple">
+<body class="hold-transition fixed sidebar-mini sidebar-mini-expand-feature skin-purple-light">
 <div id="loadnya" class="loadnya">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
       <div class="loadnya-content">
@@ -272,7 +272,7 @@
     <!-- Logo -->
     <a href="#" class="logo">
       <span class="logo-mini"><b>A</b>LT</span>
-      <span class="logo-lg"><b><img src="{{url_plug()}}/img/ks.png"  alt="User Image"> E-PROM</b></span>
+      <span class="logo-lg" style="text-align: left;"><b><img src="{{url_plug()}}/img/ks.png?v={{date('ymdhis')}}" width="20%" alt="User Image"> E-PROM</b></span>
     </a>
     <!-- Header Navbar: style can be found in header.less -->
     <nav class="navbar navbar-static-top">
@@ -370,9 +370,9 @@
   <!-- /.content-wrapper -->
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
-      <b>Version</b> 2.4.18
+      <b>Version</b> 1.0.0
     </div>
-    <strong>Copyright &copy; 2014-2019 <a href="https://adminlte.io">AdminLTE</a>.</strong> All rights
+    <strong>Copyright &copy; 2023 <a href="#">PT.KPDP</a>.</strong> All rights
     reserved.
   </footer>
 
@@ -608,8 +608,8 @@
 
 <!-- Page script -->
 <script type="text/javascript">
-       
-		function load(){
+   
+     function load(){
 			document.getElementById("loadpage").style.width = "100%";
 		}
 		function close_load(){
@@ -623,6 +623,8 @@
 		window.setTimeout(function () {
 			document.getElementById("loadpage").style.width = "0%";
 		}, 1000);
+
+
     $('#tanggal_app').datepicker({
       autoclose: true,
       format:'yyyy-mm-dd'

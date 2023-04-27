@@ -1076,11 +1076,32 @@ class KontrakController extends Controller
                     'approve_direktur_operasional'=>date('Y-m-d H:i:s'),
                     'approve_kadis_operasional_kontrak'=>date('Y-m-d H:i:s'),
                 ]);
-
+                foreach(get_master_operasional($request->kategori_project_id) as $opr){
+                    $operasional=ProjectOperasional::UpdateOrcreate([
+                        'project_header_id'=>$data->id,
+                        'keterangan'=>$opr->operasional,
+                    ],[
+                        'biaya'=>0,
+                        'status_operasional'=>0,
+                    ]);
+                }
                 echo'@ok@'.encoder($data->id);
                    
                 
             }else{
+                $mst=HeaderProject::where('id',$request->id)->first();
+                if($mst->kategori_project_id!=$request->kategori_project_id){
+                    foreach(get_master_operasional($request->kategori_project_id) as $opr){
+                        $operasional=ProjectOperasional::UpdateOrcreate([
+                            'project_header_id'=>$request->id,
+                            'keterangan'=>$opr->operasional,
+                        ],[
+                            'status_operasional'=>0,
+                        ]);
+                    }
+                }else{
+
+                }
                 $data=HeaderProject::UpdateOrcreate([
                     'id'=>$request->id,
                 ],[

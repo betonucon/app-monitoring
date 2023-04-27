@@ -257,7 +257,7 @@ class ProjectController extends Controller
                 $data = $query->where('status_id','>',1);
             }
         }
-        $data = $query->orderBy('id','Desc')->get();
+        $data = $query->where('status_id','!=',9)->orderBy('id','Desc')->get();
 
         return Datatables::of($data)
             ->addColumn('seleksi', function ($row) {
@@ -437,14 +437,26 @@ class ProjectController extends Controller
                     <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
                 </tr>';
             }else{
-                $act.='
-                <tr style="background:#fff">
-                    <td>'.($no+1).'</td>
-                    <td>'.$o->keterangan.'</td>
-                    <td class="text-right">'.uang($o->biaya).'</td>
-                    <td><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                        
-                </tr>';
+                if($o->status_operasional==0){
+                    $act.='
+                    <tr style="background:#fff">
+                        <td>'.($no+1).'</td>
+                        <td><input type="text" name="keterangan[]" value="'.$o->keterangan.'" placeholder="ketik disini.." class="form-control  input-sm"></td>
+                        <td class="text-right"><input type="text" name="biaya[]" id="biayanya'.($no+1).'" placeholder="ketik disini.." value="'.$o->biaya.'" onkeyup="sentuh_biaya(this.value)" class="form-control input-sm biayanya"></td>
+                        <td><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>
+                            
+                    </tr>';
+                }else{
+                    $act.='
+                    <tr style="background:#fff">
+                        <td>'.($no+1).'</td>
+                        <td>'.$o->keterangan.'</td>
+                        <td class="text-right">'.uang($o->biaya).'</td>
+                        <td><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>
+                            
+                    </tr>';
+                }
+                
             }
             
         }
@@ -461,6 +473,7 @@ class ProjectController extends Controller
                 <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
             </tr>';
         }
+        
         return $act;
     }
 
@@ -905,11 +918,32 @@ class ProjectController extends Controller
                     'status_id'=>1,
                     'create'=>date('Y-m-d H:i:s'),
                 ]);
-
+                foreach(get_master_operasional($request->kategori_project_id) as $opr){
+                    $operasional=ProjectOperasional::UpdateOrcreate([
+                        'project_header_id'=>$data->id,
+                        'keterangan'=>$opr->operasional,
+                    ],[
+                        'biaya'=>0,
+                        'status_operasional'=>0,
+                    ]);
+                }
                 echo'@ok@'.encoder($data->id);
                    
                 
             }else{
+                $mst=HeaderProject::where('id',$request->id)->first();
+                if($mst->kategori_project_id!=$request->kategori_project_id){
+                    foreach(get_master_operasional($request->kategori_project_id) as $opr){
+                        $operasional=ProjectOperasional::UpdateOrcreate([
+                            'project_header_id'=>$request->id,
+                            'keterangan'=>$opr->operasional,
+                        ],[
+                            'status_operasional'=>0,
+                        ]);
+                    }
+                }else{
+
+                }
                 $data=HeaderProject::UpdateOrcreate([
                     'id'=>$request->id,
                 ],[
@@ -925,7 +959,7 @@ class ProjectController extends Controller
                     'status_id'=>1,
                     'create'=>date('Y-m-d H:i:s'),
                 ]);
-
+                
                 
                 echo'@ok@'.encoder($request->id);
                 
@@ -1091,7 +1125,7 @@ class ProjectController extends Controller
             if($count>0){
                 $cek=0;
                 for($x=0;$x<$count;$x++){
-                    if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
+                    if($request->keterangan[$x]==""  || $request->biaya[$x]=="" || ubah_uang($request->biaya[$x])==0){
                         $cek+=0;
                     }else{
                         $cek+=1;
@@ -1107,7 +1141,7 @@ class ProjectController extends Controller
                     }
                     $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
                     for($x=0;$x<$count;$x++){
-                        if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
+                        if($request->keterangan[$x]==""  || $request->biaya[$x]=="" || ubah_uang($request->biaya[$x])==0){
                             
                         }else{
                             $data=ProjectOperasional::UpdateOrcreate([
@@ -1115,6 +1149,7 @@ class ProjectController extends Controller
                                 'keterangan'=>$request->keterangan[$x],
                             ],[
                                 'biaya'=>ubah_uang($request->biaya[$x]),
+                                'status_operasional'=>1,
                             ]);
                         }
                     }
