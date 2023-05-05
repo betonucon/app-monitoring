@@ -146,7 +146,7 @@
                   </div>
                   <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
-                      <li class="@if($tab==1) active @endif"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
+                      <li class="@if($tab==1 || $tab=="") active @endif"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
                       <li class="@if($tab==2) active @endif"><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Operasional Project</a></li>
                       <li class="@if($tab==3) active @endif"><a href="#tab_4" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Material Cost</a></li>
                       <li class="@if($tab==4) active @endif"><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
@@ -155,7 +155,7 @@
                     </ul>
                     <div class="tab-content" style="background: #fff3f3;">
                     
-                      <div class="tab-pane @if($tab==1) active @endif" id="tab_1">
+                      <div class="tab-pane @if($tab==1 || $tab=="") active @endif" id="tab_1">
                         <div class="box-body">
                           
                           <div class="form-group">
