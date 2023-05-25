@@ -89,8 +89,13 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::get('/delete_risiko',[ProjectController::class, 'delete_risiko']);
     Route::get('/delete_material',[ProjectController::class, 'delete_material']);
     Route::get('/delete_operasional',[ProjectController::class, 'delete_operasional']);
+    Route::get('/delete_jasa',[ProjectController::class, 'delete_jasa']);
     Route::get('/modal',[ProjectController::class, 'modal']);
+    Route::get('/reset_material',[ProjectController::class, 'reset_material']);
+    Route::get('/reset_operasional',[ProjectController::class, 'reset_operasional']);
+    Route::get('/reset_jasa',[ProjectController::class, 'reset_jasa']);
     Route::post('/',[ProjectController::class, 'store']);
+    Route::post('/store_import_material',[ProjectController::class, 'store_import_material']);
     Route::get('/kirim_kadis_komersil',[ProjectController::class, 'kirim_kadis_komersil']);
     Route::post('/kembali_komersil',[ProjectController::class, 'kembali_komersil']);
     Route::post('/store_procurement',[ProjectController::class, 'store_procurement']);
@@ -101,6 +106,7 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::post('/approve_direktur_operasional',[ProjectController::class, 'approve_direktur_operasional']);
     Route::get('/kirim_procurement',[ProjectController::class, 'kirim_procurement']);
     Route::get('/tampil_material',[ProjectController::class, 'tampil_material']);
+    Route::get('/tampil_jasa',[ProjectController::class, 'tampil_jasa']);
     Route::get('/tampil_material_in',[ProjectController::class, 'tampil_material_in']);
     Route::get('/tampil_material_proc',[ProjectController::class, 'tampil_material_proc']);
     Route::get('/form_material',[ProjectController::class, 'form_material']);
@@ -108,6 +114,7 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::get('/tampil_operasional',[ProjectController::class, 'tampil_operasional']);
     Route::post('/store_material',[ProjectController::class, 'store_material']);
     Route::post('/store_operasional',[ProjectController::class, 'store_operasional']);
+    Route::post('/store_jasa',[ProjectController::class, 'store_jasa']);
     Route::post('/store_risiko',[ProjectController::class, 'store_risiko']);
     Route::post('/store_bidding',[ProjectController::class, 'store_bidding']);
     Route::post('/publish',[ProjectController::class, 'publish']);

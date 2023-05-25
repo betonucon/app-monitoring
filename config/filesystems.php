@@ -58,6 +58,11 @@ return [
             'driver' => 'local',
             'root'   => public_path() . '/_file_kontrak',
         ],
+        'public_excel' => [
+            'driver' => 'local',
+            'root'   => public_path() . '/file_excel',
+        ],
+       
         'public_progres' => [
             'driver' => 'local',
             'root'   => public_path() . '/_file_progres',

@@ -261,8 +261,7 @@
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
       <div class="loadpage-content">
         
-            <img src="{{url_plug()}}/img/logo.png?v={[date('ymdhis')}}" width="20%"><br>
-            <img src="{{url_plug()}}/img/loading.gif" width="10%">
+            <img src="{{url_plug()}}/img/load.gif?v={[date('ymdhis')}}" width="20%">
         
       </div>
 </div>

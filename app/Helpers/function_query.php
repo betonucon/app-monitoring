@@ -39,11 +39,15 @@ function sum_personal($id){
     return $data;
 }
 function get_operasional($id){
-    $data=App\Models\ProjectOperasional::where('project_header_id',$id)->orderBy('id','Asc')->get();
+    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->orderBy('nama_material','Asc')->get();
     return $data;
 }
-function get_material($id,$status){
-    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('status',$status)->orderBy('nama_material','Asc')->get();
+function get_jasa($id){
+    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->orderBy('nama_material','Asc')->get();
+    return $data;
+}
+function get_material($id){
+    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->orderBy('nama_material','Asc')->get();
     return $data;
 }
 function get_material_project($id){

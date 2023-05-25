@@ -30,10 +30,10 @@
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<body class="hold-transition login-page" style="background:url({{url_plug()}}/img/bgbg.jpg?v={{date('Ymdhis')}})">
+<body class="hold-transition login-page" style="background:url({{url_plug()}}/img/bgbg2.jpg?v={{date('Ymdhis')}});background-size:100%">
 <div class="login-box">
   <div class="login-logo">
-    <img src="{{url_plug()}}/img/logo2.png?v={[date('ymdhis')}}" width="100%">
+    <img src="{{url_plug()}}/img/load.gif?v={[date('ymdhis')}}" width="70%">
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body" style="background: #f1e7e7c9;">

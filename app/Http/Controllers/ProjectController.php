@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Imports\ImportMaterial;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use App\Models\ViewEmploye;
@@ -80,22 +81,25 @@ class ProjectController extends Controller
             $disabled='';
             $nom=1;
             $nomper=1;
+            $nomjasa=1;
             $nommat=1;
         }else{
             $disabled='readonly';
             $connomor=ProjectRisiko::where('project_header_id',$id)->count();
-            $connomoropr=ProjectOperasional::where('project_header_id',$id)->count();
-            $connomormat=ProjectMaterial::where('project_header_id',$id)->count();
+            $connomoropr=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->count();
+            $connomorjasa=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->count();
+            $connomormat=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->count();
             $nom=($connomor+1);
             $nomper=($connomoropr+1);
             $nommat=($connomormat+1);
+            $nomjasa=($connomorjasa+1);
         }
         if(Auth::user()->role_id==6){
             if($data->status_id==1){
-                return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab'));
+                return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab','nomjasa'));
             }else{
                 if($id==0){
-                    return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab'));
+                    return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab','nomjasa'));
                 }else{
                     if($data->status_id==7){
                         return view('project.view_bidding',compact('template','data','disabled','id'));
@@ -426,53 +430,82 @@ class ProjectController extends Controller
     public function tampil_operasional(request $request)
     {
         $act='';
+        $mtr=HeaderProject::where('id',$request->id)->first();
         $sum=0;
+        $sumtotal=0;
         foreach(get_operasional($request->id) as $no=>$o){
             $sum+=$o->biaya;
-            if($request->act==1){
+            $sumtotal+=$o->total;
+            
                 $act.='
                 <tr style="background:#fff">
                     <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->keterangan.'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
                     <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                    if($mtr->status_id==1){
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>';
+                    }else{
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
+                    }
+                    $act.='
+                        
                 </tr>';
-            }else{
-                if($o->status_operasional==0){
-                    $act.='
-                    <tr style="background:#fff">
-                        <td>'.($no+1).'</td>
-                        <td><input type="text" name="keterangan[]" value="'.$o->keterangan.'" placeholder="ketik disini.." class="form-control  input-sm"></td>
-                        <td class="text-right"><input type="text" name="biaya[]" id="biayanya'.($no+1).'" placeholder="ketik disini.." value="'.$o->biaya.'" onkeyup="sentuh_biaya(this.value)" class="form-control input-sm biayanya"></td>
-                        <td><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                            
-                    </tr>';
-                }else{
-                    $act.='
-                    <tr style="background:#fff">
-                        <td>'.($no+1).'</td>
-                        <td>'.$o->keterangan.'</td>
-                        <td class="text-right">'.uang($o->biaya).'</td>
-                        <td><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                            
-                    </tr>';
-                }
-                
-            }
+             
             
         }
-        if($request->act==1){
-            $act.='
-            <tr style="background:#fff">
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-            </tr>';
-        }else{
-            $act.='
-            <tr style="background:#fff">
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-            </tr>';
+        
+        $act.='
+        <tr style="background:#fff">
+            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sumtotal).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+        </tr>';
+       
+        
+        return $act;
+    }
+    public function tampil_jasa(request $request)
+    {
+        $act='';
+        $mtr=HeaderProject::where('id',$request->id)->first();
+        $sum=0;
+        $sumtotal=0;
+        foreach(get_jasa($request->id) as $no=>$o){
+            $sum+=$o->biaya;
+            $sumtotal+=$o->total;
+            
+                $act.='
+                <tr style="background:#fff">
+                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                    if($mtr->status_id==1){
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_jasa('.$o->id.')"><i class="fa fa-close"></i></span></td>';
+                    }else{
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
+                    }
+                    $act.='
+                        
+                </tr>';
+             
+            
         }
+        
+        $act.='
+        <tr style="background:#fff">
+            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sumtotal).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+        </tr>';
+       
         
         return $act;
     }
@@ -480,117 +513,42 @@ class ProjectController extends Controller
     public function tampil_material(request $request)
     {
         $act='';
+        $mtr=HeaderProject::where('id',$request->id)->first();
         $sum=0;
         $sumact=0;
         $data=HeaderProject::where('id',$request->id)->first();
         $status=$data->status_id;
-        if($status>6){
+        
             foreach(get_material($request->id,1) as $no=>$o){
                 $sum+=$o->total;
-                $sumact+=$o->total_actual;
-                if($o->status_material_id==1){
-                    $clr='yellow';
-                }else{
-                    if($o->status_material_id==2){
-                        $clr='aqua';
-                    }else{
-                        $clr='#fff';
-                    }
-                }
-                if($request->act==1){
-                    $act.='
-                    <tr style="background:#fff">
-                        <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya_actual).'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                        <td style="padding: 2px 2px 2px 8px;background:'.$clr.'" class="text-center" >'.$o->st_material.'</td>
-                    </tr>';
-                }else{
-                    
+                
                     $act.='
                     <tr style="background:#fff" >
                         <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
                         <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
                         <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya_actual).'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                        <td style="padding: 2px 2px 2px 8px;background:'.$clr.'" class="text-center" >'.$o->st_material.'</td>';
-                        if($o->status_material_id>0){
-                            $act.='
-                            <td style="padding: 2px 2px 2px 8px;">
-                                <span class="btn btn-success btn-xs" onclick="update_material('.$o->id.')"><i class="fa fa-search"></i></span>
-                            </td>';
+                        <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                        <td style="padding: 2px 2px 2px 8px;">'.$o->satuan_material.'</td>
+                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                        if($mtr->status_id==1){
+                            $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>';
                         }else{
-                            $act.='
-                            <td style="padding: 2px 2px 2px 8px;">
-                                <span class="btn btn-info btn-xs" onclick="update_material('.$o->id.')"><i class="fa fa-search"></i></span>
-                            </td>';
+                            $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
                         }
                         $act.='
-                            
                     </tr>';
-                }
+                
                 
             }
-           
+            
             $act.='
             <tr style="background:#fff">
-                <td colspan="4" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sumact).'</td>
-                <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+                <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+                <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+                <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
             </tr>';
-        }else{
-                foreach(get_material($request->id,1) as $no=>$o){
-                    $sum+=$o->total;
-                    if($request->act==1){
-                        $act.='
-                        <tr style="background:#fff">
-                            <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                            
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                        </tr>';
-                    }else{
-                        $act.='
-                        <tr style="background:#fff" >
-                            <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                            <td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                                
-                        </tr>';
-                    }
-                    
-                }
-                if($request->act==1){
-                $act.='
-                <tr style="background:#fff">
-                    <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                    <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-                </tr>';
-                }else{
-                $act.='
-                <tr style="background:#fff">
-                    <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                    <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-                </tr>';
-                }
-        }
+                
+        
         
         return $act;
     }
@@ -849,7 +807,13 @@ class ProjectController extends Controller
     {
         $id=$request->id;
         
-        $data=ProjectOperasional::where('id',$id)->delete();
+        $data=ProjectMaterial::where('id',$id)->delete();
+    }
+    public function delete_jasa(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('id',$id)->delete();
     }
 
     public function delete_material(request $request)
@@ -857,6 +821,24 @@ class ProjectController extends Controller
         $id=$request->id;
         
         $data=ProjectMaterial::where('id',$id)->delete();
+    }
+    public function reset_material(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->delete();
+    }
+    public function reset_operasional(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->delete();
+    }
+    public function reset_jasa(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->delete();
     }
    
     public function store(request $request){
@@ -1125,13 +1107,13 @@ class ProjectController extends Controller
             if($count>0){
                 $cek=0;
                 for($x=0;$x<$count;$x++){
-                    if($request->keterangan[$x]==""  || $request->biaya[$x]=="" || ubah_uang($request->biaya[$x])==0){
+                    if($request->keterangan[$x]==""  && ($request->biayaopr[$x]=="" || ubah_uang($request->biayaopr[$x])) && ($request->qtyopr[$x]=="") || (ubah_uang($request->qtyopr[$x]))==0){
                         $cek+=0;
                     }else{
                         $cek+=1;
                     }
                 }
-
+                echo $cek.'=='.$count;
                 if($cek==$count){
                     $mst=HeaderProject::where('id',$id)->first();
                     if($mst->tab>1){
@@ -1141,17 +1123,100 @@ class ProjectController extends Controller
                     }
                     $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
                     for($x=0;$x<$count;$x++){
-                        if($request->keterangan[$x]==""  || $request->biaya[$x]=="" || ubah_uang($request->biaya[$x])==0){
+                        
                             
-                        }else{
-                            $data=ProjectOperasional::UpdateOrcreate([
+                            $data=ProjectMaterial::UpdateOrcreate([
                                 'project_header_id'=>$id,
-                                'keterangan'=>$request->keterangan[$x],
+                                'nama_material'=>$request->keterangan[$x],
+                                'kategori_ide'=>2,
+                                'status'=>1,
+                                
                             ],[
-                                'biaya'=>ubah_uang($request->biaya[$x]),
-                                'status_operasional'=>1,
+                                'biaya'=>ubah_uang($request->biayaopr[$x]),
+                                'biaya_actual'=>ubah_uang($request->biayaopr[$x]),
+                                'qty'=>ubah_uang($request->qtyopr[$x]),
+                                'status_pengadaan'=>1,
+                                'total'=>(ubah_uang($request->biayaopr[$x])*ubah_uang($request->qtyopr[$x])), 
+                                'kode_material'=>$kode_material, 
+                                'total_actual'=>(ubah_uang($request->biayaopr[$x])*ubah_uang($request->qtyopr[$x])), 
+                                'satuan_material'=>'Item',
+                                'created_at'=>date('Y-m-d H:i:s'),
                             ]);
-                        }
+                        
+                    }
+                    echo'@ok';  
+                }else{
+                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+                }
+            }else{
+                echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+            }
+        }    
+        
+    }
+    public function store_jasa(request $request){
+        error_reporting(0);
+        $id=$request->id;
+        $rules = [];
+        $messages = [];
+        if($id==0){
+            $rules['catatan']= 'required';
+            $messages['catatan.required']= 'Harap isi rencana kerja terlebih dahulu';
+        }
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
+
+
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
+                    
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
+                    }
+                }
+            echo'</div></div>';
+        }else{
+            $count=(int) count($request->keteranganjasa);
+            if($count>0){
+                $cek=0;
+                for($x=0;$x<$count;$x++){
+                    if($request->keteranjasa[$x]==""  && ($request->biayajasa[$x]=="" || ubah_uang($request->biayajasa[$x])) && ($request->qtyjasa[$x]=="") || (ubah_uang($request->qtyjasa[$x]))==0){
+                        $cek+=0;
+                    }else{
+                        $cek+=1;
+                    }
+                }
+               
+                if($cek==$count){
+                    $mst=HeaderProject::where('id',$id)->first();
+                    if($mst->tab>1){
+                        $tab=$mst->tab;
+                    }else{
+                        $tab=3;
+                    }
+                    $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
+                    for($x=0;$x<$count;$x++){
+                        
+                            
+                            $data=ProjectMaterial::UpdateOrcreate([
+                                'project_header_id'=>$id,
+                                'nama_material'=>$request->keteranganjasa[$x],
+                                'kategori_ide'=>3,
+                                'status'=>1,
+                                
+                            ],[
+                                'biaya'=>ubah_uang($request->biayajasa[$x]),
+                                'biaya_actual'=>ubah_uang($request->biayajasa[$x]),
+                                'qty'=>ubah_uang($request->qtyjasa[$x]),
+                                'status_pengadaan'=>1,
+                                'total'=>(ubah_uang($request->biayajasa[$x])*ubah_uang($request->qtyjasa[$x])), 
+                                'kode_material'=>0, 
+                                'total_actual'=>(ubah_uang($request->biayajasa[$x])*ubah_uang($request->qtyjasa[$x])), 
+                                'satuan_material'=>'Item',
+                                'created_at'=>date('Y-m-d H:i:s'),
+                            ]);
+                        
                     }
                     echo'@ok';  
                 }else{
@@ -1251,7 +1316,7 @@ class ProjectController extends Controller
             if($count>0){
                 $cek=0;
                 for($x=0;$x<$count;$x++){
-                    if($request->kode_material[$x]==""  || $request->qty[$x]==""   || $request->total[$x]=="" || $request->total[$x]==0){
+                    if($request->qty[$x]==""  || $request->satuan_material[$x]=="" || $request->total[$x]=="" || $request->total[$x]==0){
                         $cek+=0;
                     }else{
                         $cek+=1;
@@ -1259,6 +1324,7 @@ class ProjectController extends Controller
                 }
 
                 if($cek==$count){
+                    $mst=HeaderProject::where('id',$id)->first();
                     if($mst->tab>2){
                         $tab=$mst->tab;
                     }else{
@@ -1266,10 +1332,15 @@ class ProjectController extends Controller
                     }
                     $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
                     for($x=0;$x<$count;$x++){
-                        
+                            if($request->kode_material[$x]==""){
+                                $kode_material=0;
+                            }else{
+                                $kode_material=$request->kode_material[$x];
+                            }
                             $data=ProjectMaterial::UpdateOrcreate([
                                 'project_header_id'=>$id,
-                                'kode_material'=>$request->kode_material[$x],
+                                'nama_material'=>$request->nama_material[$x],
+                                'kategori_ide'=>1,
                                 'status'=>1,
                                 
                             ],[
@@ -1277,9 +1348,11 @@ class ProjectController extends Controller
                                 'biaya_actual'=>ubah_uang($request->biaya[$x]),
                                 'qty'=>ubah_uang($request->qty[$x]),
                                 'status_pengadaan'=>1,
-                                'total'=>ubah_uang($request->total[$x]),
+                                'total'=>ubah_uang($request->total[$x]), 
+                                'kode_material'=>$kode_material, 
                                 'total_actual'=>ubah_uang($request->total[$x]),
                                 'nama_material'=>$request->nama_material[$x],
+                                'satuan_material'=>$request->satuan_material[$x],
                                 'created_at'=>date('Y-m-d H:i:s'),
                             ]);
                         
@@ -1291,6 +1364,44 @@ class ProjectController extends Controller
             }else{
                 echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
             }
+        }
+        
+               
+        
+        
+    }
+    public function store_import_material(request $request){
+        error_reporting(0);
+        $id=$request->id;
+        $rules = [];
+        $messages = [];
+        $rules['file_excel_material']= 'required';
+        $messages['file_excel_material.required']= 'Harap isi upload excel';
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
+
+
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
+                    
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
+                    }
+                }
+            echo'</div></div>';
+        }else{
+            $mst=HeaderProject::where('id',$id)->first();
+            if($mst->tab>2){
+                $tab=$mst->tab;
+            }else{
+                $tab=4;
+            }
+            $filess = $request->file('file_excel_material');
+            $nama_file = 'MATERIAL'.$id.'-'.rand().$filess->getClientOriginalName();
+            $filess->move('public/file_excel',$nama_file);
+            Excel::import(new ImportMaterial($id), public_path('/file_excel/'.$nama_file));
+            echo'@ok';
         }
         
                
