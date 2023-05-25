@@ -177,7 +177,7 @@
 
                             <div class="col-sm-2">
                               <div class="input-group">
-                                <span class="input-group-addon" onclick="show_draft()"><i class="fa fa-search"></i></span>
+                                <span class="input-group-addon" onclick="show_draft_customer()"><i class="fa fa-search"></i></span>
                                 <input type="text" id="customer_code" name="customer_code" readonly value="{{$data->customer_code}}" class="form-control  input-sm" placeholder="0000">
                               </div>
                             </div>
@@ -1055,7 +1055,7 @@
             });
             
         } 
-        function show_draft(){
+        function show_draft_customer(){
            
             $('#modal-draf').modal('show');
             var tables=$('#data-table-fixed-header').DataTable();
