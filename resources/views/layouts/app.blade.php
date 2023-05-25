@@ -46,6 +46,29 @@
           min-height: 300px !important;
           overflow-x: auto;
       }
+      .skin-purple-light .wrapper, .skin-purple-light .main-sidebar, .skin-purple-light .left-side {
+          background-color: #2d58ad;
+      }
+      .skin-purple-light .sidebar a {
+          color: #fff;
+      }
+      .user-panel>.image>img {
+          width: 100%;
+          max-width: 65px;
+          height: auto;
+      }
+      .user-panel>.info {
+          width: 100%;
+          padding: 15px 5px 5px 15px;
+          line-height: 1;
+          text-align: center;
+          position: absolute;
+          left: 0px;
+      }
+      .skin-purple-light .sidebar-menu>li:hover>a, .skin-purple-light .sidebar-menu>li.active>a {
+          color: #fffdfd;
+          background: #8686a5;
+      }
       .info-box {
         display: block;
         min-height: 90px;
@@ -346,13 +369,13 @@
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
       <!-- Sidebar user panel -->
-      <div class="user-panel">
-        <div class="pull-left image">
+      <div class="user-panel" style="background: #e7e7ef;height: 130px;">
+        <div class="image" style="text-align: center;">
           <img src="{{url_plug()}}/img/akun.png" class="img-circle" alt="User Image">
         </div>
-        <div class="pull-left info">
-          <p>@ {{Auth::user()->name}}</p>
-          <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+        <div class="info">
+          <p>PT Krakatau Perbekalan</p>
+          <a href="#"><i class="fa fa-circle text-success"></i>@ {{Auth::user()->name}} Online</a>
         </div>
       </div>
       <!-- search form -->
