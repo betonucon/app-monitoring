@@ -107,7 +107,12 @@
           TableManageFixedHeadermaterial.init();
            
         });
-
+        function show_draft_customer(){
+           
+           $('#modal-draf').modal('show');
+           var tables=$('#data-table-fixed-header').DataTable();
+               tables.ajax.url("{{ url('customer/getdata')}}").load();
+        }  
         
         
     </script>
@@ -1055,12 +1060,7 @@
             });
             
         } 
-        function show_draft_customer(){
-           
-            $('#modal-draf').modal('show');
-            var tables=$('#data-table-fixed-header').DataTable();
-                tables.ajax.url("{{ url('customer/getdata')}}").load();
-        }  
+        
         function pilih_customer(customer_code,customer){
            
            $('#modal-draf').modal('hide');
