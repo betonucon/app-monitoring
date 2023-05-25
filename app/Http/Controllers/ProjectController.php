@@ -512,45 +512,47 @@ class ProjectController extends Controller
 
     public function tampil_material(request $request)
     {
-        $act='';
-        $mtr=HeaderProject::where('id',$request->id)->first();
-        $sum=0;
-        $sumact=0;
-        $data=HeaderProject::where('id',$request->id)->first();
-        $status=$data->status_id;
-        
-            foreach(get_material($request->id,1) as $no=>$o){
-                $sum+=$o->total;
-                
-                    $act.='
-                    <tr style="background:#fff" >
-                        <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                        <td style="padding: 2px 2px 2px 8px;">'.$o->satuan_material.'</td>
-                        <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
-                        if($mtr->status_id==1){
-                            $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>';
-                        }else{
-                            $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
-                        }
-                        $act.='
-                    </tr>';
-                
-                
-            }
+        if($request->id>0){
+             $act='';
+            $mtr=HeaderProject::where('id',$request->id)->first();
+            $sum=0;
+            $sumact=0;
+            $data=HeaderProject::where('id',$request->id)->first();
+            $status=$data->status_id;
             
-            $act.='
-            <tr style="background:#fff">
-                <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-                <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
-            </tr>';
+                foreach(get_material($request->id,1) as $no=>$o){
+                    $sum+=$o->total;
+                    
+                        $act.='
+                        <tr style="background:#fff" >
+                            <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
+                            <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                            <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                            <td style="padding: 2px 2px 2px 8px;">'.$o->satuan_material.'</td>
+                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                            if($mtr->status_id==1){
+                                $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>';
+                            }else{
+                                $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
+                            }
+                            $act.='
+                        </tr>';
+                    
+                    
+                }
                 
-        
-        
-        return $act;
+                $act.='
+                <tr style="background:#fff">
+                    <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+                    <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+                    <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+                </tr>';
+                    
+            
+            
+            return $act;
+        }
     }
     public function tampil_material_in(request $request)
     {

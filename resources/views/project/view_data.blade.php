@@ -110,8 +110,8 @@
         function show_draft_customer(){
            
            $('#modal-draf').modal('show');
-           var tables=$('#data-table-fixed-header').DataTable();
-               tables.ajax.url("{{ url('customer/getdata')}}").load();
+           var table=$('#data-table-fixed-header').DataTable();
+               table.ajax.url("{{ url('customer/getdata')}}").load();
         }  
         
         
