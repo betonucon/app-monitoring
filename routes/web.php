@@ -22,7 +22,14 @@ use App\Http\Controllers\Auth\LogoutController;
 |
 */
 
-
+Route::get('/cache-clear', function() {
+    $exitCode = Artisan::call('cache:clear');
+    return '<h1>Cache facade value cleared</h1>';
+});
+Route::get('/config-cache', function() {
+    $exitCode = Artisan::call('config:cache');
+    return '<h1>Cache facade value cleared</h1>';
+}); 
 Route::group(['prefix' => 'employe','middleware'    => 'auth'],function(){
     Route::get('/',[EmployeController::class, 'index']);
     Route::get('/view',[EmployeController::class, 'view_data']);
