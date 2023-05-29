@@ -34,6 +34,10 @@ Route::get('/route-clear', function() {
     $exitCode = Artisan::call('route:clear');
     return '<h1>Cache facade value cleared</h1>';
 });
+Route::get('/route-cache', function() {
+    $exitCode = Artisan::call('route:cache');
+    return '<h1>Cache facade value cleared</h1>';
+});
 Route::get('/config-cache', function() {
     $exitCode = Artisan::call('config:cache');
     return '<h1>Cache facade value cleared</h1>';
