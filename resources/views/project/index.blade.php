@@ -49,7 +49,7 @@
                         { data: 'deskripsi_project' },
                         { data: 'start_date_at', className: "text-center" },
                         { data: 'end_date_at', className: "text-center" },
-                        { data: 'status_now', className: "text-center" },
+                        { data: 'singkatan', className: "text-center" },
                         { data: 'created_at', className: "text-center" },
                         
                       ],
@@ -191,7 +191,7 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="100%" class="display">
+                <table id="data-table-fixed-header" width="100%" class="table-bordered">
                     <thead>
                         <tr>
                             <th width="5%">No</th>

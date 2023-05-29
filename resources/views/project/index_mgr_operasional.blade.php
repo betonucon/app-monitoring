@@ -49,7 +49,7 @@
                         { data: 'deskripsi_project' },
                         { data: 'start_date_at', className: "text-center" },
                         { data: 'end_date_at', className: "text-center" },
-                        { data: 'status_now', className: "text-center" },
+                        { data: 'singkatan', className: "text-center" },
                         { data: 'created_at', className: "text-center" },
                         
                       ],
@@ -103,12 +103,12 @@
     <!-- Content Header (Page header) -->
     <section class="content-header">
       <h1>
-        List Project
+        Approve RABOB
         
       </h1>
       <ol class="breadcrumb">
         <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">List Project</li>
+        <li class="active">Approve RABOB</li>
       </ol>
     </section>
 
@@ -190,7 +190,7 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="110%" class="cell-border display">
+                <table id="data-table-fixed-header" width="110%" class="table-bordered">
                     <thead>
                       <tr>
                             <th width="5%">No</th>

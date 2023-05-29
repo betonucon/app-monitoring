@@ -68,7 +68,7 @@ class CustomerController extends Controller
                 return $btn;
             })
             ->addColumn('seleksi_kontrak', function ($row) {
-                $btn='<span class="btn btn-success btn-xs" onclick="pilih_customer(`'.$row->customer_code.'`,`'.$row->customer.'`,`'.penomoran_cost_center($row->customer_code).'`)">Pilih</span>';
+                $btn='<span class="btn btn-success btn-xs" onclick="pilih_customer(`'.$row->customer_code.'`,`'.$row->customer.'`,`'.$row->cost.'`,`'.penomoran_cost_center($row->customer_code).'`)">Pilih</span>';
                 return $btn;
             })
             ->addColumn('action', function ($row) {

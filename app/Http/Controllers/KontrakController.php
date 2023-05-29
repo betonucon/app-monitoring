@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Imports\ImportMaterialKontrak;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use App\Models\ViewEmploye;
@@ -33,7 +34,7 @@ use App\Models\LogPengajuan;
 use App\Models\ProjectProgres;
 use App\Models\ViewCost;
 use App\Models\User;
-
+use PDF;
 class KontrakController extends Controller
 {
     
@@ -127,8 +128,16 @@ class KontrakController extends Controller
         $id=$request->id;
         $count = ViewHeaderProject::where('id',$id)->where('nik_pm',Auth::user()->username)->count();
         $data = ViewHeaderProject::where('id',$id)->first();
+        $connomor=ProjectRisiko::where('project_header_id',$id)->count();
+        $connomoropr=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->where('state',2)->count();
+        $connomorjasa=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->where('state',2)->count();
+        $connomormat=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->where('state',2)->count();
+        $nom=($connomor+1);
+        $nomper=($connomoropr+1);
+        $nommat=($connomormat+1);
+        $nomjasa=($connomorjasa+1);
         if($count>0){
-            return view('kontrak.task',compact('template','data'));
+            return view('kontrak.task',compact('template','data','id','nom','nomper','nommat','tab','nomjasa'));
         }else{
             return view('error');
         }
@@ -188,37 +197,35 @@ class KontrakController extends Controller
             $disabled='';
             $nom=1;
             $nomper=1;
+            $nomjasa=1;
             $nommat=1;
         }else{
             $disabled='readonly';
             $connomor=ProjectRisiko::where('project_header_id',$id)->count();
-            $connomoropr=ProjectOperasional::where('project_header_id',$id)->count();
-            $connomormat=ProjectMaterial::where('project_header_id',$id)->count();
+            $connomoropr=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->where('state',2)->count();
+            $connomorjasa=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->where('state',2)->count();
+            $connomormat=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->where('state',2)->count();
             $nom=($connomor+1);
             $nomper=($connomoropr+1);
             $nommat=($connomormat+1);
+            $nomjasa=($connomorjasa+1);
         }
         if(Auth::user()->role_id==6){
-            if($data->status_kontrak_id==1){
-                return view('kontrak.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab'));
+            if($data->status_id==9){
+                return view('kontrak.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab','nomjasa'));
             }else{
-                if($data->status_kontrak_id==0){
-                    return view('kontrak.form_kontrak',compact('template','data','disabled','id','nom','nomper','nommat','tab'));
+                if($id==0){
+                    return view('kontrak.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab','nomjasa'));
                 }else{
-                    if($data->status_kontrak_id==7){
-                        return view('kontrak.view_bidding',compact('template','data','disabled','id'));
-                    }elseif($data->status_kontrak_id==8){
-                        return view('kontrak.view_negosiasi',compact('template','data','disabled','id'));
-                    }else{
-                        return view('kontrak.view',compact('template','data','disabled','id'));
-                    }
-                    
+                    return view('kontrak.view',compact('template','data','disabled','id','nom','nomper','nommat','tab','nomjasa'));
                 }
+                
+                
                 
             }
         }
         if(Auth::user()->role_id==4){
-            if($data->status_kontrak_id==2){
+            if($data->status_id==2){
                 return view('kontrak.view_approve_komersil',compact('template','data','disabled','id'));
             }else{
                 return view('kontrak.view',compact('template','data','disabled','id'));
@@ -226,7 +233,7 @@ class KontrakController extends Controller
             }
         }
         if(Auth::user()->role_id==7){
-            if($data->status_kontrak_id==3){
+            if($data->status_id==3){
                 return view('kontrak.view_approve_operasional',compact('template','data','disabled','id'));
             }else{
                 return view('kontrak.view',compact('template','data','disabled','id'));
@@ -234,7 +241,7 @@ class KontrakController extends Controller
             }
         }
         if(Auth::user()->role_id==3){
-            if($data->status_kontrak_id==4){
+            if($data->status_id==4){
                 return view('kontrak.view_approve_mgr_operasional',compact('template','data','disabled','id'));
             }else{
                 return view('kontrak.view',compact('template','data','disabled','id'));
@@ -242,7 +249,7 @@ class KontrakController extends Controller
             }
         }
         if(Auth::user()->role_id==2){
-            if($data->status_kontrak_id==5){
+            if($data->status_id==5){
                 return view('kontrak.view_approve_direktur_operasional',compact('template','data','disabled','id'));
             }else{
                 return view('kontrak.view',compact('template','data','disabled','id'));
@@ -250,7 +257,7 @@ class KontrakController extends Controller
             }
         }
         if(Auth::user()->role_id==5){
-            if($data->status_kontrak_id==6){
+            if($data->status_id==6){
                 return view('kontrak.view_procurement',compact('template','data','disabled','id'));
             }else{
                 return view('kontrak.view',compact('template','data','disabled','id'));
@@ -284,115 +291,105 @@ class KontrakController extends Controller
     }
     public function tampil_material_kontrak(request $request)
     {
-        $act='';
-        $sum=0;
-        $sumact=0;
-        $data=HeaderProject::where('id',$request->id)->first();
-        $status=$data->status_id;
-        
-                foreach(get_material($request->id,1) as $no=>$o){
-                    $sum+=$o->total;
-                    if($o->status_material_id==2){
-                        $clr='aqua';
-                    }else{
-                        $clr='#fff';
-                    }
-                    if($request->act==1){
-                        $act.='
-                        <tr style="background:#fff">
-                            <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                            
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                            <td style="padding: 2px 2px 2px 8px;background:'.$clr.'" class="text-center" >'.$o->st_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                        </tr>';
-                    }else{
-                        $act.='
-                        <tr style="background:#fff" >
-                            <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya_actual).'</td>
-                            <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total_actual).'</td>
-                            <td style="padding: 2px 2px 2px 8px;background:'.$clr.'" class="text-center" >'.$o->st_material.'</td>
-                            <td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                                
-                        </tr>';
-                    }
-                    
-                }
-                if($request->act==1){
-                $act.='
-                <tr style="background:#fff">
-                    <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                    <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-                </tr>';
-                }else{
-                $act.='
-                <tr style="background:#fff">
-                    <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-                    <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-                    <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
-                </tr>';
-                }
-        
-        
-        return $act;
+        if($request->id>0){
+            $act='';
+           $mtr=HeaderProject::where('id',$request->id)->first();
+           $sum=0;
+           $sumact=0;
+           $data=HeaderProject::where('id',$request->id)->first();
+           $query=ViewProjectMaterial::query();
+           if($request->cari!=null){
+                $get=$query->where('nama_material','LIKE',$request->cari.'%');
+           }
+           
+           $get=$query->where('state',2)->where('project_header_id',$data->id)->where('kategori_ide',1)->orderBy('status_pengadaan','Asc')->get();
+           $status=$data->status_id;
+                
+                
+               foreach($get as $no=>$o){
+                   $sum+=$o->total;
+                   
+                       $act.='
+                       <tr style="background:#fff" >
+                           <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
+                           <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                           <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                           <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                           <td style="padding: 2px 2px 2px 8px;">'.$o->satuan_material.'</td>
+                           <td style="padding: 2px 2px 2px 8px;">'.$o->singkatan_pengadaan.'</td>
+                           <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                           if($o->status_pengadaan==1){
+                               $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>';
+                           }else{
+                               $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
+                           }
+                           $act.='
+                       </tr>';
+                   
+                   
+               }
+               
+               $act.='
+               <tr style="background:#fff">
+                   <td colspan="6" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+                   <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+                   <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+               </tr>';
+                   
+           
+           
+           return $act;
+       }
     }
     public function tampil_material(request $request)
     {
-        $act='';
-        $sum=0;
-        $sumact=0;
-        $data=HeaderProject::where('id',$request->id)->first();
-        $status=$data->status_id;
-        foreach(get_material($request->id,1) as $no=>$o){
-            $sum+=$o->total;
-            if($request->act==1){
+        if($request->id>0){
+             $act='';
+            $mtr=HeaderProject::where('id',$request->id)->first();
+            $sum=0;
+            $sumact=0;
+            $data=HeaderProject::where('id',$request->id)->first();
+            $query=ViewProjectMaterial::query();
+            if($request->cari!=null){
+                    $get=$query->where('nama_material','LIKE',$request->cari.'%');
+            }
+           
+            $get=$query->where('state',2)->where('project_header_id',$data->id)->where('kategori_ide',1)->orderBy('status_pengadaan','Asc')->get();
+            $status=$data->status_id;
+            
+                foreach($get as $no=>$o){
+                    $sum+=$o->total;
+                    
+                        $act.='
+                        <tr style="background:#fff" >
+                            <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
+                            <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                            <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                            <td style="padding: 2px 2px 2px 8px;">'.$o->satuan_material.'</td>
+                            <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                            if($status==9){
+                                $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>';
+                            }else{
+                                $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
+                            }
+                            $act.='
+                        </tr>';
+                    
+                    
+                }
+                
                 $act.='
                 <tr style="background:#fff">
-                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                    
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                    
+                    <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+                    <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+                    <td  style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
                 </tr>';
-            }else{
-                $act.='
-                <tr style="background:#fff" >
-                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->kode_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
-                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
-                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>
-                    <td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_material('.$o->id.')"><i class="fa fa-close"></i></span></td>
-                        
-                </tr>';
-            }
+                    
             
+            
+            return $act;
         }
-        if($request->act==1){
-        $act.='
-        <tr style="background:#fff">
-            <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-        </tr>';
-        }else{
-        $act.='
-        <tr style="background:#fff">
-            <td colspan="5" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
-            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
-        </tr>';
-        }
-        return $act;
     }
 
 
@@ -426,55 +423,55 @@ class KontrakController extends Controller
         
         if(Auth::user()->role_id==6){
             if($request->status_kontrak_id!=""){
-                $data = $query->where('status_kontrak_id',$request->status_kontrak_id);
+                $data = $query->where('status_id',$request->status_kontrak_id);
             }else{
-                
+                $data = $query->whereIn('status_id',array(9,10,11));
             }
         }
         if(Auth::user()->role_id==4){
             if($request->status_kontrak_id!=""){
-                $data = $query->where('status_kontrak_id',$request->status_kontrak_id);
+                $data = $query->where('status_id',$request->status_kontrak_id);
             }else{
-                $data = $query->where('status_kontrak_id','>',1);
+                $data = $query->whereIn('status_id',array(9,10,11));
             }
             
         }
         if(Auth::user()->role_id==5){
             if($request->status_kontrak_id!=""){
-                $data = $query->where('status_kontrak_id',$request->status_kontrak_id);
+                $data = $query->where('status_id',$request->status_kontrak_id);
             }else{
-                $data = $query->where('status_kontrak_id','>',2);
+                $data = $query->where('status_id','>',2);
             }
         }
         if(Auth::user()->role_id==2){
             if($request->status_kontrak_id!=""){
-                $data = $query->where('status_kontrak_id',$request->status_kontrak_id);
+                $data = $query->where('status_id',$request->status_kontrak_id);
             }else{
-                $data = $query->where('status_kontrak_id','>',4);
+                $data = $query->where('status_id','>',4);
             }
         }
         if(Auth::user()->role_id==3){
             if($request->status_kontrak_id!=""){
-                $data = $query->where('status_kontrak_id',$request->status_kontrak_id);
+                $data = $query->where('status_id',$request->status_kontrak_id);
             }else{
-                $data = $query->where('status_kontrak_id','>',1);
+                $data = $query->where('status_id','>',1);
             }
         }
         if(Auth::user()->role_id==7){
             if($request->status_kontrak_id!=""){
-                $data = $query->where('status_kontrak_id',$request->status_kontrak_id);
+                $data = $query->where('status_id',$request->status_kontrak_id);
             }else{
-                $data = $query->where('status_kontrak_id','>',2);
+                $data = $query->where('status_id','>',2);
             }
         }
         if(Auth::user()->role_id==8){
             if($request->status_kontrak_id!=""){
-                $data = $query->where('status_kontrak_id',$request->status_kontrak_id);
+                $data = $query->where('status_id',$request->status_kontrak_id);
             }else{
-                $data = $query->where('status_kontrak_id','>',1);
+                $data = $query->where('status_id','>',1);
             }
         }
-        $data = $query->where('status_id',9)->orderBy('id','Desc')->get();
+        $data = $query->orderBy('id','Desc')->get();
 
         return Datatables::of($data)
         ->addColumn('action', function ($row) {
@@ -531,7 +528,7 @@ class KontrakController extends Controller
                             Act <i class="fa fa-sort-desc"></i> 
                             </button>
                             <ul class="dropdown-menu">';
-                                if($row->status_id==1){
+                                if($row->status_id==9){
                                     $btn.='
                                     <li><a href="javascript:;" onclick="location.assign(`'.url('kontrak/view').'?id='.encoder($row->id).'`)">View</a></li>
                                     <li><a href="javascript:;"  onclick="delete_data(`'.encoder($row->id).'`,`0`)">Hidden</a></li>
@@ -813,30 +810,104 @@ class KontrakController extends Controller
         $act.='</tbody></table>';
         return $act;
     }
-
+    public function reset_material(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->where('status_pengadaan',1)->where('state',2)->delete();
+    }
+    public function reset_operasional(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->where('status_pengadaan',1)->where('state',2)->delete();
+    }
+    public function reset_jasa(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->where('status_pengadaan',1)->where('state',2)->delete();
+    }
+    public function tampil_jasa(request $request)
+    {
+        $act='';
+        $mtr=HeaderProject::where('id',$request->id)->first();
+        $sum=0;
+        $sumtotal=0;
+        foreach(get_jasa_kontrak($request->id) as $no=>$o){
+            $sum+=$o->biaya;
+            $sumtotal+=$o->total;
+            
+                $act.='
+                <tr style="background:#fff">
+                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                    if($mtr->status_id==9){
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_jasa('.$o->id.')"><i class="fa fa-close"></i></span></td>';
+                    }else{
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
+                    }
+                    $act.='
+                        
+                </tr>';
+             
+            
+        }
+        
+        $act.='
+        <tr style="background:#fff">
+            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sumtotal).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+        </tr>';
+       
+        
+        return $act;
+    }
     public function tampil_operasional(request $request)
     {
         $act='';
-        foreach(get_operasional($request->id) as $no=>$o){
-            if($request->act==1){
+        $mtr=HeaderProject::where('id',$request->id)->first();
+        $sum=0;
+        $sumtotal=0;
+        foreach(get_operasional_kontrak($request->id) as $no=>$o){
+            $sum+=$o->biaya;
+            $sumtotal+=$o->total;
+            
                 $act.='
                 <tr style="background:#fff">
-                    <td class="td-detail">'.($no+1).'</td>
-                    <td class="td-detail">'.$o->keterangan.'</td>
-                    <td class="td-detail">'.uang($o->biaya).'</td>
-                </tr>';
-            }else{
-                $act.='
-                <tr style="background:#fff">
-                    <td>'.($no+1).'</td>
-                    <td>'.$o->keterangan.'</td>
-                    <td class="text-right">'.uang($o->biaya).'</td>
-                    <td><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>
+                    <td style="padding: 2px 2px 2px 8px;">'.($no+1).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->nama_material.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->biaya).'</td>
+                    <td style="padding: 2px 2px 2px 8px;">'.$o->qty.'</td>
+                    <td style="padding: 2px 2px 2px 8px;" class="text-right">'.uang($o->total).'</td>';
+                    if($mtr->status_id==9){
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-danger btn-xs" onclick="delete_operasional('.$o->id.')"><i class="fa fa-close"></i></span></td>';
+                    }else{
+                        $act.='<td style="padding: 2px 2px 2px 8px;"><span class="btn btn-default btn-xs" ><i class="fa fa-close"></i></span></td>';
+                    }
+                    $act.='
                         
                 </tr>';
-            }
+             
             
         }
+        
+        $act.='
+        <tr style="background:#fff">
+            <td colspan="2" style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;">Total (Rp)</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sum).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right">'.uang($sumtotal).'</td>
+            <td style="padding: 6px 2px 6px 8px;background: #d9cece;font-weight: bold;" class="text-right"></td>
+        </tr>';
+       
+        
         return $act;
     }
     public function tampil_pengeluaran(request $request)
@@ -999,6 +1070,12 @@ class KontrakController extends Controller
         
         $data=ProjectMaterial::where('id',$id)->delete();
     }
+    public function delete_jasa(request $request)
+    {
+        $id=$request->id;
+        
+        $data=ProjectMaterial::where('id',$id)->delete();
+    }
     public function store_kontrak(request $request){
         error_reporting(0);
         $rules = [];
@@ -1009,7 +1086,7 @@ class KontrakController extends Controller
         $messages['customer_code.required']= 'Pilih  customer ';
         if($request->id==0){
             $rules['cost_center_project']= 'required';
-            $messages['cost_center_project.required']= 'Masukan Cost Center ';
+            $messages['cost_center_kontrak.required']= 'Masukan Cost Center ';
         }
         
 
@@ -1020,7 +1097,7 @@ class KontrakController extends Controller
         $messages['tipe_project_id.required']= 'Pilih  Tipe Project ';
 
         $rules['deskripsi_project']= 'required';
-        $messages['deskripsi_project.required']= 'Masukan Ruang Lingkup Project';
+        $messages['deskripsi_kontrak.required']= 'Masukan Ruang Lingkup Project';
         
         $rules['start_date']= 'required';
         $messages['start_date.required']= 'Masukan start date ';
@@ -1032,8 +1109,8 @@ class KontrakController extends Controller
         $messages['end_date.required']= 'Masukan end date ';
 
         $rules['nilai_project']= 'required|min:0|not_in:0';
-        $messages['nilai_project.required']= 'Masukan nilai project ';
-        $messages['nilai_project.not_in']= 'Masukan nilai project ';
+        $messages['nilai_kontrak.required']= 'Masukan nilai project ';
+        $messages['nilai_kontrak.not_in']= 'Masukan nilai project ';
         
         $validator = Validator::make($request->all(), $rules, $messages);
         $val=$validator->Errors();
@@ -1070,38 +1147,20 @@ class KontrakController extends Controller
                     'tab'=>1,
                     'status_id'=>9,
                     'create'=>date('Y-m-d H:i:s'),
+                    'update'=>date('Y-m-d H:i:s'),
                     'approve_kadis_komersil'=>date('Y-m-d H:i:s'),
                     'approve_kadis_operasional'=>date('Y-m-d H:i:s'),
                     'approve_mgr_operasional'=>date('Y-m-d H:i:s'),
                     'approve_direktur_operasional'=>date('Y-m-d H:i:s'),
                     'approve_kadis_operasional_kontrak'=>date('Y-m-d H:i:s'),
                 ]);
-                foreach(get_master_operasional($request->kategori_project_id) as $opr){
-                    $operasional=ProjectOperasional::UpdateOrcreate([
-                        'project_header_id'=>$data->id,
-                        'keterangan'=>$opr->operasional,
-                    ],[
-                        'biaya'=>0,
-                        'status_operasional'=>0,
-                    ]);
-                }
+                
                 echo'@ok@'.encoder($data->id);
                    
                 
             }else{
                 $mst=HeaderProject::where('id',$request->id)->first();
-                if($mst->kategori_project_id!=$request->kategori_project_id){
-                    foreach(get_master_operasional($request->kategori_project_id) as $opr){
-                        $operasional=ProjectOperasional::UpdateOrcreate([
-                            'project_header_id'=>$request->id,
-                            'keterangan'=>$opr->operasional,
-                        ],[
-                            'status_operasional'=>0,
-                        ]);
-                    }
-                }else{
-
-                }
+                
                 $data=HeaderProject::UpdateOrcreate([
                     'id'=>$request->id,
                 ],[
@@ -1115,6 +1174,7 @@ class KontrakController extends Controller
                     'nilai_project'=>ubah_uang($request->nilai_project),
                     'username'=>Auth::user()->username,
                     'create'=>date('Y-m-d H:i:s'),
+                    'update'=>date('Y-m-d H:i:s'),
                 ]);
 
                 
@@ -1143,7 +1203,7 @@ class KontrakController extends Controller
         $messages['tipe_project_id.required']= 'Pilih  Tipe Project ';
 
         $rules['deskripsi_project']= 'required';
-        $messages['deskripsi_project.required']= 'Masukan Ruang Lingkup Project';
+        $messages['deskripsi_kontrak.required']= 'Masukan Ruang Lingkup Project';
         
         $rules['start_date']= 'required';
         $messages['start_date.required']= 'Masukan start date ';
@@ -1152,8 +1212,8 @@ class KontrakController extends Controller
         $messages['end_date.required']= 'Masukan end date ';
 
         $rules['nilai_project']= 'required|min:0|not_in:0';
-        $messages['nilai_project.required']= 'Masukan nilai project ';
-        $messages['nilai_project.not_in']= 'Masukan nilai project ';
+        $messages['nilai_kontrak.required']= 'Masukan nilai project ';
+        $messages['nilai_kontrak.not_in']= 'Masukan nilai project ';
         
         $validator = Validator::make($request->all(), $rules, $messages);
         $val=$validator->Errors();
@@ -1207,27 +1267,13 @@ class KontrakController extends Controller
         error_reporting(0);
         $rules = [];
         $messages = [];
+        if($request->id==0){
+            $rules['isiana']= 'required';
+            $messages['isiana.required']= 'Lengkapi kolom kontrak ';
+        }
         
         
-        $rules['customer_code']= 'required';
-        $messages['customer_code.required']= 'Pilih  customer ';
-        $rules['nik_pm']= 'required';
-        $messages['nik_pm.required']= 'Pilih  project manager ';
-
-        $rules['kategori_project_id']= 'required';
-        $messages['kategori_project_id.required']= 'Pilih  Kategori Project ';
-
-        $rules['tipe_project_id']= 'required';
-        $messages['tipe_project_id.required']= 'Pilih  Tipe Project ';
        
-        $rules['deskripsi_project']= 'required';
-        $messages['deskripsi_project.required']= 'Masukan Ruang Lingkup Project';
-        
-        $rules['start_date']= 'required';
-        $messages['start_date.required']= 'Masukan start date ';
-
-        $rules['end_date']= 'required';
-        $messages['end_date.required']= 'Masukan end date ';
         
         $validator = Validator::make($request->all(), $rules, $messages);
         $val=$validator->Errors();
@@ -1247,7 +1293,7 @@ class KontrakController extends Controller
                 $data=HeaderProject::UpdateOrcreate([
                     'id'=>$request->id,
                 ],[
-                    'status_kontrak_id'=>2,
+                    'status_id'=>10,
                     'update'=>date('Y-m-d H:i:s'),
                 ]);
 
@@ -1521,7 +1567,44 @@ class KontrakController extends Controller
         
     }
     
+    public function store_import_material(request $request){
+        error_reporting(0);
+        $id=$request->id;
+        $rules = [];
+        $messages = [];
+        $rules['file_excel_material']= 'required';
+        $messages['file_excel_material.required']= 'Harap isi upload excel';
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
 
+
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
+                    
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
+                    }
+                }
+            echo'</div></div>';
+        }else{
+            $mst=HeaderProject::where('id',$id)->first();
+            if($mst->tab>2){
+                $tab=$mst->tab;
+            }else{
+                $tab=4;
+            }
+            $filess = $request->file('file_excel_material');
+            $nama_file = 'MATERIAL'.$id.'-'.rand().$filess->getClientOriginalName();
+            $filess->move('public/file_excel',$nama_file);
+            Excel::import(new ImportMaterialKontrak($id), public_path('/file_excel/'.$nama_file));
+            echo'@ok';
+        }
+        
+               
+        
+        
+    }
     public function kembali_komersil(request $request){
         error_reporting(0);
         $rules = [];
@@ -1714,101 +1797,152 @@ class KontrakController extends Controller
     
     public function store_operasional(request $request){
         error_reporting(0);
+        $id=$request->id;
         $rules = [];
         $messages = [];
-        $count=(int) count($request->keterangan);
-        if($count>0){
-            $cek=0;
-            for($x=0;$x<$count;$x++){
-                if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
-                    $cek+=0;
-                }else{
-                    $cek+=1;
-                }
-            }
+        if($id==0){
+            $rules['catatan']= 'required';
+            $messages['catatan.required']= 'Harap isi rencana kerja terlebih dahulu';
+        }
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
 
-            if($cek==$count){
-                $id=$request->id;
-                for($x=0;$x<$count;$x++){
-                    if($request->keterangan[$x]==""  || $request->biaya[$x]==""){
-                        
-                    }else{
-                        $data=ProjectOperasional::UpdateOrcreate([
-                            'project_header_id'=>$id,
-                            'keterangan'=>$request->keterangan[$x],
-                        ],[
-                            'biaya'=>ubah_uang($request->biaya[$x]),
-                        ]);
+
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
+                    
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
                     }
                 }
-                  echo'@ok';  
+            echo'</div></div>';
+        }else{
+            $count=(int) count($request->keterangan);
+            if($count>0){
+                $cek=0;
+                for($x=0;$x<$count;$x++){
+                    if($request->keterangan[$x]==""  && ($request->biayaopr[$x]=="" || ubah_uang($request->biayaopr[$x])) && ($request->qtyopr[$x]=="") || (ubah_uang($request->qtyopr[$x]))==0){
+                        $cek+=0;
+                    }else{
+                        $cek+=1;
+                    }
+                }
+                
+                if($cek==$count){
+                    $mst=HeaderProject::where('id',$id)->first();
+                    if($mst->tab>1){
+                        $tab=$mst->tab;
+                    }else{
+                        $tab=3;
+                    }
+                    $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
+                    for($x=0;$x<$count;$x++){
+                        
+                            
+                            $data=ProjectMaterial::UpdateOrcreate([
+                                'project_header_id'=>$id,
+                                'nama_material'=>$request->keterangan[$x],
+                                'kategori_ide'=>2,
+                                'status'=>1,
+                                'state'=>2,
+                                
+                            ],[
+                                'biaya'=>ubah_uang($request->biayaopr[$x]),
+                                'biaya_actual'=>ubah_uang($request->biayaopr[$x]),
+                                'qty'=>ubah_uang($request->qtyopr[$x]),
+                                'status_pengadaan'=>1,
+                                'total'=>(ubah_uang($request->biayaopr[$x])*ubah_uang($request->qtyopr[$x])), 
+                                'kode_material'=>$kode_material, 
+                                'total_actual'=>(ubah_uang($request->biayaopr[$x])*ubah_uang($request->qtyopr[$x])), 
+                                'satuan_material'=>'Item',
+                                'created_at'=>date('Y-m-d H:i:s'),
+                            ]);
+                        
+                    }
+                    echo'@ok';  
+                }else{
+                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+                }
             }else{
                 echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
             }
-        }else{
-            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+        }    
+        
+    }
+    public function store_jasa(request $request){
+        error_reporting(0);
+        $id=$request->id;
+        $rules = [];
+        $messages = [];
+        if($id==0){
+            $rules['catatan']= 'required';
+            $messages['catatan.required']= 'Harap isi rencana kerja terlebih dahulu';
         }
-        
-        // $rules['nilai_bidding']= 'required|min:0|not_in:0';
-        // $messages['nilai_bidding.required']= 'Masukan nilai bidding';
-        // $messages['nilai_bidding.not_in']= 'Masukan nilai bidding';
-        
-        // $rules['terbilang']= 'required';
-        // $messages['terbilang.required']= 'Masukan terbilang';
-       
-        
-        // $rules['bidding_date']= 'required';
-        // $messages['bidding_date.required']= 'Masukan tanggal bidding';
-
-        // $rules['status_id']= 'required';
-        // $messages['status_id.required']= 'Masukan status';
-
-        // $rules['hasil_bidding']= 'required';
-        // $messages['hasil_bidding.required']= 'Masukan hasil bidding';
-        
-
-        // $validator = Validator::make($request->all(), $rules, $messages);
-        // $val=$validator->Errors();
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
 
 
-        // if ($validator->fails()) {
-        //     echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
-        //         foreach(parsing_validator($val) as $value){
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
                     
-        //             foreach($value as $isi){
-        //                 echo'-&nbsp;'.$isi.'<br>';
-        //             }
-        //         }
-        //     echo'</div></div>';
-        // }else{
-        //         $data=HeaderProject::UpdateOrcreate([
-        //             'id'=>$request->id,
-        //         ],[
-        //             'status_id'=>$request->status_id,
-        //             'bidding_date'=>$request->bidding_date,
-        //             'hasil_bidding'=>$request->hasil_bidding,
-        //             'nilai_bidding'=>ubah_uang($request->nilai_bidding),
-        //             'update'=>date('Y-m-d H:i:s'),
-        //         ]);
-
-        //         if($request->status_id==50){
-        //             $revisi=2;
-        //         }else{
-        //             $revisi=1;
-        //         }
-        //         $log=LogPengajuan::create([
-        //             'project_header_id'=>$request->id,
-        //             'deskripsi'=>$request->hasil_bidding,
-        //             'status_id'=>$request->status_id,
-        //             'nik'=>Auth::user()->username,
-        //             'role_id'=>Auth::user()->role_id,
-        //             'revisi'=>$revisi,
-        //             'created_at'=>date('Y-m-d H:i:s'),
-        //         ]);
-        //         echo'@ok';
-        // }
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
+                    }
+                }
+            echo'</div></div>';
+        }else{
+            $count=(int) count($request->keteranganjasa);
+            if($count>0){
+                $cek=0;
+                for($x=0;$x<$count;$x++){
+                    if($request->keteranjasa[$x]==""  && ($request->biayajasa[$x]=="" || ubah_uang($request->biayajasa[$x])) && ($request->qtyjasa[$x]=="") || (ubah_uang($request->qtyjasa[$x]))==0){
+                        $cek+=0;
+                    }else{
+                        $cek+=1;
+                    }
+                }
                
-        
+                if($cek==$count){
+                    $mst=HeaderProject::where('id',$id)->first();
+                    if($mst->tab>1){
+                        $tab=$mst->tab;
+                    }else{
+                        $tab=3;
+                    }
+                    $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
+                    for($x=0;$x<$count;$x++){
+                        
+                            
+                            $data=ProjectMaterial::UpdateOrcreate([
+                                'project_header_id'=>$id,
+                                'nama_material'=>$request->keteranganjasa[$x],
+                                'kategori_ide'=>3,
+                                'status'=>1,
+                                'state'=>2,
+                                
+                            ],[
+                                'biaya'=>ubah_uang($request->biayajasa[$x]),
+                                'biaya_actual'=>ubah_uang($request->biayajasa[$x]),
+                                'qty'=>ubah_uang($request->qtyjasa[$x]),
+                                'status_pengadaan'=>1,
+                                'total'=>(ubah_uang($request->biayajasa[$x])*ubah_uang($request->qtyjasa[$x])), 
+                                'kode_material'=>0, 
+                                'total_actual'=>(ubah_uang($request->biayajasa[$x])*ubah_uang($request->qtyjasa[$x])), 
+                                'satuan_material'=>'Item',
+                                'created_at'=>date('Y-m-d H:i:s'),
+                            ]);
+                        
+                    }
+                    echo'@ok';  
+                }else{
+                    echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+                }
+            }else{
+                echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof"> Lengkapi semua kolom</div></div>';
+            }
+        }    
         
     }
     public function store_material_kontrak(request $request){
@@ -1912,7 +2046,7 @@ class KontrakController extends Controller
             if($count>0){
                 $cek=0;
                 for($x=0;$x<$count;$x++){
-                    if($request->kode_material[$x]==""  || $request->qty[$x]==""   || $request->total[$x]=="" || $request->total[$x]==0){
+                    if($request->qty[$x]==""  || $request->satuan_material[$x]=="" || $request->total[$x]=="" || $request->total[$x]==0){
                         $cek+=0;
                     }else{
                         $cek+=1;
@@ -1920,6 +2054,7 @@ class KontrakController extends Controller
                 }
 
                 if($cek==$count){
+                    $mst=HeaderProject::where('id',$id)->first();
                     if($mst->tab>2){
                         $tab=$mst->tab;
                     }else{
@@ -1927,20 +2062,28 @@ class KontrakController extends Controller
                     }
                     $header=HeaderProject::where('id',$id)->update(['tab'=>$tab]);
                     for($x=0;$x<$count;$x++){
-                        
+                            if($request->kode_material[$x]==""){
+                                $kode_material=0;
+                            }else{
+                                $kode_material=$request->kode_material[$x];
+                            }
                             $data=ProjectMaterial::UpdateOrcreate([
                                 'project_header_id'=>$id,
-                                'kode_material'=>$request->kode_material[$x],
+                                'nama_material'=>$request->nama_material[$x],
+                                'kategori_ide'=>1,
                                 'status'=>1,
+                                'state'=>2,
                                 
                             ],[
                                 'biaya'=>ubah_uang($request->biaya[$x]),
                                 'biaya_actual'=>ubah_uang($request->biaya[$x]),
                                 'qty'=>ubah_uang($request->qty[$x]),
                                 'status_pengadaan'=>1,
-                                'total'=>ubah_uang($request->total[$x]),
+                                'total'=>ubah_uang($request->total[$x]), 
+                                'kode_material'=>$kode_material, 
                                 'total_actual'=>ubah_uang($request->total[$x]),
                                 'nama_material'=>$request->nama_material[$x],
+                                'satuan_material'=>$request->satuan_material[$x],
                                 'created_at'=>date('Y-m-d H:i:s'),
                             ]);
                         
@@ -2313,5 +2456,18 @@ class KontrakController extends Controller
                
         
         
+    }
+
+    public function cetak(Request $request)
+    {
+        error_reporting(0);
+        $id=decoder($request->id);
+        $data=ViewHeaderProject::where('id',$id)->first();
+        // $ford=3;
+        $pdf = PDF::loadView('kontrak.cetak', compact('data'));
+        // $custom=array(0,0,500,400);
+        $pdf->setPaper('A4','portrait');
+        $pdf->stream($request->id.'.pdf');
+        return $pdf->stream();
     }
 }

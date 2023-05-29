@@ -6,7 +6,7 @@ use App\Models\HeaderProject;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-class ImportMaterial implements ToModel, WithStartRow
+class ImportMaterialKontrak implements ToModel, WithStartRow
 {
     /**
     * @param array $row
@@ -35,7 +35,7 @@ class ImportMaterial implements ToModel, WithStartRow
                     'nama_material'=>$row[2],
                     'status'=>1,
                     'kategori_ide'=>1,
-                    'state'=>1,
+                    'state'=>2,
                 ],[
                     'biaya'=>ubah_uang($row[5]),
                     'kode_material'=>0,
@@ -43,6 +43,7 @@ class ImportMaterial implements ToModel, WithStartRow
                     'satuan_material'=>$row[4],
                     'biaya_actual'=>ubah_uang($row[5]),
                     'qty'=>ubah_uang($row[3]),
+                    'qty_out'=>0,
                     'status_pengadaan'=>1,
                     'total'=>(ubah_uang($row[5])*ubah_uang($row[3])),
                     'total_actual'=>(ubah_uang($row[5])*ubah_uang($row[3])),
@@ -55,7 +56,7 @@ class ImportMaterial implements ToModel, WithStartRow
                     'nama_material'=>$row[2],
                     'status'=>1,
                     'kategori_ide'=>2,
-                    'state'=>1,
+                    'state'=>2,
                 ],[
                     'biaya'=>ubah_uang($row[4]),
                     'kode_material'=>0,
@@ -63,6 +64,7 @@ class ImportMaterial implements ToModel, WithStartRow
                     'satuan_material'=>'Item',
                     'biaya_actual'=>ubah_uang($row[4]),
                     'qty'=>ubah_uang($row[3]),
+                    'qty_out'=>0,
                     'status_pengadaan'=>1,
                     'total'=>(ubah_uang($row[4])*ubah_uang($row[3])),
                     'total_actual'=>(ubah_uang($row[4])*ubah_uang($row[3])),
@@ -75,12 +77,12 @@ class ImportMaterial implements ToModel, WithStartRow
                     'nama_material'=>$row[2],
                     'status'=>1,
                     'kategori_ide'=>3,
-                    'state'=>1,
+                    'state'=>2,
                     
                 ],[
                     'biaya'=>ubah_uang($row[4]),
                     'kode_material'=>0,
-                    
+                    'qty_out'=>0,
                     'satuan_material'=>'Item',
                     'biaya_actual'=>ubah_uang($row[4]),
                     'qty'=>ubah_uang($row[3]),

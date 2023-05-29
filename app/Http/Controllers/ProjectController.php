@@ -7,6 +7,7 @@ use Yajra\Datatables\Datatables;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Imports\ImportMaterial;
+use App\Imports\ImportMaterialKontrak;
 use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 use App\Models\ViewEmploye;
@@ -86,9 +87,9 @@ class ProjectController extends Controller
         }else{
             $disabled='readonly';
             $connomor=ProjectRisiko::where('project_header_id',$id)->count();
-            $connomoropr=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->count();
-            $connomorjasa=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->count();
-            $connomormat=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->count();
+            $connomoropr=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->where('state',1)->count();
+            $connomorjasa=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->where('state',1)->count();
+            $connomormat=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->where('state',1)->count();
             $nom=($connomor+1);
             $nomper=($connomoropr+1);
             $nommat=($connomormat+1);
@@ -828,19 +829,19 @@ class ProjectController extends Controller
     {
         $id=$request->id;
         
-        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->delete();
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->where('state',1)->delete();
     }
     public function reset_operasional(request $request)
     {
         $id=$request->id;
         
-        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->delete();
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->where('state',1)->delete();
     }
     public function reset_jasa(request $request)
     {
         $id=$request->id;
         
-        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->delete();
+        $data=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->where('state',1)->delete();
     }
    
     public function store(request $request){
@@ -896,6 +897,7 @@ class ProjectController extends Controller
                     'tipe_project_id'=>$request->tipe_project_id, 
                     'end_date'=>$request->end_date,
                     'nilai_project'=>ubah_uang($request->nilai_project),
+                    'nilai'=>ubah_uang($request->nilai_project),
                     'username'=>Auth::user()->username,
                     'active'=>1,
                     'tab'=>1,
@@ -938,6 +940,7 @@ class ProjectController extends Controller
                     'tipe_project_id'=>$request->tipe_project_id, 
                     'end_date'=>$request->end_date,
                     'nilai_project'=>ubah_uang($request->nilai_project),
+                    'nilai'=>ubah_uang($request->nilai_project),
                     'username'=>Auth::user()->username,
                     'active'=>1,
                     'status_id'=>1,
@@ -1115,7 +1118,7 @@ class ProjectController extends Controller
                         $cek+=1;
                     }
                 }
-                echo $cek.'=='.$count;
+                
                 if($cek==$count){
                     $mst=HeaderProject::where('id',$id)->first();
                     if($mst->tab>1){
@@ -1132,6 +1135,7 @@ class ProjectController extends Controller
                                 'nama_material'=>$request->keterangan[$x],
                                 'kategori_ide'=>2,
                                 'status'=>1,
+                                'state'=>1,
                                 
                             ],[
                                 'biaya'=>ubah_uang($request->biayaopr[$x]),
@@ -1206,6 +1210,7 @@ class ProjectController extends Controller
                                 'nama_material'=>$request->keteranganjasa[$x],
                                 'kategori_ide'=>3,
                                 'status'=>1,
+                                'state'=>1,
                                 
                             ],[
                                 'biaya'=>ubah_uang($request->biayajasa[$x]),
@@ -1344,6 +1349,7 @@ class ProjectController extends Controller
                                 'nama_material'=>$request->nama_material[$x],
                                 'kategori_ide'=>1,
                                 'status'=>1,
+                                'state'=>1,
                                 
                             ],[
                                 'biaya'=>ubah_uang($request->biaya[$x]),
@@ -1410,6 +1416,7 @@ class ProjectController extends Controller
         
         
     }
+    
 
     public function kirim_kadis_komersil (request $request){
         error_reporting(0);
@@ -1783,13 +1790,16 @@ class ProjectController extends Controller
                 }
             echo'</div></div>';
         }else{
+                $mstr=HeaderProject::find($request->id);
                 $data=HeaderProject::UpdateOrcreate([
                     'id'=>$request->id,
                 ],[
                     'status_id'=>$request->status_id,
+                    'cost_center_project'=>penomoran_cost_center($mstr->customer_code),
                     'bidding_date'=>$request->bidding_date,
                     'hasil_bidding'=>$request->hasil_bidding,
                     'nilai_bidding'=>ubah_uang($request->nilai_bidding),
+                    'nilai_project'=>ubah_uang($request->nilai_bidding),
                     'update'=>date('Y-m-d H:i:s'),
                 ]);
 
@@ -1797,6 +1807,29 @@ class ProjectController extends Controller
                     $revisi=2;
                 }else{
                     $revisi=1;
+                }
+                $detail=ProjectMaterial::where('project_header_id',$request->id)->where('state',1)->get();
+                if($request->status_id==9){
+                    foreach($detail as $o){
+                        $save=ProjectMaterial::UpdateOrcreate([
+                            'project_header_id'=>$request->id,
+                            'nama_material'=>$o->nama_material,
+                            'status'=>$o->status,
+                            'kategori_ide'=>$o->kategori_ide,
+                            'state'=>2,
+                        ],[
+                            'biaya'=>$o->biaya,
+                            'kode_material'=>0,
+                            
+                            'satuan_material'=>$o->satuan_material,
+                            'biaya_actual'=>$o->biaya_actual,
+                            'qty'=>$o->qty,
+                            'status_pengadaan'=>$o->status_pengadaan,
+                            'total'=>$o->total,
+                            'total_actual'=>$o->total_actual,
+                            'created_at'=>date('Y-m-d H:i:s'),
+                        ]);
+                    }
                 }
                 $log=LogPengajuan::create([
                     'project_header_id'=>$request->id,

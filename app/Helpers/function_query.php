@@ -38,16 +38,60 @@ function sum_personal($id){
     $data=App\Models\ViewPersonal::where('project_header_id',$id)->sum('biaya');
     return $data;
 }
+
+//------material rencana------------------------------------//
 function get_operasional($id){
-    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->orderBy('nama_material','Asc')->get();
+    $data=App\Models\ViewProjectMaterial::where('state',1)->where('project_header_id',$id)->where('kategori_ide',2)->orderBy('nama_material','Asc')->get();
+    return $data;
+}
+function sum_biaya_operasional($id){
+    $data=App\Models\ViewProjectMaterial::where('state',1)->where('project_header_id',$id)->where('kategori_ide',2)->sum('total');
+    return $data;
+}
+function sum_biaya_jasa($id){
+    $data=App\Models\ViewProjectMaterial::where('state',1)->where('project_header_id',$id)->where('kategori_ide',3)->sum('total');
     return $data;
 }
 function get_jasa($id){
-    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('kategori_ide',3)->orderBy('nama_material','Asc')->get();
+    $data=App\Models\ViewProjectMaterial::where('state',1)->where('project_header_id',$id)->where('kategori_ide',3)->orderBy('nama_material','Asc')->get();
+    return $data;
+}
+function sum_biaya_material($id){
+    $data=App\Models\ViewProjectMaterial::where('state',1)->where('project_header_id',$id)->where('kategori_ide',1)->sum('total');
     return $data;
 }
 function get_material($id){
-    $data=App\Models\ViewProjectMaterial::where('project_header_id',$id)->where('kategori_ide',1)->orderBy('nama_material','Asc')->get();
+    $data=App\Models\ViewProjectMaterial::where('state',1)->where('project_header_id',$id)->where('kategori_ide',1)->orderBy('nama_material','Asc')->get();
+    return $data;
+}
+
+//------material kontrak------------------------------------//
+function get_operasional_kontrak($id){
+    $data=App\Models\ViewProjectMaterial::where('state',2)->where('project_header_id',$id)->where('kategori_ide',2)->orderBy('nama_material','Asc')->get();
+    return $data;
+}
+function sum_biaya_operasional_kontrak($id){
+    $data=App\Models\ViewProjectMaterial::where('state',2)->where('project_header_id',$id)->where('kategori_ide',2)->sum('total');
+    return $data;
+}
+function sum_biaya_jasa_kontrak($id){
+    $data=App\Models\ViewProjectMaterial::where('state',2)->where('project_header_id',$id)->where('kategori_ide',3)->sum('total');
+    return $data;
+}
+function get_jasa_kontrak($id){
+    $data=App\Models\ViewProjectMaterial::where('state',2)->where('project_header_id',$id)->where('kategori_ide',3)->orderBy('nama_material','Asc')->get();
+    return $data;
+}
+function sum_biaya_material_kontrak($id){
+    $data=App\Models\ViewProjectMaterial::where('state',2)->where('project_header_id',$id)->where('kategori_ide',1)->sum('total');
+    return $data;
+}
+function get_material_kontrak($id){
+    $data=App\Models\ViewProjectMaterial::where('state',2)->where('project_header_id',$id)->where('kategori_ide',1)->orderBy('nama_material','Asc')->get();
+    return $data;
+}
+function get_material_kontrak_ready($id){
+    $data=App\Models\ViewProjectMaterial::where('state',2)->where('project_header_id',$id)->where('kategori_ide',1)->orderBy('status_pengadaan','Asc')->get();
     return $data;
 }
 function get_material_project($id){
@@ -491,30 +535,31 @@ function get_status_event(){
     
     return $data;
 }
+
 function get_status_event_kontrak(){
     if(Auth::user()->role_id==1){
-        $data=App\Models\Viewstatus::whereBetween('id',[8,18])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[9,11])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==2){
-        $data=App\Models\HeaderProject::whereBetween('status_id',[5,18])->count();
+        $data=App\Models\HeaderProject::whereBetween('id',[9,11])->count();
     }
     if(Auth::user()->role_id==3){
-        $data=App\Models\Viewstatus::whereBetween('id',[1,4])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[9,11])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==4){
-        $data=App\Models\Viewstatus::whereBetween('id',[2,18])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[9,11])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==5){
-        $data=App\Models\Viewstatus::whereBetween('id',[3,18])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[9,11])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==6){
-        $data=App\Models\Viewstatus::whereBetween('id',[8,18])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[9,11])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==7){
-        $data=App\Models\Viewstatus::whereBetween('id',[3,18])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[9,11])->orderBy('id','Asc')->get();
     }
     if(Auth::user()->role_id==8){
-        $data=App\Models\Viewstatus::whereBetween('id',[1,4])->orderBy('id','Asc')->get();
+        $data=App\Models\Viewstatus::whereBetween('id',[9,11])->orderBy('id','Asc')->get();
     }
     
     return $data;

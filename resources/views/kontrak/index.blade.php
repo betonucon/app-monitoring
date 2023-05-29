@@ -49,7 +49,7 @@
                         { data: 'deskripsi_project' },
                         { data: 'start_date_at', className: "text-center" },
                         { data: 'end_date_at', className: "text-center" },
-                        { data: 'status_now', className: "text-center" },
+                        { data: 'singkatan', className: "text-center" },
                         { data: 'created_at', className: "text-center" },
                         
                       ],
@@ -75,7 +75,7 @@
 
         function pilih_jenis(KD_Divisi){
           var tables=$('#data-table-fixed-header').DataTable();
-          tables.ajax.url("{{ url('project/getdata')}}?status_id="+KD_Divisi).load();
+          tables.ajax.url("{{ url('kontrak/getdata')}}?status_kontrak_id="+KD_Divisi).load();
           tables.on( 'draw', function () {
               var count=tables.data().count();
                 $('#count_data').html('Total data :'+count)  
@@ -124,7 +124,7 @@
           <div class="row">
             <div class="col-md-5">
               <div class="btn-group" style="margin-top:5%">
-                <button type="button" class="btn btn-success btn-sm" onclick="location.assign(`{{url('kontrak/form_kontrak')}}?id={{encoder(0)}}`)"><i class="fa fa-plus"></i> Buat Kontrak</button>
+                <button type="button" class="btn btn-success btn-sm" onclick="location.assign(`{{url('kontrak/view')}}?id={{encoder(0)}}`)"><i class="fa fa-plus"></i> Buat Kontrak</button>
                 
                 
               </div>
@@ -135,7 +135,7 @@
                 <label>Status Progres</label>
                   <select onchange="pilih_jenis(this.value)" class="form-control  input-sm">
                     <option value="">All Data</option>
-                    @foreach(get_status_event() as $get)
+                    @foreach(get_status_event_kontrak() as $get)
                       <option value="{{$get->id}}">{{$get->status}}</option>
                     @endforeach
                   </select>
@@ -157,15 +157,15 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="100%" class="display">
+                <table id="data-table-fixed-header" width="130%" class="table-bordered">
                     <thead>
                         <tr>
-                            <th width="5%">No</th>
+                            <th width="3%">No</th>
                             
-                            <th width="5%"></th>
-                            <th width="4%"></th>
+                            <th width="3%"></th>
+                            <th width="3%"></th>
                             <th width="15%">Customer</th>
-                            <th width="10%">Kategori</th>
+                            <th width="7%">Kategori</th>
                             <th >Ruang Lingkup</th>
                             <th width="8%">Start</th>
                             <th width="8%">End</th>

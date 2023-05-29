@@ -49,7 +49,7 @@
                         { data: 'deskripsi_project' },
                         { data: 'start_date_at', className: "text-center" },
                         { data: 'end_date_at', className: "text-center" },
-                        { data: 'status_now', className: "text-center" },
+                        { data: 'singkatan', className: "text-center" },
                         { data: 'created_at', className: "text-center" },
                         
                       ],
@@ -119,42 +119,7 @@
         
       </div>
       <div class="box box-default">
-        <div class="box-header with-border"  id="header-monitoring" style="border: dotted 2px #bebecb; background: #e8e8ef;">
-          <div class="row" >
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(1) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>  
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(2) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            <div class="col-md-4">
-              <ul class="nav nav-stacked">
-                
-              @foreach(get_status_board(3) as $get)
-              <li><a href="#" class="li-dashboard">{{$get->urut}}.{{$get->status}} <span class="pull-right badge bg-{{$get->color}}">{{$get->total}}</span></a></li>   
-              @endforeach
-               
-                
-              </ul>
-            </div>
-            
-          </div>
-
-        </div>
+        
         <div class="box-header with-border">
           <div class="row">
             <div class="col-md-5">
@@ -190,7 +155,7 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="110%" class="cell-border display">
+                <table id="data-table-fixed-header" width="110%" class="table-bordered">
                     <thead>
                         <tr>
                             <th width="5%">No</th>

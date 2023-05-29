@@ -52,6 +52,11 @@
       .skin-purple-light .sidebar a {
           color: #fff;
       }
+      .skin-purple-light .sidebar-menu>li.header {
+          color: #f1ecec;
+          text-align: center;
+          background: #344f85;
+      }
       .user-panel>.image>img {
           width: 100%;
           max-width: 65px;
@@ -91,7 +96,7 @@
           background: #e5330b;
       }
       table.dataTable thead  th {
-          padding: 8px 10px !important;
+          padding: 8px 7px !important;
           background: #e7e7f3;
           border-top: 1px solid rgb(0 0 0 / 15%) !important;
           border-bottom: 1px solid rgb(0 0 0 / 15%) !important;
@@ -108,9 +113,13 @@
           box-shadow: none;
       }
       table.dataTable tbody td {
-          padding: 2px 3px !important;
+          padding: 2px 7px !important;
           background:#fff !important;
           border-bottom: 0px solid rgb(0 0 0 / 15%) !important;
+      }
+      .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th {
+        border-left: 0px solid #efefef !important;
+        border-right: 1px solid #e1d9d9 !important;
       }
       .swal-text {
             width: 100%;

@@ -190,7 +190,7 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" width="110%" class="cell-border display">
+                <table id="data-table-fixed-header" width="110%" class="table-bordered">
                     <thead>
                         <tr>
                             <th width="5%">No</th>

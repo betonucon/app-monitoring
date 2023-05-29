@@ -77,7 +77,7 @@ class PengadaanController extends Controller
         error_reporting(0);
         $query = ViewPengadaan::query();
         
-        $data = $query->whereIn('progres_pengadaan',array(1,2,3))->orderBy('id','Desc')->get();
+        $data = $query->whereIn('status_id',array(10,11))->orderBy('id','Desc')->get();
 
         return Datatables::of($data)
         ->addColumn('pengadaan', function ($row) {
@@ -86,10 +86,10 @@ class PengadaanController extends Controller
         })
         
         ->addColumn('action', function ($row) {
-            if($row->note==0 && $row->total_verifikasi==0){
-                $color='default';
-            }else{
+            if($row->total_note>0){
                 $color='success';
+            }else{
+                $color='default';
             }
             $btn='
                 <div class="btn-group">
@@ -113,35 +113,26 @@ class PengadaanController extends Controller
         error_reporting(0);
         $query = ViewProjectmaterial::query();
         if($request->status_material_id>0){
-            $data = $query->where('status_material_id',$request->status_material_id);
+            $data = $query->where('status_pengadaan',$request->status_material_id);
         }
         if($request->status_aset_id>0){
             $data = $query->where('status_aset_id',$request->status_aset_id);
         }
-        $data = $query->where('project_header_id',$request->id)->whereNotIn('status_pengadaan',array(2,3))->orderBy('status_material_id','Asc')->get();
+        $data = $query->where('project_header_id',$request->id)->where('kategori_ide',1)->where('state',2)->orderBy('status_pengadaan','Asc')->get();
 
         return Datatables::of($data)
         ->addColumn('pilih', function ($row) {
-            if($row->status_material_id==1 && $row->status_pengadaan==1 && $row->status_aset_id>0){
+            if($row->status_pengadaan==1){
                 return '<input type="checkbox" name="project_material_id[]" value="'.$row->id.'">';
             }else{
-                return '<input type="checkbox" disabled >';
+                return '<i class="fa fa-check-square-o"></i>';
             }
             
              
         })
         ->addColumn('action', function ($row) {
             
-            $btn='
-                <div class="btn-group">
-                    <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    Act <i class="fa fa-sort-desc"></i> 
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="javascript:;"  onclick="show_detail('.$row->id.')">Detail</a></li>
-                    </ul>
-                </div>
-            ';
+            $btn='<span class="btn btn-info btn-xs"  onclick="show_detail('.$row->id.')"><i class="fa fa-cog"></i></span>';
            
             return $btn;
         })
@@ -1307,6 +1298,7 @@ class PengadaanController extends Controller
                         'qty'=>ubah_uang($request->qty),
                         'total'=>(ubah_uang($request->qty)*$mst->biaya),
                         'total_actual'=>(ubah_uang($request->qty)*ubah_uang($request->biaya_actual)),
+                        'status_pengadaan'=>$request->status_material_id,
                         'status_material_id'=>$request->status_material_id,
                         'status_aset_id'=>$request->status_aset_id,
                         
@@ -1658,7 +1650,42 @@ class PengadaanController extends Controller
                     'created_at'=>date('Y-m-d H:i:s'),
                 ]);
             }
-            $update=ProjectMaterial::whereIn('id',$request->project_material_id)->update(['status_pengadaan'=>2]);
+            $update=ProjectMaterial::whereIn('id',$request->project_material_id)->where('state',2)->update(['status_pengadaan'=>2]);
+                
+
+                echo '@ok';
+        }
+               
+        
+        
+    }
+    public function store_ready(request $request){
+        error_reporting(0);
+        $rules = [];
+        $messages = [];
+        $count=count((array) $request->project_material_id);
+        if($count==0){
+            $rules['nilai']= 'required';
+            $messages['nilai.required']= 'Masukan material';
+        }
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+        $val=$validator->Errors();
+
+
+        if ($validator->fails()) {
+            echo'<div class="nitof"><b>Oops Error !</b><br><div class="isi-nitof">';
+                foreach(parsing_validator($val) as $value){
+                    
+                    foreach($value as $isi){
+                        echo'-&nbsp;'.$isi.'<br>';
+                    }
+                }
+            echo'</div></div>';
+        }else{
+            
+            
+            $update=ProjectMaterial::whereIn('id',$request->project_material_id)->where('state',2)->update(['status_pengadaan'=>3]);
                 
 
                 echo '@ok';

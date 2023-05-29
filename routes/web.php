@@ -89,7 +89,7 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::get('/delete_risiko',[ProjectController::class, 'delete_risiko']);
     Route::get('/delete_material',[ProjectController::class, 'delete_material']);
     Route::get('/delete_operasional',[ProjectController::class, 'delete_operasional']);
-    Route::get('/delete_jasa',[ProjectController::class, 'delete_jasa']);
+    
     Route::get('/modal',[ProjectController::class, 'modal']);
     Route::get('/reset_material',[ProjectController::class, 'reset_material']);
     Route::get('/reset_operasional',[ProjectController::class, 'reset_operasional']);
@@ -114,6 +114,7 @@ Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::get('/tampil_operasional',[ProjectController::class, 'tampil_operasional']);
     Route::post('/store_material',[ProjectController::class, 'store_material']);
     Route::post('/store_operasional',[ProjectController::class, 'store_operasional']);
+    Route::get('/delete_jasa',[ProjectController::class, 'delete_jasa']);
     Route::post('/store_jasa',[ProjectController::class, 'store_jasa']);
     Route::post('/store_risiko',[ProjectController::class, 'store_risiko']);
     Route::post('/store_bidding',[ProjectController::class, 'store_bidding']);
@@ -143,13 +144,14 @@ Route::group(['prefix' => 'pengadaan','middleware'    => 'auth'],function(){
     Route::post('/store_material',[PengadaanController::class, 'store_material']);
     Route::post('/store_material_pm',[PengadaanController::class, 'store_material_pm']);
     Route::post('/store_pengadaan',[PengadaanController::class, 'store_pengadaan']);
+    Route::post('/store_ready',[PengadaanController::class, 'store_ready']);
     Route::get('/modal_verifikasi',[PengadaanController::class, 'modal_verifikasi']);
 });
 Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::get('/',[KontrakController::class, 'index']);
     Route::get('/form_kontrak',[KontrakController::class, 'form_kontrak']);
     Route::get('/view',[KontrakController::class, 'view_data']);
-   
+    Route::get('/cetak',[KontrakController::class, 'cetak']);
     Route::get('/timeline',[KontrakController::class, 'timeline']);
     Route::get('/getdata',[KontrakController::class, 'get_data']);
     Route::get('/modal_material',[KontrakController::class, 'modal_material']);
@@ -161,6 +163,7 @@ Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::get('/tampil_personal_periode',[KontrakController::class, 'tampil_personal_periode']);
     Route::get('/tampil_operasional_periode',[KontrakController::class, 'tampil_operasional_periode']);
     Route::get('/tampil_material',[KontrakController::class, 'tampil_material']);
+    Route::get('/tampil_jasa',[KontrakController::class, 'tampil_jasa']);
     Route::get('/tampil_material_kontrak',[KontrakController::class, 'tampil_material_kontrak']);
     Route::get('/total_qty',[KontrakController::class, 'total_qty']);
     Route::get('/delete',[KontrakController::class, 'delete']);
@@ -172,7 +175,11 @@ Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::get('/delete_personal',[KontrakController::class, 'delete_personal']);
     Route::get('/delete_operasional',[KontrakController::class, 'delete_operasional']);
     Route::get('/delete_material',[KontrakController::class, 'delete_material']);
+    Route::get('/reset_material',[KontrakController::class, 'reset_material']);
+    Route::get('/reset_operasional',[KontrakController::class, 'reset_operasional']);
+    Route::get('/reset_jasa',[KontrakController::class, 'reset_jasa']);
     Route::get('/modal',[KontrakController::class, 'modal']);
+    Route::post('/store_import_material',[KontrakController::class, 'store_import_material']);
     Route::post('/',[KontrakController::class, 'store']);
     Route::get('/kirim_kadis_komersil',[KontrakController::class, 'kirim_kadis_komersil']);
     Route::post('/kembali_komersil',[KontrakController::class, 'kembali_komersil']);
@@ -187,6 +194,9 @@ Route::group(['prefix' => 'kontrak','middleware'    => 'auth'],function(){
     Route::post('/store_personal',[KontrakController::class, 'store_personal']);
     Route::post('/store_operasional',[KontrakController::class, 'store_operasional']);
     Route::post('/store_pengadaan',[KontrakController::class, 'store_pengadaan']);
+    
+    Route::get('/delete_jasa',[KontrakController::class, 'delete_jasa']);
+    Route::post('/store_jasa',[KontrakController::class, 'store_jasa']);
     Route::post('/store_periode_personal',[KontrakController::class, 'store_periode_personal']);
     Route::post('/store_periode_operasional',[KontrakController::class, 'store_periode_operasional']);
     Route::post('/store_negosiasi',[KontrakController::class, 'store_negosiasi']);

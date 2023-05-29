@@ -43,11 +43,11 @@
                         
                         { data: 'pilih' },
                         { data: 'action' },
-                        { data: 'kode_material' ,className: "text-center" },
-                        { data: 'nama_status_pengadaan' ,className: "text-center" },
-                        { data: 'singkatan_aset' ,className: "text-center" },
+                        { data: 'singkatan_pengadaan' ,className: "text-center" },
+                        // { data: 'singkatan_aset' ,className: "text-center" },
                         { data: 'nama_material' },
                         { data: 'qty' ,className: "text-center" },
+                        { data: 'satuan_material' ,className: "text-center" },
                         { data: 'harga_satuan_actual' ,className: "text-right" },
                         { data: 'harga_total_actual' ,className: "text-right" },
                         
@@ -128,9 +128,9 @@
         
         
         <div class="box-body">
-          <form class="form-horizontal" id="material" method="post" action="{{ url('project') }}" enctype="multipart/form-data" >
+          <form class="form-horizontal" id="material" method="post" action="{{ url('pengadaan/store_ready') }}" enctype="multipart/form-data" >
               @csrf
-              <!-- <input type="submit"> -->
+              <input type="submit">
               <input type="hidden" name="id" value="{{$id}}">
               <div class="row">
               
@@ -159,15 +159,15 @@
 
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Customer Cost</label>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Customer Cost Center</label>
 
                             <div class="col-sm-2">
                               <div class="input-group">
-                                <input type="text" id="customer_code" name="cost" readonly value="{{$data->cost_customer}}" class="form-control  input-sm" placeholder="0000">
+                                <input type="text" id="customer_code" name="cost" readonly value="{{$data->cost_center_project}}" class="form-control  input-sm" placeholder="0000">
                               </div>
                             </div>
                             <div class="col-sm-4">
-                              <input type="text" id="customer" readonly class="form-control input-sm"  value="{{$data->customer}}" placeholder="Ketik...">
+                              <input type="text" id="customer" readonly class="form-control input-sm"  value="({{$data->customer_code}}) {{$data->customer}}" placeholder="Ketik...">
                             </div>
                           </div>
                           <div class="form-group">
@@ -215,6 +215,15 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
+                                <?php
+                                  $rencanaall=(sum_biaya_jasa_kontrak($data->id)+sum_biaya_operasional_kontrak($data->id)+sum_biaya_operasional_kontrak($data->id));
+                                  $permaterial=round((sum_biaya_material_kontrak($data->id)/$data->nilai_project)*100);
+                                  $peroperasional=round((sum_biaya_operasional_kontrak($data->id)/$data->nilai_project)*100);
+                                  $perjasa=round((sum_biaya_jasa_kontrak($data->id)/$data->nilai_project)*100);
+                                  $allcost=$permaterial+$permaterial+$perjasa;
+                                  $revenue=100-($permaterial+$permaterial+$perjasa);
+
+                                ?>
                                 <div class="form-group">
                                   <label for="inputEmail3" class="col-sm-4 control-label">Nilai Project</label>
 
@@ -226,27 +235,37 @@
                                   
                                 </div>
                                 <div class="form-group">
-                                  <label for="inputEmail3" class="col-sm-4 control-label">Operasional Cost</label>
+                                  <label for="inputEmail3" class="col-sm-4 control-label">Operasional Cost ({{$peroperasional}}%)</label>
 
                                   <div class="col-sm-5">
                                     <div class="input-group">
-                                      <input type="text"  readonly value="{{uang(sum_operasional($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
+                                      <input type="text"  readonly value="{{uang(sum_biaya_operasional_kontrak($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
                                     </div>
                                   </div>
                                   
                                 </div>
                                 <div class="form-group">
-                                  <label for="inputEmail3" class="col-sm-4 control-label">Material Cost</label>
+                                  <label for="inputEmail3" class="col-sm-4 control-label">Material Cost ({{$permaterial}}%)</label>
 
                                   <div class="col-sm-5">
                                     <div class="input-group">
-                                      <input type="text"  readonly value="{{uang(sum_material($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
+                                      <input type="text"  readonly value="{{uang(sum_biaya_material_kontrak($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
                                     </div>
                                   </div>
                                   
                                 </div>
                                 <div class="form-group">
-                                  <label for="inputEmail3" class="col-sm-4 control-label">Total Pembiayaan</label>
+                                  <label for="inputEmail3" class="col-sm-4 control-label">Jasa Cost ({{$perjasa}}%)</label>
+
+                                  <div class="col-sm-5">
+                                    <div class="input-group">
+                                      <input type="text"  readonly value="{{uang(sum_biaya_jasa_kontrak($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
+                                    </div>
+                                  </div>
+                                  
+                                </div>
+                                <div class="form-group">
+                                  <label for="inputEmail3" class="col-sm-4 control-label">Total Pembiayaan  ({{$allcost}}%)</label>
 
                                   <div class="col-sm-5">
                                     <div class="input-group">
@@ -256,7 +275,7 @@
                                   
                                 </div>
                                 <div class="form-group">
-                                  <label for="inputEmail3" class="col-sm-4 control-label">Spase Anggaran</label>
+                                  <label for="inputEmail3" class="col-sm-4 control-label">Revenue ({{$revenue}}%)</label>
 
                                   <div class="col-sm-5">
                                     <div class="input-group">
@@ -279,7 +298,8 @@
            
                           <div class="col-md-4" style="line-height: 6;">
                             
-                            <button type="button" class="btn btn-primary btn-sm" onclick="proses_pengadaan()"><i class="fa fa-plus"></i> Proses Pengadaan</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="proses_pengadaan()"><i class="fa fa-plus"></i>Pengadaan (PG)</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="proses_ready()"><i class="fa fa-plus"></i> Ready (RD)</button>
                 
                           </div>
                           <div class="col-md-2">
@@ -298,9 +318,10 @@
                               <label>Status Material</label>
                               <select  class="form-control  input-sm" id="cari_status_material" placeholder="0000">
                                   <option value="">All Status--</option>
-                                  @foreach(get_status_material() as $emp)
-                                      <option value="{{$emp->id}}" @if($data->status_material_id==$emp->id) selected @endif >{{$emp->id}}. {{$emp->status_material}}</option>
-                                  @endforeach
+                                  
+                                      <option value="2"  >Pengadaan</option>
+                                      <option value="3"  >Stok</option>
+                                  
                               </select>
                             </div>
                           </div>
@@ -321,12 +342,12 @@
                                           <th width="5%">No</th>
                                           
                                           <th width="2%"></th>
-                                          <th width="5%"></th>
-                                          <th width="10%">Kode</th>
-                                          <th width="12%">STS Pengadaan</th>
-                                          <th width="6%">Aset</th>
+                                          <th width="2%"></th>
+                                          <th width="6%">STS</th>
+                                          <!-- <th width="6%">Aset</th> -->
                                           <th>Material</th>
                                           <th width="7%">Qty</th>
+                                          <th width="9%">Satuan</th>
                                           <th width="9%">H.Satuan</th>
                                           <th width="9%">H.Total</th>
                                           
@@ -527,12 +548,64 @@
                 }
             });
         }
-       function proses_pengadaan(){
+        function proses_pengadaan(){
             
             var form=document.getElementById('material');
             $.ajax({
                 type: 'POST',
                 url: "{{ url('pengadaan/store_pengadaan') }}",
+                data: new FormData(form),
+                contentType: false,
+                cache: false,
+                processData:false,
+                beforeSend: function() {
+                    document.getElementById("loadnya").style.width = "100%";
+                },
+                success: function(msg){
+                    var bat=msg.split('@');
+                    if(bat[1]=='ok'){
+                        document.getElementById("loadnya").style.width = "0px";
+                        swal("Success! berhasil disimpan!", {
+                            icon: "success",
+                        });
+                        $('#modal-form').modal('hide');
+                        $('#tampil-form').html("");
+                        var tables=$('#data-table-fixed-header').DataTable();
+                            tables.ajax.url("{{ url('pengadaan/getdatamaterial')}}?id={{$data->id}}").load();
+                        var tablesm=$('#data-table-fixed-header-pengadaan').DataTable();
+                            tablesm.ajax.url("{{ url('pengadaan/getdatapengadaan')}}?cost_center={{$data->cost_center_project}}").load();
+                    }else{
+                        document.getElementById("loadnya").style.width = "0px";
+                        swal({
+                            title: 'Notifikasi',
+                           
+                            html:true,
+                            text:'ss',
+                            icon: 'error',
+                            buttons: {
+                                cancel: {
+                                    text: 'Tutup',
+                                    value: null,
+                                    visible: true,
+                                    className: 'btn btn-dangers',
+                                    closeModal: true,
+                                },
+                                
+                            }
+                        });
+                        $('.swal-text').html('<div style="width:100%;background:#f2f2f5;padding:1%;text-align:left;font-size:13px">'+msg+'</div>')
+                    }
+                    
+                    
+                }
+            });
+        }
+        function proses_ready(){
+            
+            var form=document.getElementById('material');
+            $.ajax({
+                type: 'POST',
+                url: "{{ url('pengadaan/store_ready') }}",
                 data: new FormData(form),
                 contentType: false,
                 cache: false,

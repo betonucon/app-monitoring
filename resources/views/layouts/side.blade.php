@@ -71,7 +71,7 @@
             
             </ul>
           </li>
-          <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-calendar text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Verifikasi Project</span></a></li>
+          <!-- <li @if(Request::is('project')==1 || Request::is('project/*')==1) class="active" @endif><a href="{{url('project')}}"><i class="fa fa-calendar text-white"></i>{!!notifikasi_side(1)!!}&nbsp;<span>Verifikasi Project</span></a></li> -->
           <li @if(Request::is('pengadaan')==1 || Request::is('pengadaan/*')==1) class="active" @endif><a href="{{url('pengadaan')}}"><i class="fa fa-calendar text-white"></i>&nbsp;<span>Draft Pengadaan </span></a></li>
         @endif
         @if(Auth::user()->role_id==6)

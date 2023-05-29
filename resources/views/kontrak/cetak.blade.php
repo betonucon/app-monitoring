@@ -10,7 +10,7 @@
                 src: url(http://themes.googleusercontent.com/static/fonts/opensans/v8/cJZKeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf) format('truetype');
             }
             .head{
-                height:70px;
+                height:140px;
                 width:100%;
                 border-bottom:double 4px #000;
                 text-align:center;
@@ -64,8 +64,8 @@
     </head>
     <body>
         <div class="head">
-            <p>Rencana Anggaran Biaya(RAB)</p>
-            <p>Proposal pengajuan rencana project</p>
+            <img src="{{public_path('img/ks.png')}}" width="10%">
+            <p style="font-size:20px">Rencana Anggaran Biaya(RAB)</p>
             <p>PT. Krakatau Perbengkelan dan Perawatan</p>
         </div>
         
@@ -77,15 +77,15 @@
                 </tr>
                 <tr>
                     <td class="ttdhg" width="1%"></td>
-                    <td class="ttdhg" width="20%">Customer</td>
+                    <td class="ttdhg" width="25%">Customer</td>
                     <td class="ttdhg" width="3%">:</td>
                     <td class="ttdhg" > {{$data->customer}} ({{$data->singkatan_customer}})</td>
                 </tr>
                 <tr>
                     <td class="ttdhg"></td>
-                    <td class="ttdhg">Cost</td>
+                    <td class="ttdhg">Cost Center</td>
                     <td class="ttdhg">:</td>
-                    <td class="ttdhg" > {{$data->header_cost}}</td>
+                    <td class="ttdhg" > {{$data->cost_center_project}}</td>
                 </tr>
                 <tr>
                     <td class="ttdhg"></td>
@@ -129,7 +129,7 @@
                 <?php
                     $biaya=0;
                 ?>
-                @foreach(get_material($data->id) as $no=>$o)
+                @foreach(get_material_kontrak($data->id) as $no=>$o)
                     <?php
                         $biaya+=$o->total;
                     ?>
@@ -144,7 +144,7 @@
                 @endforeach
                 <tr>
                     <td class="ttdl" colspan="5">TOTAL</td>
-                    <td class="ttdl">{{uang(sum_biaya_material($data->id))}}</td>
+                    <td class="ttdl">{{uang(sum_biaya_material_kontrak($data->id))}}</td>
                 </tr>
             </table><br>
             <table width="100%" border="1">
@@ -159,7 +159,7 @@
                     <th  class="tth" width="8%">F(x)</th>
                     <th  class="tth" width="15%">Total</th>
                 </tr>
-                @foreach(get_operasional($data->id) as $no=>$o)
+                @foreach(get_operasional_kontrak($data->id) as $no=>$o)
                     <?php
                         $biaya+=$o->biaya;
                     ?>
@@ -173,7 +173,7 @@
                 @endforeach
                 <tr >
                     <td class="ttdl" colspan="4">TOTAL</td>
-                    <td class="ttdl">{{uang(sum_biaya_operasional($data->id))}}</td>
+                    <td class="ttdl">{{uang(sum_biaya_operasional_kontrak($data->id))}}</td>
                 </tr>
             </table><br>
             <table width="100%" border="1">
@@ -187,7 +187,7 @@
                     <th  class="tth" width="8%">F(x)</th>
                     <th  class="tth" width="15%">Total</th>
                 </tr>
-                @foreach(get_jasa($data->id) as $no=>$o)
+                @foreach(get_jasa_kontrak($data->id) as $no=>$o)
                     <?php
                         $biaya+=$o->biaya;
                     ?>
@@ -201,7 +201,7 @@
                 @endforeach
                 <tr >
                     <td class="ttdl" colspan="4">TOTAL</td>
-                    <td class="ttdl">{{uang(sum_biaya_jasa($data->id))}}</td>
+                    <td class="ttdl">{{uang(sum_biaya_jasa_kontrak($data->id))}}</td>
                 </tr>
             </table>
             
@@ -230,17 +230,63 @@
                
                     <tr>
                         <td width="40%">
-                                
+                            @if($data->nilai>0)
+                            <?php
+                                $rencanaallrcn=(sum_biaya_jasa($data->id)+sum_biaya_operasional($data->id)+sum_biaya_operasional($data->id));
+                                $permaterialrcn=round((sum_biaya_material($data->id)/$data->nilai)*100);
+                                $peroperasionalrcn=round((sum_biaya_operasional($data->id)/$data->nilai)*100);
+                                $perjasarcn=round((sum_biaya_jasa($data->id)/$data->nilai)*100);
+                                $allcostrcn=$permaterial+$permaterial+$perjasa;
+                                $revenuercn=100-($permaterialrcn+$permaterialrcn+$peroperasionalrcn);
+                            ?>
+                            <table width="100%" border="1" align="right">
+               
+                                <tr>
+                                    <td class="ttd" style="background:aqua" colspan="3">TOTAL BIAYA</td>
+                                </tr>
+                                <tr>
+                                    <td class="ttdl">Estimasi Penawaran</td>
+                                    <td class="ttdl" width="10%" >100%</td>
+                                    <td class="ttdl" width="30%" >{{uang($data->nilai)}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="ttdl">Biaya Material</td>
+                                    <td class="ttdl" >{{uang($permaterialrcn)}}%</td>
+                                    <td class="ttdl" >{{uang(sum_biaya_material($data->id))}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="ttdl">Biaya Operasional</td>
+                                    <td class="ttdl" >{{uang($peroperasionalrcn)}}%</td>
+                                    <td class="ttdl">{{uang(sum_biaya_operasional($data->id))}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="ttdl">Biaya Jasa</td>
+                                    <td class="ttdl" >{{uang($perjasarcn)}}%</td>
+                                    <td class="ttdl">{{uang(sum_biaya_jasa($data->id))}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="ttdl">Persentase RABOB</td>
+                                    <td class="ttdl" >{{uang($allcostrcn)}}%</td>
+                                    <td class="ttdl">{{uang(sum_biaya_jasa($data->id)+sum_biaya_operasional($data->id)+sum_biaya_operasional_kontrak($data->id))}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="ttdl">Revenue</td>
+                                    <td class="ttdl" >{{uang($revenuercn)}}%</td>
+                                    <td class="ttdl">{{uang(round(($data->nilait*(100-$allcostrcn))/100))}}</td>
+                                </tr>
+                            
+                            </table>
+                            @endif
                         </td>
                         <td>
 
                         </td>
                         <td width="50%">
                             <?php
-                                $rencanaall=(sum_biaya_jasa($data->id)+sum_biaya_operasional($data->id)+sum_biaya_operasional($data->id));
-                                $permaterial=round((sum_biaya_material($data->id)/$data->nilai_project)*100);
-                                $peroperasional=round((sum_biaya_operasional($data->id)/$data->nilai_project)*100);
-                                $perjasa=round((sum_biaya_jasa($data->id)/$data->nilai_project)*100);
+                                $rencanaall=(sum_biaya_jasa_kontrak($data->id)+sum_biaya_operasional_kontrak($data->id)+sum_biaya_operasional_kontrak($data->id));
+                                $permaterial=round((sum_biaya_material_kontrak($data->id)/$data->nilai_project)*100);
+                                $peroperasional=round((sum_biaya_operasional_kontrak($data->id)/$data->nilai_project)*100);
+                                $perjasa=round((sum_biaya_jasa_kontrak($data->id)/$data->nilai_project)*100);
                                 $allcost=$permaterial+$permaterial+$perjasa;
                                 $revenue=100-($permaterial+$permaterial+$perjasa);
                             ?>
@@ -257,22 +303,22 @@
                                 <tr>
                                     <td class="ttdl">Biaya Material</td>
                                     <td class="ttdl" >{{uang($permaterial)}}%</td>
-                                    <td class="ttdl" >{{uang(sum_biaya_material($data->id))}}</td>
+                                    <td class="ttdl" >{{uang(sum_biaya_material_kontrak($data->id))}}</td>
                                 </tr>
                                 <tr>
                                     <td class="ttdl">Biaya Operasional</td>
                                     <td class="ttdl" >{{uang($peroperasional)}}%</td>
-                                    <td class="ttdl">{{uang(sum_biaya_operasional($data->id))}}</td>
+                                    <td class="ttdl">{{uang(sum_biaya_operasional_kontrak($data->id))}}</td>
                                 </tr>
                                 <tr>
                                     <td class="ttdl">Biaya Jasa</td>
                                     <td class="ttdl" >{{uang($perjasa)}}%</td>
-                                    <td class="ttdl">{{uang(sum_biaya_jasa($data->id))}}</td>
+                                    <td class="ttdl">{{uang(sum_biaya_jasa_kontrak($data->id))}}</td>
                                 </tr>
                                 <tr>
                                     <td class="ttdl">Persentase RABOB</td>
                                     <td class="ttdl" >{{uang($allcost)}}%</td>
-                                    <td class="ttdl">{{uang(sum_biaya_jasa($data->id)+sum_biaya_operasional($data->id)+sum_biaya_operasional($data->id))}}</td>
+                                    <td class="ttdl">{{uang(sum_biaya_jasa_kontrak($data->id)+sum_biaya_operasional_kontrak($data->id)+sum_biaya_operasional_kontrak($data->id))}}</td>
                                 </tr>
                                 <tr>
                                     <td class="ttdl">Revenue</td>
@@ -281,6 +327,22 @@
                                 </tr>
                             
                             </table>
+                        </td>
+                    </tr>
+                    
+            </table>
+            <table width="100%">
+                    <tr>
+                        <td align="center" width="30%" style="text-transform:uppercase">
+                            <br><b>Cilegon,&nbsp;&nbsp;&nbsp;&nbsp; {{tgl_ttd($data->update)}}&nbsp;&nbsp;&nbsp;&nbsp;</b>
+                            <br>Project Manager<br><br><br><br>
+                            <br>(&nbsp;&nbsp;&nbsp;&nbsp;{{$data->nama_pem}}&nbsp;&nbsp;&nbsp;&nbsp;)
+                        </td>
+                        <td>
+
+                        </td>
+                        <td  width="30%"  align="center" style="font-weight:bold">
+
                         </td>
                     </tr>
             </table>

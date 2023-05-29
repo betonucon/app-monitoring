@@ -27,6 +27,7 @@
                     lengthMenu: [20,50,100],
                     searching:true,
                     lengthChange:false,
+                    ordering:false,
                     fixedHeader: {
                         header: true,
                         headerOffset: $('#header').height()
@@ -45,10 +46,11 @@
                         { data: 'cost_center_project' ,className: "text-center" },
                         { data: 'customer' },
                         { data: 'deskripsi_project' },
-                        { data: 'nilai_pengadaan' ,className: "text-right" },
-                        { data: 'total_verifikasi' ,className: "text-center" },
+                        { data: 'total' ,className: "text-center" },
+                        { data: 'total_note' ,className: "text-center" },
                         { data: 'total_pengadaan' ,className: "text-center" },
-                        { data: 'pengadaan' ,className: "text-center" },
+                        { data: 'total_ready' ,className: "text-center" },
+                        { data: 'updated_at' ,className: "text-left" },
                         
                       ],
                       
@@ -123,11 +125,7 @@
         </div>
         <div class="box-header with-border">
           <div class="row">
-            <div class="col-md-6">
-         
-              
-            </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
               <!-- <div class="form-group">
                 <label>Divisi</label>
                   <select onchange="pilih_jenis(this.value)" class="form-control  input-sm">
@@ -137,6 +135,16 @@
                
               </div> -->
             </div>
+            <div class="col-md-5">
+              <ul class="nav nav-stacked">
+                <li><a href="#" class="li-dashboard"><b>TA</b> = Total Material</span></a></li>   
+                <li><a href="#" class="li-dashboard"><b>NT</b> = Total Material Belum Diproses</span></a></li>   
+                <li><a href="#" class="li-dashboard"><b>PG</b> = Total Material Proses Pengadaan</span></a></li>   
+                <li><a href="#" class="li-dashboard"><b>RD</b> = Total Material Siap didistribusikan</span></a></li>   
+              </ul>
+              
+            </div>
+            
             <div class="col-md-4">
               <div class="form-group">
                   <label>Cari data</label>
@@ -152,7 +160,7 @@
            
             <div class="col-md-12">
               <div class="table-responsive">
-                <table id="data-table-fixed-header" class="cell-border display">
+                <table id="data-table-fixed-header" class="table-bordered">
                     <thead>
                         <tr>
                             <th width="5%">No</th>
@@ -162,10 +170,12 @@
                             <th width="20%">Customer</th>
                             
                             <th>Project</th>
-                            <th width="13%">Nilai Pengadaan</th>
-                            <th width="9%">Proses</th>
-                            <th width="9%">Item</th>
-                            <th width="9%">Pengadaan</th>
+                           
+                            <th width="5%">TA</th>
+                            <th width="5%">NT</th>
+                            <th width="5%">PG</th>
+                            <th width="5%">RD</th>
+                            <th width="10%">Updated</th>
                             
                         </tr>
                     </thead>

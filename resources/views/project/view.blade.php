@@ -42,12 +42,8 @@
               <div class="row">
               
                 <div class="col-md-12">
-                  <div class="callout callout-success">
-                    <h4>Penyusunan RAB</h4>
-
-                    <p>Penyusunan nilai anggaran rencana project yang terdiri dari 4 aspek (Rencana , Biaya Operasional, Material Cos dan Risiko Project)</p>
-                  </div>
-                  @if($data->status_id>8)
+                  
+                  @if($data->status_id>1)
                   <div class="btn-group" style="margin-bottom:1%">
                     <button type="button" class="btn btn-success btn-sm" onclick="window.open(`{{url('project/cetak')}}?id={{encoder($data->id)}}`)"><i class="fa fa-clone"></i> Cetak RABOP</button>
                   </div>
@@ -56,13 +52,14 @@
                     <ul class="nav nav-tabs">
                       <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true"><i class="fa fa-check-square-o"></i> Rencana Pekerjaan</a></li>
                       <li class=""><a href="#tab_3" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Operasional Project</a></li>
-                      <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Material Cost</a></li>
+                      <li class=""><a href="#tab_4" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Cost Material</a></li>
+                      <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Cost Jasa</a></li>
                       <li class=""><a href="#tab_2" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Risiko Pekerjaan</a></li>
                       @if($data->status_id>7)
-                      <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Bidding</a></li>
+                      <!-- <li class=""><a href="#tab_5" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Bidding</a></li> -->
                       @endif
                       @if($data->status_id>8)
-                      <li class=""><a href="#tab_6" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Negosiasi</a></li>
+                      <!-- <li class=""><a href="#tab_6" data-toggle="tab" aria-expanded="false"><i class="fa fa-check-square-o"></i> Negosiasi</a></li> -->
                       @endif
                       <li class="pull-right"><a href="#" class="text-muted"><i class="fa fa-gear"></i></a></li>
                     </ul>
@@ -151,42 +148,61 @@
                             <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Pembiayaan</label>
 
                           </div>
+                          
+                          <?php
+                            $rencanaall=(sum_biaya_jasa($data->id)+sum_biaya_operasional($data->id)+sum_biaya_operasional($data->id));
+                            $permaterial=round((sum_biaya_material($data->id)/$data->nilai_project)*100);
+                            $peroperasional=round((sum_biaya_operasional($data->id)/$data->nilai_project)*100);
+                            $perjasa=round((sum_biaya_jasa($data->id)/$data->nilai_project)*100);
+                            $allcost=$permaterial+$permaterial+$perjasa;
+                            $revenue=100-($permaterial+$permaterial+$perjasa);
+                          ?>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Operasional Cost</label>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Material ({{uang($permaterial)}}%)</label>
 
                             <div class="col-sm-5">
                               <div class="input-group">
-                                <input type="text"  readonly value="{{uang(sum_operasional($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
+                                <input type="text"  readonly value="{{uang(sum_biaya_material($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
                               </div>
                             </div>
                             
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Material Cost</label>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Operasional  ({{uang($peroperasional)}}%)</label>
 
                             <div class="col-sm-5">
                               <div class="input-group">
-                                <input type="text"  readonly value="{{uang(sum_material($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
+                                <input type="text"  readonly value="{{uang(sum_biaya_operasional($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
+                              </div>
+                            </div>
+                           
+                          </div>
+                          <div class="form-group">
+                            <label for="inputEmail3" class="col-sm-2 control-label">Jasa  ({{uang($perjasa)}}%)</label>
+
+                            <div class="col-sm-5">
+                              <div class="input-group">
+                                <input type="text"  readonly value="{{uang(sum_biaya_jasa($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
                               </div>
                             </div>
                             
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Total Pembiayaan</label>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Rencana RABOB  ({{uang($allcost)}}%)</label>
 
                             <div class="col-sm-5">
                               <div class="input-group">
-                                <input type="text"  readonly value="{{uang(sum_operasional($data->id)+sum_material($data->id))}}" class="form-control  input-sm text-right" placeholder="0000">
+                                <input type="text"  readonly value="{{uang($rencanaall)}}" class="form-control  input-sm text-right" placeholder="0000">
                               </div>
                             </div>
                             
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Spase Anggaran</label>
+                            <label for="inputEmail3" class="col-sm-2 control-label">Revenue ({{uang($revenue)}}%)</label>
 
                             <div class="col-sm-5">
                               <div class="input-group">
-                                <input type="text"  readonly value="{{uang($data->nilai_project-(sum_operasional($data->id)+sum_material($data->id)))}}" class="form-control  input-sm text-right" placeholder="0000">
+                                <input type="text"  readonly value="{{uang(round(($data->nilai_project*(100-$allcost))/100))}}" class="form-control  input-sm text-right" placeholder="0000">
                               </div>
                             </div>
                             
@@ -196,13 +212,13 @@
                         </div>
                       </div>
 
-                      <div class="tab-pane" id="tab_2">
+                      <div class="tab-pane " id="tab_2">
                         <div class="form-group">
                           <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Risiko Pekerjaan</label>
 
                         </div>
                         <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-1 control-label"></label>
+                            <label for="inputEmail3" class="col-sm-1 control-label" style="width:2%"></label>
                             
                             <div class="col-sm-10">
                               <table class="table table-bordered" id="">
@@ -210,13 +226,18 @@
                                   <tr style="background:#bcbcc7">
                                     <th style="width: 10px">No</th>
                                     <th>Risiko Yang Terjadi</th>
-                                    <th>Tipe</th>
+                                    <th style="width:15%">Tipe</th>
+                                    <th style="width:5%"></th>
                                   </tr>
                                 </thead>
                                 <tbody id="tampil-risiko-save"></tbody>
-                                
+                                <tbody id="tampil_risiko"></tbody>
                               </table>
                             </div>
+                        </div>
+                        <div class="box-footer" style="text-align:center">
+                          
+                              
                         </div>
                       </div>
 
@@ -231,39 +252,28 @@
                             
                             <div class="col-sm-11">
                               <table class="table table-bordered" id="">
-                                @if($data->status_id>6)
                                 <thead>
                                   <tr style="background:#bcbcc7">
                                     <th style="width: 10px">No</th>
-                                    <th style="width:10%">Kode</th>
                                     <th>Material</th>
+                                    <th style="width:15%">H.Satuan</th>
                                     <th style="width:8%">Qty</th>
-                                    
-                                    <th style="width:12%">H Pengajuan</th>
-                                    <th style="width:12%">Total</th>
-                                    <th style="width:12%">H Actual</th>
-                                    <th style="width:12%">Total</th>
-                                    <th style="width:5%">Sts</th>
+                                    <th style="width:8%">Satuan</th>
+                                    <th style="width:15%">Total</th>
+                                    <th style="width:5%"></th>
                                   </tr>
                                 </thead>
-                                @else
-                                  <thead>
-                                    <tr style="background:#bcbcc7">
-                                      <th style="width: 10px">No</th>
-                                      <th style="width:15%">Kode</th>
-                                      <th>Material</th>
-                                      <th style="width:15%">H.Satuan</th>
-                                      <th style="width:8%">Qty</th>
-                                      <th style="width:15%">Total</th>
-                                    </tr>
-                                  </thead>
-                                @endif
+                                <tbody id="tampil_material"></tbody>
+                                
                                 <tbody id="tampil-material-save"></tbody>
                                 
                               </table>
                             </div>
                         </div>
-                        
+                        <div class="box-footer" style="text-align:center">
+                          
+                              
+                        </div>
                       </div>
 
                       <div class="tab-pane" id="tab_3">
@@ -280,10 +290,15 @@
                                 <thead>
                                   <tr style="background:#bcbcc7">
                                     <th style="width: 10px">No</th>
-                                    <th>Keterangan</th>
+                                    <th>Keterangan Biaya</th>
                                     <th style="width:14%">Biaya</th>
+                                    <th style="width:8%">F(x)</th>
+                                    <th style="width:14%">Tot Biaya</th>
+                                    <th style="width:5%"></th>
                                   </tr>
                                 </thead>
+                                <tbody id="tampil_operasional"></tbody>
+                                
                                 <tbody id="tampil-operasional-save"></tbody>
                                 
                               </table>
@@ -291,90 +306,43 @@
                           
                             </div>
                           </div>
-                          
+                          <div class="box-footer" style="text-align:center">
+                            
+                          </div>
                       </div>
-                      <div class="tab-pane " id="tab_5">
+                      <div class="tab-pane" id="tab_5">
                       
-                        <div class="box-body">
-                          
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Deskripsi Bidding</label>
+                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Cost Jasa</label>
 
                           </div>
                           <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Bidding (Rp)</label>
-
-                            <div class="col-sm-2">
-                              <input type="text"   name="nilai_bidding" readonly class="form-control  input-sm" value="{{uang($data->nilai_bidding)}}" placeholder="">
-                            </div>
-                            <div class="col-sm-7">
-                              <input type="text"  id="out" readonly name="terbilang" value="{{terbilang($data->nilai_bidding)}} rupiah" class="form-control  input-sm" placeholder="">
-                            </div>
+                            <label for="inputEmail3" class="col-sm-1 control-label" style="width:2%"></label>
                             
-                            
-                          </div>
-                          <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Tanggal Bidding</label>
-
-                            <div class="col-sm-2">
-                              <div class="input-group">
-                                <span class="input-group-addon" ><i class="fa fa-calendar"></i></span>
-                                <input type="text" id="bidding_date" readonly name="bidding_date"  value="{{$data->bidding_date}}" class="form-control  input-sm" placeholder="yyyy-mm-dd">
-                              </div>
-                            </div>
-                            
-                          </div>
-                          <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Status Bidding</label>
-
-                            <div class="col-sm-4">
-                              <div class="input-group">
-                                <span class="input-group-addon" ><i class="fa  fa-chevron-down"></i></span>
-                                @if($data->status_id==50)
-                                <input type="text" id="bidding_date" readonly name="bidding_date"  value="Cancel Proses" class="form-control  input-sm" placeholder="yyyy-mm-dd">
-                                @else
-                                <input type="text" id="bidding_date" readonly name="bidding_date"  value="Lolos dan lanjut" class="form-control  input-sm" placeholder="yyyy-mm-dd">
-                                @endif
+                            <div class="col-sm-11">
+                              <table class="table table-bordered" id="">
+                                <thead>
+                                  <tr style="background:#bcbcc7">
+                                    <th style="width: 10px">No</th>
+                                    <th>Keterangan Biaya</th>
+                                    <th style="width:14%">Biaya</th>
+                                    <th style="width:8%">F(x)</th>
+                                    <th style="width:14%">Tot Biaya</th>
+                                    <th style="width:5%"></th>
+                                  </tr>
+                                </thead>
+                                <tbody id="tampil_jasa"></tbody>
                                 
-                              </div>
+                                <tbody id="tampil-jasa-save"></tbody>
+                                
+                              </table>
+                        
+                          
                             </div>
+                          </div>
+                          <div class="box-footer" style="text-align:center">
                             
                           </div>
-                          <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Catatan Hasil Bidding</label>
-                              <div class="col-sm-10">
-                              <textarea  class="form-control input-sm" disabled name="hasil_bidding" placeholder="Ketik..." rows="7">{{$data->hasil_bidding}}</textarea>
-                            </div>
-                          </div>
-                          
-                          
-                          
-                          
-                        </div>
-                          
-                      </div>
-                      <div class="tab-pane" id="tab_6">
-                        <div class="box-body">
-                          
-                          <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-11 control-label" id="header-label"><i class="fa fa-bars"></i> Informasi Hasil Negosiasi</label>
-
-                          </div>
-                          <div class="form-group">
-                            <label for="inputEmail3" class="col-sm-2 control-label">Nilai Kontrak (Rp)</label>
-
-                            <div class="col-sm-2">
-                              <input type="text"  id="nilai_negosiasi" readonly name="nilai_negosiasi"  class="form-control  input-sm" value="{{uang($data->nilai_project)}}" placeholder="">
-                            </div>
-                            <div class="col-sm-7">
-                              <input type="text"  id="out" readonly name="terbilang" value="{{terbilang($data->nilai_project)}} rupiah" class="form-control  input-sm" placeholder="">
-                            </div>
-                            
-                            
-                          </div>
-                          
-                          
-                        </div>
                       </div>
                     </div>
                     <!-- /.box-body -->
@@ -429,6 +397,6 @@
        $('#tampil-risiko-save').load("{{url('project/tampil_risiko_view')}}?id={{$data->id}}");
        $('#tampil-operasional-save').load("{{url('project/tampil_operasional')}}?id={{$data->id}}&act=1");
        $('#tampil-material-save').load("{{url('project/tampil_material')}}?id={{$data->id}}&act=1");
-        
+       $('#tampil-jasa-save').load("{{url('project/tampil_jasa')}}?id={{$data->id}}&act=1"); 
     </script> 
 @endpush
