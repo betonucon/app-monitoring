@@ -603,7 +603,8 @@
 <!-- ./wrapper -->
 
 <!-- jQuery 3 -->
-<script src="{{url_plug()}}/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- <script src="{{url_plug()}}/bower_components/jquery/dist/jquery.min.js"></script> -->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <!-- Bootstrap 3.3.7 -->
 <script src="{{url_plug()}}/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- Select2 -->
@@ -632,7 +633,7 @@
 <!-- AdminLTE App -->
 <script src="{{url_plug()}}/dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
-
+<script src="{{url_plug()}}/dist/js/demo.js"></script>
 <link rel="stylesheet" type="text/css" href="{{url_plug()}}/dist/jquery.dataTables.css">
   
 <script type="text/javascript" charset="utf8" src="{{url_plug()}}/dist/jquery.dataTables.js"></script>
