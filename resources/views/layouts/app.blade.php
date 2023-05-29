@@ -632,28 +632,29 @@
 <!-- AdminLTE App -->
 <script src="{{url_plug()}}/dist/js/adminlte.min.js"></script>
 <!-- AdminLTE for demo purposes -->
-<script src="{{url_plug()}}/dist/js/demo.js"></script>
+
 <link rel="stylesheet" type="text/css" href="{{url_plug()}}/dist/jquery.dataTables.css">
   
 <script type="text/javascript" charset="utf8" src="{{url_plug()}}/dist/jquery.dataTables.js"></script>
-
+@stack('datatable')
+@stack('ajax')
 <!-- Page script -->
 <script type="text/javascript">
    
-     function load(){
-			document.getElementById("loadpage").style.width = "100%";
-		}
-		function close_load(){
-			document.getElementById("loadpage").style.width = "0%";
-		}
-		$(document).ready(function() {
+    //  function load(){
+		// 	document.getElementById("loadpage").style.width = "100%";
+		// }
+		// function close_load(){
+		// 	document.getElementById("loadpage").style.width = "0%";
+		// }
+		// $(document).ready(function() {
 			
-			load();
-		});
+		// 	load();
+		// });
 		
-		window.setTimeout(function () {
-			document.getElementById("loadpage").style.width = "0%";
-		}, 1000);
+		// window.setTimeout(function () {
+		// 	document.getElementById("loadpage").style.width = "0%";
+		// }, 1000);
 
 
     $('#tanggal_app').datepicker({
@@ -749,7 +750,6 @@
 
         }
   </script>
-@stack('datatable')
-@stack('ajax')
+
 </body>
 </html>
