@@ -670,7 +670,7 @@
         $('#tampil-jasa-save').load("{{url('project/tampil_jasa')}}?id={{$data->id}}");
         $(document).ready(function(e) {
           $('#save-jasa').hide();
-          var nom = {{$nomjasa}};
+          var nom = 1;
             $("#addjasa").click(function(){
                 var no = nom++;
                 $("#tampil_jasa").append('<tr style="background:#fff" class="addjasa">'
