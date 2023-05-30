@@ -91,6 +91,8 @@ Route::group(['prefix' => 'material','middleware'    => 'auth'],function(){
     Route::post('/store_stok',[MaterialController::class, 'store_stok']);
 });
 
+
+
 Route::group(['prefix' => 'project','middleware'    => 'auth'],function(){
     Route::get('/',[ProjectController::class, 'index']);
     Route::get('/view',[ProjectController::class, 'view_data']);
