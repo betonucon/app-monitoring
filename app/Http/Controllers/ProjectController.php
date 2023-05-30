@@ -78,13 +78,7 @@ class ProjectController extends Controller
             $tab=$request->tab;
         }
         
-        if($id==0){
-            $disabled='';
-            $nom=1;
-            $nomper=1;
-            $nomjasa=1;
-            $nommat=1;
-        }else{
+        if($id>0){
             $disabled='readonly';
             $connomor=ProjectRisiko::where('project_header_id',$id)->count();
             $connomoropr=ProjectMaterial::where('project_header_id',$id)->where('kategori_ide',2)->where('state',1)->count();
@@ -94,6 +88,14 @@ class ProjectController extends Controller
             $nomper=($connomoropr+1);
             $nommat=($connomormat+1);
             $nomjasa=($connomorjasa+1);
+
+            
+        }else{
+            $disabled='';
+            $nom=1;
+            $nomper=1;
+            $nomjasa=1;
+            $nommat=1;
         }
         if(Auth::user()->role_id==6){
             if($data->status_id==1){
