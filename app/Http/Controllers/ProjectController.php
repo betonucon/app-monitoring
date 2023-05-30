@@ -97,6 +97,7 @@ class ProjectController extends Controller
             $nomjasa=1;
             $nommat=1;
         }
+        dd($nomjasa);
         if(Auth::user()->role_id==6){
             if($data->status_id==1){
                 return view('project.view_data',compact('template','data','disabled','id','nom','nomper','nommat','tab','nomjasa'));
